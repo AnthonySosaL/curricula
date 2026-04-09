@@ -1,50 +1,85 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { profile } from '@/data/portfolio';
 import { GithubIcon, LinkedinIcon } from '@/components/ui/BrandIcons';
 import { Mail, Download, ChevronDown } from 'lucide-react';
 
+// phase thresholds
+const HERO_END    = 0.20;
+const MAIN_START  = 0.20;
+const MAIN_END    = 0.78;
+const LEAVE_START = 0.78;
+
+function applyFade(el: HTMLDivElement | null, visible: boolean) {
+  if (!el) return;
+  el.style.opacity      = visible ? '1' : '0';
+  el.style.transform    = visible ? 'translateY(0)' : 'translateY(20px)';
+  el.style.pointerEvents = visible ? 'auto' : 'none';
+}
+
 export function ScrollVideoSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [progress, setProgress] = useState(0);
+  const sectionRef  = useRef<HTMLDivElement>(null);
+  const videoRef    = useRef<HTMLVideoElement>(null);
+  const topRef      = useRef(0);
+  const scrollableRef = useRef(0);
+
+  // Phase panel refs
+  const heroRef    = useRef<HTMLDivElement>(null);
+  const mainRef    = useRef<HTMLDivElement>(null);
+  const leavingRef = useRef<HTMLDivElement>(null);
+  // Progress bar ref
+  const barRef     = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const cachePos = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+      topRef.current        = el.getBoundingClientRect().top + window.scrollY;
+      scrollableRef.current = el.offsetHeight - window.innerHeight;
+    };
+    cachePos();
+    window.addEventListener('resize', cachePos, { passive: true });
+
+    // Set initial state — hero visible
+    applyFade(heroRef.current, true);
+    applyFade(mainRef.current, false);
+    applyFade(leavingRef.current, false);
+
     let rafId: number;
-    let lastScrollY = -1; // -1 fuerza la primera actualización
+    let lastPhase = -1; // -1=uninit, 0=hero, 1=main, 2=leaving
 
     const tick = () => {
-      const section = sectionRef.current;
-      const video = videoRef.current;
-      if (section && video) {
-        const currentScrollY = window.scrollY;
-        if (currentScrollY !== lastScrollY || rafId === undefined) {
-          lastScrollY = currentScrollY;
-          const scrollable = section.offsetHeight - window.innerHeight;
-          const p = Math.max(0, Math.min(1, (currentScrollY - section.offsetTop) / scrollable));
-          setProgress(p);
-          if (video.readyState >= 2 && video.duration) {
-            video.currentTime = 1 + p * (video.duration - 1);
-          }
+      const scrollable = scrollableRef.current;
+      if (scrollable > 0) {
+        const y = window.scrollY;
+        const p = Math.max(0, Math.min(1, (y - topRef.current) / scrollable));
+
+        // Scrub video
+        const vid = videoRef.current;
+        if (vid && vid.readyState >= 2 && vid.duration) {
+          vid.currentTime = 1 + p * (vid.duration - 1);
+        }
+
+        // Progress bar — always update (cheap, no layout)
+        if (barRef.current) barRef.current.style.width = `${p * 100}%`;
+
+        // Phase transitions — only update DOM on change
+        const phase = p < HERO_END ? 0 : p < MAIN_END ? 1 : 2;
+        if (phase !== lastPhase) {
+          lastPhase = phase;
+          applyFade(heroRef.current,    phase === 0);
+          applyFade(mainRef.current,    phase === 1);
+          applyFade(leavingRef.current, phase === 2);
         }
       }
       rafId = requestAnimationFrame(tick);
     };
 
     rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', cachePos);
+    };
   }, []);
-
-  // Fases: hero (0-20%), main con info (20-78%), salida (78-100%)
-  const isHero = progress < 0.20;
-  const isMain = progress >= 0.20 && progress < 0.78;
-  const isLeaving = progress >= 0.78;
-
-  const fadeIn = (visible: boolean, delay = 0): React.CSSProperties => ({
-    opacity: visible ? 1 : 0,
-    transform: visible ? 'translateY(0)' : 'translateY(20px)',
-    transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`,
-    pointerEvents: visible ? 'auto' : 'none',
-  });
 
   return (
     <section ref={sectionRef} id="inicio" style={{ height: '500vh' }} className="relative">
@@ -66,8 +101,9 @@ export function ScrollVideoSection() {
 
         {/* FASE HERO — nombre, foto, CTAs */}
         <div
+          ref={heroRef}
           className="absolute inset-0 flex flex-col items-center justify-center text-center px-6"
-          style={fadeIn(isHero)}
+          style={{ opacity: 1, transform: 'translateY(0)', transition: 'opacity 0.6s ease, transform 0.6s ease', willChange: 'opacity, transform' }}
         >
           {/* Avatar */}
           <div className="mb-6">
@@ -141,8 +177,9 @@ export function ScrollVideoSection() {
 
         {/* FASE MAIN — datos + bio */}
         <div
+          ref={mainRef}
           className="absolute inset-0 flex flex-col items-center justify-center text-center px-6"
-          style={fadeIn(isMain)}
+          style={{ opacity: 0, transform: 'translateY(20px)', transition: 'opacity 0.6s ease, transform 0.6s ease', pointerEvents: 'none', willChange: 'opacity, transform' }}
         >
           <span className="text-xs uppercase tracking-widest text-orange-300 font-semibold mb-4 px-3 py-1 rounded-full border border-orange-300/40 bg-black/20">
             Full Stack Developer
@@ -165,8 +202,8 @@ export function ScrollVideoSection() {
               { value: '3+', label: 'años exp.' },
               { value: '4', label: 'empresas' },
               { value: '30+', label: 'tecnologías' },
-            ].map(({ value, label }, i) => (
-              <div key={label} className="text-center" style={fadeIn(isMain, i * 100)}>
+            ].map(({ value, label }) => (
+              <div key={label} className="text-center">
                 <p className="text-3xl font-bold text-white drop-shadow">{value}</p>
                 <p className="text-xs text-white/55 uppercase tracking-wide mt-0.5">{label}</p>
               </div>
@@ -176,8 +213,9 @@ export function ScrollVideoSection() {
 
         {/* FASE SALIDA */}
         <div
+          ref={leavingRef}
           className="absolute inset-0 flex flex-col items-center justify-center text-center"
-          style={fadeIn(isLeaving)}
+          style={{ opacity: 0, transform: 'translateY(20px)', transition: 'opacity 0.6s ease, transform 0.6s ease', pointerEvents: 'none', willChange: 'opacity, transform' }}
         >
           <p className="text-white/50 text-sm uppercase tracking-[0.25em]">Explorando habilidades</p>
           <div className="w-px h-10 bg-gradient-to-b from-white/40 to-transparent mx-auto mt-3" />
@@ -185,7 +223,7 @@ export function ScrollVideoSection() {
 
         {/* Barra de progreso */}
         <div className="absolute bottom-0 left-0 h-0.5 bg-white/10 w-full">
-          <div className="h-full bg-orange-400 transition-none" style={{ width: `${progress * 100}%` }} />
+          <div ref={barRef} className="h-full bg-orange-400" style={{ width: '0%' }} />
         </div>
       </div>
     </section>

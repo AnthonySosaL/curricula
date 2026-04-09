@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Menu, X, ArrowUp } from 'lucide-react';
 import { profile } from '@/data/portfolio';
 import { ScrollVideoSection } from './sections/ScrollVideoSection';
@@ -143,39 +143,46 @@ function Navbar({ onAdminClick }: { onAdminClick: () => void }) {
 }
 
 function ScrollProgress() {
-  const [progress, setProgress] = useState(0);
+  const barRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const fn = () => {
       const total = document.body.scrollHeight - window.innerHeight;
-      setProgress(total > 0 ? (window.scrollY / total) * 100 : 0);
+      if (barRef.current) barRef.current.style.width = total > 0 ? `${(window.scrollY / total) * 100}%` : '0%';
     };
     window.addEventListener('scroll', fn, { passive: true });
     return () => window.removeEventListener('scroll', fn);
   }, []);
   return (
     <div className="fixed top-0 left-0 right-0 z-[60] h-0.5 pointer-events-none">
-      <div
-        className="h-full bg-gradient-to-r from-[var(--color-primary)] to-blue-400"
-        style={{ width: `${progress}%`, transition: 'width 0.1s linear' }}
-      />
+      <div ref={barRef} className="h-full bg-gradient-to-r from-[var(--color-primary)] to-blue-400" style={{ width: '0%', transition: 'width 0.1s linear' }} />
     </div>
   );
 }
 
 function BackToTop() {
-  const [show, setShow] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    const fn = () => setShow(window.scrollY > 600);
+    let last = false;
+    const fn = () => {
+      const show = window.scrollY > 600;
+      if (show !== last) {
+        last = show;
+        if (btnRef.current) {
+          btnRef.current.style.opacity      = show ? '1' : '0';
+          btnRef.current.style.transform    = show ? 'scale(1)' : 'scale(0.75)';
+          btnRef.current.style.pointerEvents = show ? 'auto' : 'none';
+        }
+      }
+    };
     window.addEventListener('scroll', fn, { passive: true });
     return () => window.removeEventListener('scroll', fn);
   }, []);
   return (
     <button
+      ref={btnRef}
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className={cn(
-        'fixed bottom-6 right-6 z-50 w-11 h-11 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center shadow-[var(--shadow-lg)] hover:bg-[var(--color-primary-dark)] hover:-translate-y-1 transition-all duration-300',
-        show ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none',
-      )}
+      className="fixed bottom-6 right-6 z-50 w-11 h-11 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center shadow-[var(--shadow-lg)] hover:bg-[var(--color-primary-dark)] hover:-translate-y-1 transition-all duration-300"
+      style={{ opacity: 0, transform: 'scale(0.75)', pointerEvents: 'none' }}
       aria-label="Volver al inicio"
     >
       <ArrowUp size={18} />

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Users, Lightbulb, Zap, Target, GitMerge, MessageSquare } from 'lucide-react';
 import { skills } from '@/data/portfolio';
 
@@ -31,30 +31,100 @@ const PHASES = [
 ];
 
 export function SkillsSection({ className = 'bg-white' }: { className?: string }) {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [phase, setPhase] = useState(0);
+  const sectionRef    = useRef<HTMLDivElement>(null);
+  const topRef        = useRef(0);
+  const scrollableRef = useRef(0);
+
+  // Phase title refs
+  const title0Ref = useRef<HTMLDivElement>(null);
+  const title1Ref = useRef<HTMLDivElement>(null);
+  // Phase content refs
+  const content0Ref = useRef<HTMLDivElement>(null);
+  const content1Ref = useRef<HTMLDivElement>(null);
+  // Progress bar refs
+  const barRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const barsAnimated = useRef(false);
+  // Pill refs
+  const pill0Ref = useRef<HTMLDivElement>(null);
+  const pill1Ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let rafId: number;
-    let lastY = -1;
-    const tick = () => {
+    const cachePos = () => {
       const el = sectionRef.current;
-      if (el) {
+      if (!el) return;
+      topRef.current        = el.getBoundingClientRect().top + window.scrollY;
+      scrollableRef.current = el.offsetHeight - window.innerHeight;
+    };
+    cachePos();
+    window.addEventListener('resize', cachePos, { passive: true });
+
+    let rafId: number;
+    let lastPhase = -1;
+
+    const tick = () => {
+      const scrollable = scrollableRef.current;
+      if (scrollable > 0) {
         const y = window.scrollY;
-        if (y !== lastY) {
-          lastY = y;
-          const top = el.getBoundingClientRect().top + y;
-          const scrollable = el.offsetHeight - window.innerHeight;
-          if (scrollable > 0) {
-            const p = Math.max(0, Math.min(1, (y - top) / scrollable));
-            setPhase(p < 0.5 ? 0 : 1);
+        const p = Math.max(0, Math.min(1, (y - topRef.current) / scrollable));
+        const phase = p < 0.5 ? 0 : 1;
+
+        if (phase !== lastPhase) {
+          lastPhase = phase;
+
+          // Titles
+          if (title0Ref.current) {
+            title0Ref.current.style.opacity   = phase === 0 ? '1' : '0';
+            title0Ref.current.style.transform = phase === 0 ? 'translateY(0)' : 'translateY(-14px)';
+            title0Ref.current.style.pointerEvents = phase === 0 ? 'auto' : 'none';
+          }
+          if (title1Ref.current) {
+            title1Ref.current.style.opacity   = phase === 1 ? '1' : '0';
+            title1Ref.current.style.transform = phase === 1 ? 'translateY(0)' : 'translateY(14px)';
+            title1Ref.current.style.pointerEvents = phase === 1 ? 'auto' : 'none';
+          }
+
+          // Content panels
+          if (content0Ref.current) {
+            content0Ref.current.style.opacity   = phase === 0 ? '1' : '0';
+            content0Ref.current.style.transform = phase === 0 ? 'translateY(0)' : 'translateY(-28px)';
+            content0Ref.current.style.pointerEvents = phase === 0 ? 'auto' : 'none';
+          }
+          if (content1Ref.current) {
+            content1Ref.current.style.opacity   = phase === 1 ? '1' : '0';
+            content1Ref.current.style.transform = phase === 1 ? 'translateY(0)' : 'translateY(28px)';
+            content1Ref.current.style.pointerEvents = phase === 1 ? 'auto' : 'none';
+          }
+
+          // Pills
+          if (pill0Ref.current) {
+            pill0Ref.current.style.width      = phase === 0 ? '28px' : '8px';
+            pill0Ref.current.style.background = phase === 0 ? 'var(--color-primary)' : 'var(--color-border)';
+          }
+          if (pill1Ref.current) {
+            pill1Ref.current.style.width      = phase === 1 ? '28px' : '8px';
+            pill1Ref.current.style.background = phase === 1 ? 'var(--color-primary)' : 'var(--color-border)';
+          }
+
+          // Progress bars (animate in when entering phase 1, reset on phase 0)
+          if (phase === 1 && !barsAnimated.current) {
+            barsAnimated.current = true;
+            barRefs.current.forEach((bar, i) => {
+              if (bar) bar.style.width = `${SOFT_SKILLS[i].level}%`;
+            });
+          } else if (phase === 0 && barsAnimated.current) {
+            barsAnimated.current = false;
+            barRefs.current.forEach(bar => { if (bar) bar.style.width = '0%'; });
           }
         }
       }
       rafId = requestAnimationFrame(tick);
     };
+
     rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', cachePos);
+    };
   }, []);
 
   return (
@@ -62,30 +132,31 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
       <div className={`sticky top-0 h-screen overflow-hidden flex flex-col justify-center px-4 ${className}`}>
         <div className="max-w-5xl mx-auto w-full">
 
-          {/* Badge siempre visible */}
+          {/* Badge */}
           <div className="text-center mb-5">
             <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-xs font-semibold uppercase tracking-widest">
               Habilidades
             </span>
           </div>
 
-          {/* Títulos animados por fase */}
+          {/* Títulos por fase */}
           <div className="relative text-center mb-7" style={{ minHeight: '64px' }}>
-            {PHASES.map((p, i) => (
-              <div
-                key={i}
-                className="absolute inset-0 flex flex-col items-center justify-center"
-                style={{
-                  opacity: phase === i ? 1 : 0,
-                  transform: phase === i ? 'translateY(0)' : phase > i ? 'translateY(-14px)' : 'translateY(14px)',
-                  transition: 'opacity 0.45s ease, transform 0.45s ease',
-                  pointerEvents: phase === i ? 'auto' : 'none',
-                }}
-              >
-                <h2 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg">{p.title}</h2>
-                <p className="mt-1.5 text-white/75 text-sm max-w-lg drop-shadow">{p.subtitle}</p>
-              </div>
-            ))}
+            <div
+              ref={title0Ref}
+              className="absolute inset-0 flex flex-col items-center justify-center"
+              style={{ opacity: 1, transform: 'translateY(0)', transition: 'opacity 0.45s ease, transform 0.45s ease', willChange: 'opacity, transform' }}
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg">{PHASES[0].title}</h2>
+              <p className="mt-1.5 text-white/75 text-sm max-w-lg drop-shadow">{PHASES[0].subtitle}</p>
+            </div>
+            <div
+              ref={title1Ref}
+              className="absolute inset-0 flex flex-col items-center justify-center"
+              style={{ opacity: 0, transform: 'translateY(14px)', transition: 'opacity 0.45s ease, transform 0.45s ease', pointerEvents: 'none', willChange: 'opacity, transform' }}
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg">{PHASES[1].title}</h2>
+              <p className="mt-1.5 text-white/75 text-sm max-w-lg drop-shadow">{PHASES[1].subtitle}</p>
+            </div>
           </div>
 
           {/* Contenido de fases */}
@@ -93,19 +164,15 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
 
             {/* Fase 0 — Stack Tecnológico */}
             <div
+              ref={content0Ref}
               className="absolute inset-0"
-              style={{
-                opacity: phase === 0 ? 1 : 0,
-                transform: phase === 0 ? 'translateY(0)' : 'translateY(-28px)',
-                transition: 'opacity 0.45s ease, transform 0.45s ease',
-                pointerEvents: phase === 0 ? 'auto' : 'none',
-              }}
+              style={{ opacity: 1, transform: 'translateY(0)', transition: 'opacity 0.45s ease, transform 0.45s ease', willChange: 'opacity, transform' }}
             >
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 {skills.map(({ category, items }) => {
                   const colors = CATEGORY_COLORS[category] ?? { badge: 'bg-slate-50 text-slate-600 border-slate-200', icon: 'bg-slate-100 text-slate-500' };
                   return (
-                    <div key={category} className="bg-[var(--color-bg)] rounded-2xl p-5 border border-[var(--color-border)] hover:border-[var(--color-primary)]/30 hover:shadow-[var(--shadow-md)] transition-all">
+                    <div key={category} className="bg-[var(--color-bg)] rounded-2xl p-5 border border-[var(--color-border)] hover:border-[var(--color-primary)]/30 hover:shadow-[var(--shadow-md)] transition-shadow">
                       <div className="flex items-center gap-2 mb-3">
                         <span className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm ${colors.icon}`}>
                           {CATEGORY_EMOJI[category] ?? '🔧'}
@@ -115,7 +182,7 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
                       </div>
                       <div className="flex flex-wrap gap-1.5">
                         {items.map(skill => (
-                          <span key={skill} className={`px-2.5 py-0.5 rounded-full text-xs font-medium border cursor-default ${colors.badge}`}>{skill}</span>
+                          <span key={skill} className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${colors.badge}`}>{skill}</span>
                         ))}
                       </div>
                     </div>
@@ -126,17 +193,13 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
 
             {/* Fase 1 — Habilidades Blandas */}
             <div
+              ref={content1Ref}
               className="absolute inset-0"
-              style={{
-                opacity: phase === 1 ? 1 : 0,
-                transform: phase === 1 ? 'translateY(0)' : 'translateY(28px)',
-                transition: 'opacity 0.45s ease, transform 0.45s ease',
-                pointerEvents: phase === 1 ? 'auto' : 'none',
-              }}
+              style={{ opacity: 0, transform: 'translateY(28px)', transition: 'opacity 0.45s ease, transform 0.45s ease', pointerEvents: 'none', willChange: 'opacity, transform' }}
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {SOFT_SKILLS.map(({ name, icon: Icon, level, desc, color }) => (
-                  <div key={name} className="bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border)] p-4 hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all">
+                {SOFT_SKILLS.map(({ name, icon: Icon, level, desc, color }, i) => (
+                  <div key={name} className="bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border)] p-4 hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-shadow">
                     <div className="flex items-center gap-3 mb-2">
                       <span className={`w-9 h-9 rounded-xl flex items-center justify-center ${color}`}>
                         <Icon size={16} />
@@ -147,11 +210,9 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
                     <p className="text-xs text-[var(--color-text-muted)] mb-2.5 leading-snug">{desc}</p>
                     <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
                       <div
+                        ref={el => { barRefs.current[i] = el; }}
                         className="h-full rounded-full bg-gradient-to-r from-[var(--color-primary)] to-blue-400"
-                        style={{
-                          width: phase === 1 ? `${level}%` : '0%',
-                          transition: 'width 1s cubic-bezier(0.22, 1, 0.36, 1)',
-                        }}
+                        style={{ width: '0%', transition: 'width 1s cubic-bezier(0.22, 1, 0.36, 1)' }}
                       />
                     </div>
                   </div>
@@ -160,18 +221,10 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
             </div>
           </div>
 
-          {/* Indicador de fase (pills) */}
+          {/* Pills */}
           <div className="flex justify-center gap-2 mt-5">
-            {PHASES.map((_, i) => (
-              <div
-                key={i}
-                className="h-1 rounded-full transition-all duration-400"
-                style={{
-                  width: phase === i ? '28px' : '8px',
-                  background: phase === i ? 'var(--color-primary)' : 'var(--color-border)',
-                }}
-              />
-            ))}
+            <div ref={pill0Ref} className="h-1 rounded-full" style={{ width: '28px', background: 'var(--color-primary)', transition: 'width 0.3s ease, background 0.3s ease' }} />
+            <div ref={pill1Ref} className="h-1 rounded-full" style={{ width: '8px', background: 'var(--color-border)', transition: 'width 0.3s ease, background 0.3s ease' }} />
           </div>
 
         </div>
@@ -180,7 +233,6 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
   );
 }
 
-// Reutilizable en otras secciones
 export function SectionHeader({
   label, title, subtitle, inView = true,
 }: { label: string; title: string; subtitle?: string; inView?: boolean }) {

@@ -1,32 +1,84 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Briefcase, MapPin } from 'lucide-react';
 import { experience } from '@/data/portfolio';
 
 export function ExperienceSection({ className = 'bg-[var(--color-bg)]' }: { className?: string }) {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [jobIndex, setJobIndex] = useState(0);
+  const sectionRef    = useRef<HTMLDivElement>(null);
+  const topRef        = useRef(0);
+  const scrollableRef = useRef(0);
+
+  // Card refs — one per job
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // Dot refs — one per job
+  const dotRefs  = useRef<(HTMLDivElement | null)[]>([]);
+  // Counter text ref
+  const counterRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    let rafId: number;
-    let lastY = -1;
-    const tick = () => {
+    const cachePos = () => {
       const el = sectionRef.current;
-      if (el) {
-        const y = window.scrollY;
-        if (y !== lastY) {
-          lastY = y;
-          const top = el.getBoundingClientRect().top + y;
-          const scrollable = el.offsetHeight - window.innerHeight;
-          if (scrollable > 0) {
-            const p = Math.max(0, Math.min(1, (y - top) / scrollable));
-            setJobIndex(Math.min(experience.length - 1, Math.floor(p * experience.length)));
+      if (!el) return;
+      topRef.current        = el.getBoundingClientRect().top + window.scrollY;
+      scrollableRef.current = el.offsetHeight - window.innerHeight;
+    };
+    cachePos();
+    window.addEventListener('resize', cachePos, { passive: true });
+
+    let rafId: number;
+    let lastJobIndex = -1;
+
+    const tick = () => {
+      const scrollable = scrollableRef.current;
+      if (scrollable > 0) {
+        const y  = window.scrollY;
+        const p  = Math.max(0, Math.min(1, (y - topRef.current) / scrollable));
+        const ji = Math.min(experience.length - 1, Math.floor(p * experience.length));
+
+        if (ji !== lastJobIndex) {
+          const prev = lastJobIndex;
+          lastJobIndex = ji;
+
+          // Counter text
+          if (counterRef.current) {
+            counterRef.current.textContent = `Experiencia ${ji + 1} / ${experience.length}`;
           }
+
+          // Cards
+          cardRefs.current.forEach((card, i) => {
+            if (!card) return;
+            if (i === ji) {
+              card.style.opacity      = '1';
+              card.style.transform    = 'translateY(0) scale(1)';
+              card.style.pointerEvents = 'auto';
+            } else {
+              card.style.opacity      = '0';
+              card.style.transform    = i < ji
+                ? 'translateY(-24px) scale(0.97)'
+                : 'translateY(24px) scale(0.97)';
+              card.style.pointerEvents = 'none';
+            }
+          });
+
+          // Dots
+          dotRefs.current.forEach((dot, i) => {
+            if (!dot) return;
+            dot.style.width      = i === ji ? '32px' : '8px';
+            dot.style.background = i <= ji
+              ? 'var(--color-primary)'
+              : 'var(--color-border)';
+          });
+
+          void prev; // suppress unused warning
         }
       }
       rafId = requestAnimationFrame(tick);
     };
+
     rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', cachePos);
+    };
   }, []);
 
   return (
@@ -36,8 +88,11 @@ export function ExperienceSection({ className = 'bg-[var(--color-bg)]' }: { clas
 
           {/* Header */}
           <div className="text-center mb-7">
-            <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-xs font-semibold uppercase tracking-widest mb-3">
-              Experiencia {jobIndex + 1} / {experience.length}
+            <span
+              ref={counterRef}
+              className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-xs font-semibold uppercase tracking-widest mb-3"
+            >
+              Experiencia 1 / {experience.length}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg">Trayectoria Profesional</h2>
             <p className="mt-1.5 text-white/75 text-sm drop-shadow">Empresas y roles donde he aportado valor</p>
@@ -48,16 +103,14 @@ export function ExperienceSection({ className = 'bg-[var(--color-bg)]' }: { clas
             {experience.map((job, i) => (
               <div
                 key={i}
+                ref={el => { cardRefs.current[i] = el; }}
                 className="absolute inset-0"
                 style={{
-                  opacity: jobIndex === i ? 1 : 0,
-                  transform: jobIndex === i
-                    ? 'translateY(0) scale(1)'
-                    : jobIndex > i
-                      ? 'translateY(-24px) scale(0.97)'
-                      : 'translateY(24px) scale(0.97)',
+                  opacity: i === 0 ? 1 : 0,
+                  transform: i === 0 ? 'translateY(0) scale(1)' : 'translateY(24px) scale(0.97)',
                   transition: 'opacity 0.45s ease, transform 0.45s ease',
-                  pointerEvents: jobIndex === i ? 'auto' : 'none',
+                  pointerEvents: i === 0 ? 'auto' : 'none',
+                  willChange: 'opacity, transform',
                 }}
               >
                 <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow">
@@ -102,10 +155,12 @@ export function ExperienceSection({ className = 'bg-[var(--color-bg)]' }: { clas
             {experience.map((_, i) => (
               <div
                 key={i}
-                className="h-1 rounded-full transition-all duration-400"
+                ref={el => { dotRefs.current[i] = el; }}
+                className="h-1 rounded-full"
                 style={{
-                  width: jobIndex === i ? '32px' : '8px',
-                  background: i <= jobIndex ? 'var(--color-primary)' : 'var(--color-border)',
+                  width: i === 0 ? '32px' : '8px',
+                  background: i === 0 ? 'var(--color-primary)' : 'var(--color-border)',
+                  transition: 'width 0.3s ease, background 0.3s ease',
                 }}
               />
             ))}
