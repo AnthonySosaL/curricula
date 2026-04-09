@@ -1,0 +1,46 @@
+# ── Dependencias ─────────────────────────────────────────────
+node_modules/
+
+# ── Variables de entorno (NUNCA al repositorio) ───────────────
+.env
+.env.local
+.env.production
+.env.*.local
+
+# ── Build outputs ────────────────────────────────────────────
+dist/
+build/
+.next/
+out/
+
+# ── Prisma ───────────────────────────────────────────────────
+generated/
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# ── OS ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── IDE ──────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+
+# ── Testing ──────────────────────────────────────────────────
+coverage/
+
+# ── Vercel ───────────────────────────────────────────────────
+.vercel/
+
+# ── TypeScript ───────────────────────────────────────────────
+*.tsbuildinfo
+
+# ── Videos originales pesados (usar solo los -web.mp4 optimizados) ───
+frontend/public/scroll-video.mp4
+frontend/public/scroll-video-fixed.mp4
+video.mp4
+video2.mp4
+video3.mp4

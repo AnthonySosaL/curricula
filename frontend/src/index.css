@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Tokens de color — Psicología del color para educación
+   Ver src/styles/colors.ts para la documentación completa
+   ============================================================ */
+@layer base {
+  :root {
+    /* Primarios */
+    --color-primary:       #2563eb;
+    --color-primary-light: #eff6ff;
+    --color-primary-dark:  #1e40af;
+
+    /* Éxito / Progreso */
+    --color-success:       #16a34a;
+    --color-success-light: #f0fdf4;
+
+    /* Acento / CTA */
+    --color-accent:        #f59e0b;
+    --color-accent-light:  #fffbeb;
+
+    /* Semánticos */
+    --color-danger:        #ef4444;
+    --color-warning:       #f97316;
+    --color-info:          #0ea5e9;
+
+    /* Superficies */
+    --color-bg:            #f8fafc;
+    --color-card:          #ffffff;
+    --color-border:        #e2e8f0;
+
+    /* Texto */
+    --color-text:          #0f172a;
+    --color-text-secondary:#475569;
+    --color-text-muted:    #94a3b8;
+    --color-text-inverse:  #ffffff;
+
+    /* Sombras */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+    /* Tipografía */
+    --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: ui-monospace, Consolas, 'Courier New', monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+    border-color: var(--color-border);
+  }
+
+  html {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  body {
+    margin: 0;
+  }
+
+  #root {
+    min-height: 100svh;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ============================================================
+   Animaciones de entrada — scroll-triggered via .animate-in
+   ============================================================ */
+@layer utilities {
+  .fade-up {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .fade-up.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .fade-left {
+    opacity: 0;
+    transform: translateX(-24px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .fade-left.animate-in {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .fade-right {
+    opacity: 0;
+    transform: translateX(24px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .fade-right.animate-in {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .scale-in {
+    opacity: 0;
+    transform: scale(0.93);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+  .scale-in.animate-in {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ============================================================
+   Delay helpers para stagger
+   ============================================================ */
+.delay-100 { transition-delay: 100ms; }
+.delay-150 { transition-delay: 150ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-250 { transition-delay: 250ms; }
+.delay-300 { transition-delay: 300ms; }
+.delay-350 { transition-delay: 350ms; }
+.delay-400 { transition-delay: 400ms; }
+.delay-500 { transition-delay: 500ms; }
+
+/* ============================================================
+   Typing cursor blink
+   ============================================================ */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.cursor-blink {
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  background: var(--color-primary);
+  margin-left: 4px;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  animation: blink 1s step-end infinite;
+}
+
+/* ============================================================
+   Glow hover en cards de proyecto
+   ============================================================ */
+.project-card:hover {
+  box-shadow: 0 0 0 1px var(--color-primary), var(--shadow-md);
+}
+
+/* ============================================================
+   Línea de tiempo animada
+   ============================================================ */
+.timeline-line {
+  transform-origin: top;
+  transform: scaleY(0);
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.timeline-line.animate-in {
+  transform: scaleY(1);
+}
+
+/* ============================================================
+   Skill badge hover
+   ============================================================ */
+.skill-badge {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.skill-badge:hover {
+  transform: translateY(-2px) scale(1.06);
+  box-shadow: 0 4px 10px -2px rgb(37 99 235 / 0.2);
+}
