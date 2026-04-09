@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
@@ -9,7 +10,7 @@ import { AppModule } from '../src/app.module';
 import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter';
 import { TransformInterceptor } from '../src/common/interceptors/transform.interceptor';
 
-// Cache the app so it survives across serverless warm invocations
+// Cache the Express instance across warm serverless invocations
 let cachedServer: Express | null = null;
 
 async function bootstrap(): Promise<Express> {
@@ -51,6 +52,13 @@ async function bootstrap(): Promise<Express> {
 }
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
-  const server = await bootstrap();
-  server(req as any, res as any);
+  try {
+    const server = await bootstrap();
+    server(req as any, res as any);
+  } catch (err) {
+    console.error('Bootstrap error:', err);
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ error: 'Server failed to initialize', details: String(err) }));
+  }
 }
