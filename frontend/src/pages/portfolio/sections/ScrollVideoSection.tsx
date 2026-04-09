@@ -4,10 +4,8 @@ import { GithubIcon, LinkedinIcon } from '@/components/ui/BrandIcons';
 import { Mail, Download, ChevronDown } from 'lucide-react';
 
 // phase thresholds
-const HERO_END    = 0.20;
-const MAIN_START  = 0.20;
-const MAIN_END    = 0.78;
-const LEAVE_START = 0.78;
+const HERO_END = 0.20;
+const MAIN_END = 0.78;
 
 function applyFade(el: HTMLDivElement | null, visible: boolean) {
   if (!el) return;
