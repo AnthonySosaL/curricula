@@ -1,5 +1,5 @@
 {
-  "installCommand": "cd frontend && pnpm install && cd ../backend && pnpm install",
+  "installCommand": "cd frontend && pnpm install && cd ../backend && npm install",
   "experimentalServices": {
     "frontend": {
       "entrypoint": "frontend",
