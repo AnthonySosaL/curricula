@@ -2,9 +2,6 @@
   "name": "curricula-root",
   "private": true,
   "version": "1.0.0",
-  "scripts": {
-    "build": "cd frontend && npm install && npm run build"
-  },
   "dependencies": {
     "groq-sdk": "^1.1.2"
   }
