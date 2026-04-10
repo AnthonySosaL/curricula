@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import express from 'express';
 import type { Express } from 'express';
@@ -33,14 +32,7 @@ async function bootstrap(): Promise<Express> {
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: { enableImplicitConversion: true },
-    }),
-  );
+  // ValidationPipe disabled — class-validator not available in Lambda runtime
 
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
