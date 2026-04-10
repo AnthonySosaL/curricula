@@ -1,5 +1,4 @@
 import type { IncomingMessage, ServerResponse } from 'http';
-import Groq from 'groq-sdk';
 
 // ─── System prompt ────────────────────────────────────────────────────────────
 const SYSTEM_PROMPT = `Eres el asistente virtual del portafolio de Anthony Sebastian Sosa Loroña.
@@ -42,7 +41,9 @@ IDIOMAS: Español nativo, Inglés B1
 Si te preguntan algo que no sabes de Anthony, di que no tienes esa información y sugiere contactarlo directamente.
 No inventes información. No respondas preguntas ajenas al portafolio de Anthony.`;
 
-// ─── CORS ─────────────────────────────────────────────────────────────────────
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 function setCors(res: ServerResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS, GET');
@@ -55,7 +56,7 @@ function json(res: ServerResponse, status: number, body: unknown) {
   res.end(JSON.stringify(body));
 }
 
-// ─── Main handler ─────────────────────────────────────────────────────────────
+// ─── Handler ─────────────────────────────────────────────────────────────────
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   setCors(res);
 
@@ -65,51 +66,66 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return;
   }
 
-  // Health check
-  if (req.url?.includes('/health') || req.method === 'GET') {
+  if (req.method === 'GET') {
     return json(res, 200, { status: 'ok', timestamp: new Date().toISOString() });
   }
 
-  // Chat endpoint: POST /api/chat
-  if (req.method === 'POST') {
-    try {
-      const raw = await new Promise<string>((resolve, reject) => {
-        let data = '';
-        req.on('data', (chunk) => (data += chunk));
-        req.on('end', () => resolve(data));
-        req.on('error', reject);
-      });
+  if (req.method !== 'POST') {
+    return json(res, 405, { statusCode: 405, message: 'Method Not Allowed' });
+  }
 
-      const body = JSON.parse(raw) as { messages?: { role: string; content: string }[] };
-      const messages = body?.messages;
+  try {
+    const raw = await new Promise<string>((resolve, reject) => {
+      let data = '';
+      req.on('data', (chunk) => (data += chunk));
+      req.on('end', () => resolve(data));
+      req.on('error', reject);
+    });
 
-      if (!Array.isArray(messages) || messages.length === 0) {
-        return json(res, 400, { statusCode: 400, message: 'messages array is required' });
-      }
+    const body = JSON.parse(raw) as { messages?: { role: string; content: string }[] };
+    const messages = body?.messages;
 
-      const apiKey = process.env.GROQ_API_KEY;
-      if (!apiKey) {
-        return json(res, 500, { statusCode: 500, message: 'GROQ_API_KEY not configured' });
-      }
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return json(res, 400, { statusCode: 400, message: 'messages array is required' });
+    }
 
-      const groq = new Groq({ apiKey });
-      const completion = await groq.chat.completions.create({
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+      return json(res, 500, { statusCode: 500, message: 'GROQ_API_KEY not configured' });
+    }
+
+    // Use fetch directly — avoids groq-sdk ESM bundling issues with ncc
+    const groqResponse = await fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
         model: 'llama-3.1-8b-instant',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
-          ...(messages.slice(-8) as Groq.Chat.ChatCompletionMessageParam[]),
+          ...messages.slice(-8),
         ],
         max_tokens: 300,
         temperature: 0.7,
-      });
+      }),
+    });
 
-      const reply = completion.choices[0]?.message?.content ?? 'Sin respuesta';
-      return json(res, 200, { data: { reply }, timestamp: new Date().toISOString() });
-    } catch (err) {
-      console.error('Chat handler error:', err);
-      return json(res, 500, { statusCode: 500, message: 'Error interno del servidor' });
+    if (!groqResponse.ok) {
+      const errorText = await groqResponse.text();
+      console.error('Groq API error:', errorText);
+      return json(res, 502, { statusCode: 502, message: 'Groq API error' });
     }
-  }
 
-  return json(res, 404, { statusCode: 404, message: 'Not found' });
+    const completion = (await groqResponse.json()) as {
+      choices: { message: { content: string } }[];
+    };
+    const reply = completion.choices[0]?.message?.content ?? 'Sin respuesta';
+
+    return json(res, 200, { data: { reply }, timestamp: new Date().toISOString() });
+  } catch (err) {
+    console.error('Chat handler error:', err);
+    return json(res, 500, { statusCode: 500, message: 'Error interno del servidor' });
+  }
 }
