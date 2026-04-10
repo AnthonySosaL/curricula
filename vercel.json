@@ -17,6 +17,7 @@
       "dest": "/api/chat",
       "methods": ["POST", "OPTIONS"]
     },
+    { "src": "/api/(.+)", "dest": "/api/$1" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
