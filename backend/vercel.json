@@ -10,7 +10,13 @@
       "use": "@vercel/node",
       "config": {
         "includeFiles": ["src/**/*", "prisma/**/*"],
-        "maxDuration": 30
+        "maxDuration": 30,
+        "externalNodeModules": [
+          "@prisma/adapter-neon",
+          "@prisma/driver-adapter-utils",
+          "@neondatabase/serverless",
+          "postgres-array"
+        ]
       }
     }
   ],

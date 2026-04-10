@@ -1,39 +1,68 @@
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
-import { PrismaClient } from '../../generated/prisma-client';
-import { PrismaNeon } from '@prisma/adapter-neon';
 
-function buildClient(): PrismaClient {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) throw new Error('DATABASE_URL no está configurado');
-  const adapter = new PrismaNeon({ connectionString });
+type PrismaClientLike = {
+  user: unknown;
+  $connect(): Promise<void>;
+  $disconnect(): Promise<void>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return new PrismaClient({ adapter } as any);
-}
+  $transaction(args: any): Promise<any>;
+};
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaService.name);
-  private readonly client: PrismaClient;
+  private client: PrismaClientLike | null = null;
 
-  constructor() {
-    this.client = buildClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  get user(): any {
+    if (!this.client) throw new Error('Database not available');
+    return this.client.user;
   }
 
-  // Proxy: delega todas las propiedades al PrismaClient interno
-  // Permite usar this.prisma.user.findMany() en los repositories
-  get user() { return this.client.user; }
+  async $connect() {
+    if (this.client) await this.client.$connect();
+  }
 
-  async $connect() { return this.client.$connect(); }
-  async $disconnect() { return this.client.$disconnect(); }
+  async $disconnect() {
+    if (this.client) await this.client.$disconnect();
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async $transaction(args: any) { return this.client.$transaction(args); }
+  async $transaction(args: any) {
+    if (!this.client) throw new Error('Database not available');
+    return this.client.$transaction(args);
+  }
 
   async onModuleInit() {
-    await this.client.$connect();
-    this.logger.log('Conectado a Neon PostgreSQL');
+    try {
+      const connectionString = process.env.DATABASE_URL;
+      if (!connectionString) {
+        this.logger.warn('DATABASE_URL not configured — DB features disabled');
+        return;
+      }
+
+      // Dynamic requires prevent startup crash when packages aren't bundled
+      // (e.g. Vercel ncc may not bundle @prisma/adapter-neon correctly)
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { PrismaNeon } = require('@prisma/adapter-neon') as {
+        PrismaNeon: new (opts: { connectionString: string }) => unknown;
+      };
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { PrismaClient } = require('../../generated/prisma-client') as {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        PrismaClient: new (opts: any) => PrismaClientLike;
+      };
+
+      const adapter = new PrismaNeon({ connectionString });
+      this.client = new PrismaClient({ adapter });
+      await this.client.$connect();
+      this.logger.log('Conectado a Neon PostgreSQL');
+    } catch (err) {
+      this.logger.warn(`Prisma init failed: ${String(err)} — DB features disabled`);
+    }
   }
 
   async onModuleDestroy() {
-    await this.client.$disconnect();
+    if (this.client) await this.client.$disconnect();
   }
 }
