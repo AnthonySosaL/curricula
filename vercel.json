@@ -1,7 +1,16 @@
 {
-  "buildCommand": "cd frontend && pnpm install && pnpm build",
-  "outputDirectory": "frontend/dist",
-  "installCommand": "npm install",
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    },
+    {
+      "src": "api/chat.ts",
+      "use": "@vercel/node"
+    }
+  ],
   "routes": [
     {
       "src": "/_/backend/api/chat",
