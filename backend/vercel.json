@@ -2,25 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["src/**/*", "prisma/**/*"],
-        "maxDuration": 30,
-        "externalNodeModules": [
-          "@prisma/adapter-neon",
-          "@prisma/driver-adapter-utils",
-          "@neondatabase/serverless",
-          "postgres-array"
-        ]
-      }
+      "src": "api/chat.ts",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/index.ts",
-      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"]
+      "dest": "api/chat.ts",
+      "methods": ["POST", "OPTIONS", "GET"]
     }
   ]
 }
