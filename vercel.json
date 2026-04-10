@@ -2,6 +2,12 @@
   "buildCommand": "cd frontend && pnpm install && pnpm build",
   "outputDirectory": "frontend/dist",
   "installCommand": "npm install",
+  "experimentalServices": {
+    "backend": {
+      "src": "./backend",
+      "use": "@vercel/node"
+    }
+  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]

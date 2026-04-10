@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import * as bcryptjs from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +21,8 @@ export class AuthService {
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) throw new UnauthorizedException('Credenciales inválidas');
 
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const bcryptjs = require('bcryptjs') as typeof import('bcryptjs');
     const valid = await bcryptjs.compare(dto.password, user.password);
     if (!valid) throw new UnauthorizedException('Credenciales inválidas');
 

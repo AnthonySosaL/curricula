@@ -2,7 +2,6 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { UsersRepository } from './users.repository';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
-import * as bcryptjs from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -26,6 +25,8 @@ export class UsersService {
   async create(data: { email: string; name: string; password: string }) {
     const exists = await this.usersRepo.findByEmail(data.email);
     if (exists) throw new ConflictException('El email ya está registrado');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const bcryptjs = require('bcryptjs') as typeof import('bcryptjs');
     const hashed = await bcryptjs.hash(data.password, 10);
     const user = await this.usersRepo.create({ ...data, password: hashed });
     return UserEntity.fromPrisma(user);
@@ -34,6 +35,8 @@ export class UsersService {
   async update(id: string, dto: UpdateUserDto): Promise<UserEntity> {
     await this.findById(id);
     if (dto.password) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const bcryptjs = require('bcryptjs') as typeof import('bcryptjs');
       dto.password = await bcryptjs.hash(dto.password, 10);
     }
     const updated = await this.usersRepo.update(id, dto);
