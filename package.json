@@ -1,0 +1,8 @@
+{
+  "name": "curricula-root",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "groq-sdk": "^1.1.2"
+  }
+}
