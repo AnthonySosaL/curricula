@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import Groq from 'groq-sdk';
+
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 const SYSTEM_PROMPT = `Eres el asistente virtual del portafolio de Anthony Sebastian Sosa Loroña.
 Tu misión es responder preguntas sobre Anthony de forma concisa, amigable y profesional.
@@ -43,28 +44,36 @@ No inventes información. No respondas preguntas ajenas al portafolio de Anthony
 
 @Injectable()
 export class ChatService {
-  private groq: Groq | null = null;
-
-  private getGroq(): Groq {
-    if (!this.groq) {
-      const key = process.env['GROQ_API_KEY'];
-      if (!key) throw new InternalServerErrorException('GROQ_API_KEY not configured');
-      this.groq = new Groq({ apiKey: key });
-    }
-    return this.groq;
-  }
-
   async chat(messages: { role: 'user' | 'assistant'; content: string }[]) {
-    const groq = this.getGroq();
-    const completion = await groq.chat.completions.create({
-      model: 'llama-3.1-8b-instant',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        ...messages.slice(-8), // últimos 8 mensajes para contexto
-      ],
-      max_tokens: 300,
-      temperature: 0.7,
+    const apiKey = process.env['GROQ_API_KEY'];
+    if (!apiKey) throw new InternalServerErrorException('GROQ_API_KEY not configured');
+
+    const response = await fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...messages.slice(-8),
+        ],
+        max_tokens: 300,
+        temperature: 0.7,
+      }),
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Groq API error:', errorText);
+      throw new InternalServerErrorException('Groq API error');
+    }
+
+    const completion = (await response.json()) as {
+      choices: { message: { content: string } }[];
+    };
     return { reply: completion.choices[0]?.message?.content ?? 'Sin respuesta' };
   }
 }
