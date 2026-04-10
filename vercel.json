@@ -7,13 +7,8 @@
       "maxDuration": 30
     }
   },
-  "routes": [
-    {
-      "src": "/_/backend/api/chat",
-      "dest": "/api/chat",
-      "methods": ["POST", "OPTIONS"]
-    },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/_/backend/api/chat", "destination": "/api/chat" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
