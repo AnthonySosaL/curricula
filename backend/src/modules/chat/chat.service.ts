@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import Groq from 'groq-sdk';
 
 const SYSTEM_PROMPT = `Eres el asistente virtual del portafolio de Anthony Sebastian Sosa Loroña.
 Tu misión es responder preguntas sobre Anthony de forma concisa, amigable y profesional.
@@ -42,16 +43,12 @@ No inventes información. No respondas preguntas ajenas al portafolio de Anthony
 
 @Injectable()
 export class ChatService {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private groq: any = null;
+  private groq: Groq | null = null;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private getGroq(): any {
+  private getGroq(): Groq {
     if (!this.groq) {
       const key = process.env['GROQ_API_KEY'];
       if (!key) throw new InternalServerErrorException('GROQ_API_KEY not configured');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const Groq = require('groq-sdk').default ?? require('groq-sdk');
       this.groq = new Groq({ apiKey: key });
     }
     return this.groq;
