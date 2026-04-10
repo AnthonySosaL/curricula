@@ -9,6 +9,6 @@
   },
   "rewrites": [
     { "source": "/_/backend/api/chat", "destination": "/api/chat" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
