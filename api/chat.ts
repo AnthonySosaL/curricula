@@ -1,7 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http';
-import Groq from 'groq-sdk';
 
-// ─── System prompt ────────────────────────────────────────────
+// ─── System prompt ────────────────────────────────────────────────────────────
 const SYSTEM_PROMPT = `Eres el asistente virtual del portafolio de Anthony Sebastian Sosa Loroña.
 Tu misión es responder preguntas sobre Anthony de forma concisa, amigable y profesional.
 Responde siempre en el idioma en que te hablen (español o inglés).
@@ -42,10 +41,12 @@ IDIOMAS: Español nativo, Inglés B1
 Si te preguntan algo que no sabes de Anthony, di que no tienes esa información y sugiere contactarlo directamente.
 No inventes información. No respondas preguntas ajenas al portafolio de Anthony.`;
 
-// ─── CORS helper ─────────────────────────────────────────────
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 function setCors(res: ServerResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS, GET');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 }
 
@@ -55,7 +56,7 @@ function json(res: ServerResponse, status: number, body: unknown) {
   res.end(JSON.stringify(body));
 }
 
-// ─── Handler ─────────────────────────────────────────────────
+// ─── Handler ─────────────────────────────────────────────────────────────────
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   setCors(res);
 
@@ -63,6 +64,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     res.statusCode = 204;
     res.end();
     return;
+  }
+
+  if (req.method === 'GET') {
+    return json(res, 200, { status: 'ok', timestamp: new Date().toISOString() });
   }
 
   if (req.method !== 'POST') {
@@ -89,23 +94,36 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       return json(res, 500, { statusCode: 500, message: 'GROQ_API_KEY not configured' });
     }
 
-    const groq = new Groq({ apiKey });
-    const completion = await groq.chat.completions.create({
-      model: 'llama-3.1-8b-instant',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        ...(messages.slice(-8) as Groq.Chat.ChatCompletionMessageParam[]),
-      ],
-      max_tokens: 300,
-      temperature: 0.7,
+    // Usa fetch() nativo de Node.js 18+ — sin dependencias npm
+    const groqResponse = await fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...messages.slice(-8),
+        ],
+        max_tokens: 300,
+        temperature: 0.7,
+      }),
     });
 
+    if (!groqResponse.ok) {
+      const errorText = await groqResponse.text();
+      console.error('Groq API error:', errorText);
+      return json(res, 502, { statusCode: 502, message: 'Groq API error' });
+    }
+
+    const completion = (await groqResponse.json()) as {
+      choices: { message: { content: string } }[];
+    };
     const reply = completion.choices[0]?.message?.content ?? 'Sin respuesta';
 
-    return json(res, 200, {
-      data: { reply },
-      timestamp: new Date().toISOString(),
-    });
+    return json(res, 200, { data: { reply }, timestamp: new Date().toISOString() });
   } catch (err) {
     console.error('Chat handler error:', err);
     return json(res, 500, { statusCode: 500, message: 'Error interno del servidor' });
