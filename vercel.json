@@ -6,9 +6,8 @@
       "framework": "vite"
     },
     "backend": {
-      "entrypoint": "backend",
-      "routePrefix": "/_/backend",
-      "framework": "nestjs"
+      "entrypoint": "backend/src/main.ts",
+      "routePrefix": "/_/backend"
     }
   }
 }
