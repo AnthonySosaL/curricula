@@ -4,8 +4,8 @@ import { GithubIcon, LinkedinIcon } from '@/components/ui/BrandIcons';
 import { Mail, Download, ChevronDown } from 'lucide-react';
 
 // phase thresholds
-const HERO_END = 0.20;
-const MAIN_END = 0.78;
+const HERO_END = 0.25;
+const MAIN_END = 0.70;
 
 function applyFade(el: HTMLDivElement | null, visible: boolean) {
   if (!el) return;
@@ -80,7 +80,7 @@ export function ScrollVideoSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="inicio" style={{ height: '500vh' }} className="relative">
+    <section ref={sectionRef} id="inicio" style={{ height: '250vh' }} className="relative">
       <div className="sticky top-0 h-screen overflow-hidden">
 
         {/* Video */}
