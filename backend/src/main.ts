@@ -1,19 +1,19 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Entry point dual:
-//   - VERCEL=1  → servidor Node.js puro (sin NestJS, sin pnpm shims)
-//   - local dev  → NestJS completo via dynamic import (evita shim errors en Lambda)
+// Dual-entry point:
+//   VERCEL=1  → pure Node.js HTTP server (no AppModule loaded, no shim errors)
+//   local dev → full NestJS app
+//
+// WHY: experimentalServices generates CJS shims for pnpm packages.
+//   - @nestjs/core shim: WORKS (kept as static import for framework detection)
+//   - @nestjs/common.Injectable shim: BROKEN (in chat.service.cjs)
+//   - Fix: AppModule loaded via dynamic import only in the non-Vercel branch,
+//     so chat.service.cjs is NEVER require()'d on the Lambda.
 // ─────────────────────────────────────────────────────────────────────────────
+import { NestFactory } from '@nestjs/core'; // static import for NestJS detection — shim works
 
-const isVercel = process.env['VERCEL'] === '1';
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-if (isVercel) {
-  // ── Vercel Lambda: pure Node.js HTTP server ──────────────────────────────
-  // Zero npm dependencies — only Node.js 18+ built-ins + native fetch()
-  const http = require('http') as typeof import('http');
-
-  const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-
-  const SYSTEM_PROMPT = `Eres el asistente virtual del portafolio de Anthony Sebastian Sosa Loroña.
+const SYSTEM_PROMPT = `Eres el asistente virtual del portafolio de Anthony Sebastian Sosa Loroña.
 Tu misión es responder preguntas sobre Anthony de forma concisa, amigable y profesional.
 Responde siempre en el idioma en que te hablen (español o inglés).
 Sé breve: máximo 3-4 oraciones por respuesta.
@@ -53,6 +53,11 @@ IDIOMAS: Español nativo, Inglés B1
 Si te preguntan algo que no sabes de Anthony, di que no tienes esa información y sugiere contactarlo directamente.
 No inventes información. No respondas preguntas ajenas al portafolio de Anthony.`;
 
+// ── Vercel Lambda: pure Node.js HTTP server ───────────────────────────────────
+// AppModule / chat.service are NEVER loaded here → no @nestjs/common shim errors
+async function bootstrapVercel() {
+  const http = await import('http');
+
   function setCors(res: import('http').ServerResponse) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS, GET');
@@ -78,10 +83,7 @@ No inventes información. No respondas preguntas ajenas al portafolio de Anthony
       (req.url === '/api/chat' || (req.url ?? '').endsWith('/api/chat'));
 
     if (!isChat) {
-      if (req.method === 'GET') {
-        return sendJson(res, 200, { status: 'ok', timestamp: new Date().toISOString() });
-      }
-      return sendJson(res, 404, { statusCode: 404, message: 'Not Found' });
+      return sendJson(res, 200, { status: 'ok', timestamp: new Date().toISOString() });
     }
 
     try {
@@ -133,16 +135,29 @@ No inventes información. No respondas preguntas ajenas al portafolio de Anthony
   });
 
   const port = parseInt(process.env['PORT'] ?? '3001', 10);
-  server.listen(port, () => {
-    console.log(`Vercel backend listening on port ${port}`);
-  });
-} else {
-  // ── Local dev: full NestJS app via dynamic import ────────────────────────
-  // Dynamic import ensures NestJS modules are NEVER loaded in the Vercel Lambda,
-  // preventing pnpm CJS shim errors for @nestjs/* packages.
-  (async () => {
-    const { bootstrap } = await import('./bootstrap');
-    await bootstrap();
-  })();
+  server.listen(port, () => console.log(`Vercel backend listening on port ${port}`));
 }
 
+// ── Local dev: full NestJS app ────────────────────────────────────────────────
+// AppModule loaded via dynamic import — NEVER executed when VERCEL=1
+async function bootstrapNestJS() {
+  const { AppModule } = await import('./app.module');
+  const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
+  app.enableCors({
+    origin: '*',
+    credentials: false,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+  const port = parseInt(process.env['PORT'] ?? '3001', 10);
+  await app.listen(port);
+  console.log(`Backend corriendo en http://localhost:${port}/api`);
+}
+
+// ── Entry ─────────────────────────────────────────────────────────────────────
+if (process.env['VERCEL'] === '1') {
+  void bootstrapVercel();
+} else {
+  void bootstrapNestJS();
+}
