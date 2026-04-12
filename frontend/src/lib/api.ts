@@ -4,9 +4,11 @@ import axios from 'axios';
 // Cliente HTTP centralizado
 // Base URL → VITE_API_BASE_URL (sin /api)
 // El prefijo /api se agrega aquí — NUNCA en los servicios.
+// En producción, VITE_API_BASE_URL apunta al backend de Render.
+// En local, apunta a http://localhost:3001
 // ============================================================
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3001';
 
 export const api = axios.create({
   baseURL: `${BASE_URL}/api`,
