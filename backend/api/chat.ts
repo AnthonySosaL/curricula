@@ -42,6 +42,23 @@ IDIOMAS: Español nativo, Inglés B1
 Si te preguntan algo que no sabes de Anthony, di que no tienes esa información y sugiere contactarlo directamente.
 No inventes información. No respondas preguntas ajenas al portafolio de Anthony.`;
 
+function isExecutiveDashboardPrompt(messages: { role: string; content: string }[]) {
+  const latestUserPrompt = [...messages]
+    .reverse()
+    .find((message) => message.role === 'user')
+    ?.content
+    ?.toLowerCase() ?? '';
+
+  return (
+    latestUserPrompt.includes('[resumen]')
+    || latestUserPrompt.includes('[summary]')
+    || latestUserPrompt.includes('formato exacto')
+    || latestUserPrompt.includes('exact tagged format')
+    || latestUserPrompt.includes('[recomendaciones]')
+    || latestUserPrompt.includes('[recommendations]')
+  );
+}
+
 // ─── CORS helper ─────────────────────────────────────────────
 function setCors(res: ServerResponse) {
   const origin = process.env.FRONTEND_URL ?? '*';
@@ -93,15 +110,24 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       return json(res, 500, { statusCode: 500, message: 'GROQ_API_KEY not configured' });
     }
 
+    const isExecutiveRequest = isExecutiveDashboardPrompt(messages);
+    const executiveInstruction: Groq.Chat.ChatCompletionMessageParam[] = isExecutiveRequest
+      ? [{
+        role: 'system',
+        content: 'If the user requests a tagged executive dashboard analysis, strictly follow the requested sections and keep each section concise.',
+      }]
+      : [];
+
     const groq = new Groq({ apiKey });
     const completion = await groq.chat.completions.create({
       model: 'llama-3.1-8b-instant',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
+        ...executiveInstruction,
         ...(messages.slice(-8) as Groq.Chat.ChatCompletionMessageParam[]),
       ],
-      max_tokens: 300,
-      temperature: 0.7,
+      max_tokens: isExecutiveRequest ? 520 : 300,
+      temperature: isExecutiveRequest ? 0.35 : 0.7,
     });
 
     const reply = completion.choices[0]?.message?.content ?? 'Sin respuesta';

@@ -2,6 +2,23 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
+function isExecutiveDashboardPrompt(messages: { role: 'user' | 'assistant'; content: string }[]) {
+  const latestUserPrompt = [...messages]
+    .reverse()
+    .find((message) => message.role === 'user')
+    ?.content
+    ?.toLowerCase() ?? '';
+
+  return (
+    latestUserPrompt.includes('[resumen]')
+    || latestUserPrompt.includes('[summary]')
+    || latestUserPrompt.includes('formato exacto')
+    || latestUserPrompt.includes('exact tagged format')
+    || latestUserPrompt.includes('[recomendaciones]')
+    || latestUserPrompt.includes('[recommendations]')
+  );
+}
+
 const SYSTEM_PROMPT = `Eres el asistente virtual del portafolio de Anthony Sebastian Sosa Loroña.
 Tu misión es responder preguntas sobre Anthony de forma concisa, amigable y profesional.
 Responde siempre en el idioma en que te hablen (español o inglés).
@@ -48,6 +65,8 @@ export class ChatService {
     const apiKey = process.env['GROQ_API_KEY'];
     if (!apiKey) throw new InternalServerErrorException('GROQ_API_KEY not configured');
 
+    const isExecutiveRequest = isExecutiveDashboardPrompt(messages);
+
     const response = await fetch(GROQ_API_URL, {
       method: 'POST',
       headers: {
@@ -58,10 +77,16 @@ export class ChatService {
         model: 'llama-3.1-8b-instant',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
+          ...(isExecutiveRequest
+            ? [{
+              role: 'system',
+              content: 'If the user requests a tagged executive dashboard analysis, strictly follow the requested sections and keep each section concise.',
+            }]
+            : []),
           ...messages.slice(-8),
         ],
-        max_tokens: 300,
-        temperature: 0.7,
+        max_tokens: isExecutiveRequest ? 520 : 300,
+        temperature: isExecutiveRequest ? 0.35 : 0.7,
       }),
     });
 

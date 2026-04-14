@@ -43,6 +43,23 @@ No inventes información. No respondas preguntas ajenas al portafolio de Anthony
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
+function isExecutiveDashboardPrompt(messages: { role: string; content: string }[]) {
+  const latestUserPrompt = [...messages]
+    .reverse()
+    .find((message) => message.role === 'user')
+    ?.content
+    ?.toLowerCase() ?? '';
+
+  return (
+    latestUserPrompt.includes('[resumen]')
+    || latestUserPrompt.includes('[summary]')
+    || latestUserPrompt.includes('formato exacto')
+    || latestUserPrompt.includes('exact tagged format')
+    || latestUserPrompt.includes('[recomendaciones]')
+    || latestUserPrompt.includes('[recommendations]')
+  );
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function setCors(res: ServerResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -94,6 +111,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       return json(res, 500, { statusCode: 500, message: 'GROQ_API_KEY not configured' });
     }
 
+    const isExecutiveRequest = isExecutiveDashboardPrompt(messages);
+
     // Usa fetch() nativo de Node.js 18+ — sin dependencias npm
     const groqResponse = await fetch(GROQ_API_URL, {
       method: 'POST',
@@ -105,10 +124,16 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         model: 'llama-3.1-8b-instant',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
+          ...(isExecutiveRequest
+            ? [{
+              role: 'system',
+              content: 'If the user requests a tagged executive dashboard analysis, strictly follow the requested sections and keep each section concise.',
+            }]
+            : []),
           ...messages.slice(-8),
         ],
-        max_tokens: 300,
-        temperature: 0.7,
+        max_tokens: isExecutiveRequest ? 520 : 300,
+        temperature: isExecutiveRequest ? 0.35 : 0.7,
       }),
     });
 
