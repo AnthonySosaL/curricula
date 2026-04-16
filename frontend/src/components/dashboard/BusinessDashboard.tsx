@@ -21,10 +21,6 @@ interface ParsedAiResponse {
   conclusion: string;
 }
 
-function escapeForRegex(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function metricTone(value: number) {
   if (value >= 60) return 'text-[var(--color-success)]';
   if (value >= 35) return 'text-[var(--color-accent)]';
@@ -40,110 +36,95 @@ function parseListBlock(input: string) {
     .filter(Boolean);
 }
 
-function stripMarkdown(text: string): string {
+// ── Markdown cleaner ─────────────────────────────────────────────────────────
+function stripMd(text: string): string {
   return text
     .replace(/\*\*([^*]+)\*\*/g, '$1')
     .replace(/\*([^*]+)\*/g, '$1')
     .replace(/`([^`]+)`/g, '$1')
+    .replace(/\*+/g, '')          // leftover stray asterisks
     .trim();
 }
 
-function normalizeTagFormat(text: string): string {
-  // Groq sometimes returns **TAGNAME** instead of [TAGNAME] — normalize both
-  const tagNames = [
-    'RESUMEN EJECUTIVO', 'EXECUTIVE SUMMARY', 'RESUMEN', 'SUMMARY',
-    'HALLAZGOS', 'FINDINGS',
-    'RIESGOS', 'RISKS',
-    'OPORTUNIDADES', 'OPPORTUNITIES',
-    'RECOMENDACIONES', 'RECOMMENDATIONS',
-    'CONCLUSION FINAL', 'CONCLUSION EJECUTIVA', 'CONCLUSIONES', 'CONCLUSION',
-  ];
-  let result = text.replace(/\r\n/g, '\n');
-  for (const tag of tagNames) {
-    const escaped = tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    // **TAG** or ## TAG or ### TAG → [TAG]
-    result = result.replace(
-      new RegExp(`(?:\\*\\*\\s*${escaped}\\s*\\*\\*|#{1,3}\\s*${escaped})\\s*:?`, 'gi'),
-      `[${tag}]`,
-    );
+// ── TAG aliases ───────────────────────────────────────────────────────────────
+const TAG_ALIASES: Record<keyof ParsedAiResponse, string[]> = {
+  resumen:        ['RESUMEN EJECUTIVO', 'EXECUTIVE SUMMARY', 'RESUMEN', 'SUMMARY'],
+  hallazgos:      ['HALLAZGOS', 'FINDINGS'],
+  riesgos:        ['RIESGOS', 'RISKS'],
+  oportunidades:  ['OPORTUNIDADES', 'OPPORTUNITIES'],
+  recomendaciones:['RECOMENDACIONES', 'RECOMMENDATIONS'],
+  conclusion:     ['CONCLUSION FINAL', 'CONCLUSION EJECUTIVA', 'CONCLUSIONES', 'CONCLUSION'],
+};
+
+// Map every known alias → canonical field key
+const ALIAS_TO_KEY = new Map<string, keyof ParsedAiResponse>();
+for (const [key, aliases] of Object.entries(TAG_ALIASES)) {
+  for (const alias of aliases) {
+    ALIAS_TO_KEY.set(alias.toUpperCase(), key as keyof ParsedAiResponse);
   }
-  return result;
 }
 
+// Regex that matches ANY known tag marker in any format:
+//   [TAG]  **TAG**  ## TAG  ### TAG   (case-insensitive)
+const ALL_ALIASES = [...ALIAS_TO_KEY.keys()].join('|');
+const TAG_LINE_RE = new RegExp(
+  `^\\s*(?:\\[(?:${ALL_ALIASES})\\]|\\*\\*\\s*(?:${ALL_ALIASES})\\s*\\*\\*|#{1,3}\\s*(?:${ALL_ALIASES}))\\s*:?\\s*$`,
+  'i',
+);
+
+function identifyTag(line: string): keyof ParsedAiResponse | null {
+  if (!TAG_LINE_RE.test(line)) return null;
+  // Extract the tag name from any format
+  const clean = line
+    .replace(/^\s*#{1,3}\s*/, '')
+    .replace(/\*\*/g, '')
+    .replace(/[\[\]]/g, '')
+    .replace(/:$/, '')
+    .trim()
+    .toUpperCase();
+  return ALIAS_TO_KEY.get(clean) ?? null;
+}
+
+// ── Main parser (line-by-line, immune to regex $ multiline bug) ───────────────
 function parseAiResponse(text: string): ParsedAiResponse | null {
-  const normalized = normalizeTagFormat(text);
-  const tagGroups = {
-    resumen: ['RESUMEN', 'SUMMARY', 'RESUMEN EJECUTIVO', 'EXECUTIVE SUMMARY'],
-    hallazgos: ['HALLAZGOS', 'FINDINGS'],
-    riesgos: ['RIESGOS', 'RISKS'],
-    oportunidades: ['OPORTUNIDADES', 'OPPORTUNITIES'],
-    recomendaciones: ['RECOMENDACIONES', 'RECOMMENDATIONS'],
-    conclusion: ['CONCLUSION', 'CONCLUSIONES', 'CONCLUSION FINAL', 'CONCLUSION EJECUTIVA'],
-  } as const;
+  const lines = text.replace(/\r\n/g, '\n').split('\n');
 
-  const allTags = Object.values(tagGroups).flat().map((tag) => escapeForRegex(tag));
-  const allTagsGroup = allTags.join('|');
-
-  const readBlockByAliases = (aliases: readonly string[]) => {
-    const aliasGroup = aliases.map((alias) => escapeForRegex(alias)).join('|');
-    const startPattern = `(?:\\[(?:${aliasGroup})\\]|^\\s*(?:#{1,3}\\s*)?(?:${aliasGroup})\\s*:?\\s*$)`;
-    const endPattern = `(?=\\[(?:${allTagsGroup})\\]|^\\s*(?:#{1,3}\\s*)?(?:${allTagsGroup})\\s*:?\\s*$|$)`;
-    const re = new RegExp(`${startPattern}([\\s\\S]*?)${endPattern}`, 'im');
-    const match = normalized.match(re);
-    if (match?.[1]?.trim()) return match[1].trim();
-
-    for (const alias of aliases) {
-      const reInline = new RegExp(`(?:\\[${escapeForRegex(alias)}\\]|${escapeForRegex(alias)}\\s*:)\\s*([^\\n]+)`, 'i');
-      const inlineMatch = normalized.match(reInline);
-      if (inlineMatch?.[1]?.trim()) return inlineMatch[1].trim();
-    }
-
-    return '';
+  const buckets: Record<keyof ParsedAiResponse, string[]> = {
+    resumen: [], hallazgos: [], riesgos: [],
+    oportunidades: [], recomendaciones: [], conclusion: [],
   };
 
-  const resumen = stripMarkdown(readBlockByAliases(tagGroups.resumen));
-  const hallazgos = parseListBlock(readBlockByAliases(tagGroups.hallazgos)).map(stripMarkdown);
-  const riesgos = parseListBlock(readBlockByAliases(tagGroups.riesgos)).map(stripMarkdown);
-  const oportunidades = parseListBlock(readBlockByAliases(tagGroups.oportunidades)).map(stripMarkdown);
-  const recomendaciones = parseListBlock(readBlockByAliases(tagGroups.recomendaciones)).map(stripMarkdown);
-  const conclusion = stripMarkdown(readBlockByAliases(tagGroups.conclusion));
+  let current: keyof ParsedAiResponse | null = null;
 
-  if (!resumen && !hallazgos.length && !riesgos.length && !oportunidades.length && !recomendaciones.length && !conclusion) {
+  for (const line of lines) {
+    const tag = identifyTag(line);
+    if (tag !== null) {
+      current = tag;
+      continue;
+    }
+    if (current !== null) {
+      buckets[current].push(line);
+    }
+  }
+
+  const getText = (key: keyof ParsedAiResponse) =>
+    stripMd(buckets[key].join('\n').trim());
+
+  const resumen        = getText('resumen');
+  const hallazgos      = parseListBlock(getText('hallazgos')).map(stripMd);
+  const riesgos        = parseListBlock(getText('riesgos')).map(stripMd);
+  const oportunidades  = parseListBlock(getText('oportunidades')).map(stripMd);
+  const recomendaciones= parseListBlock(getText('recomendaciones')).map(stripMd);
+  const conclusion     = getText('conclusion');
+
+  if (!resumen && !hallazgos.length && !riesgos.length
+    && !oportunidades.length && !recomendaciones.length && !conclusion) {
     return null;
   }
 
-  return {
-    resumen,
-    hallazgos,
-    riesgos,
-    oportunidades,
-    recomendaciones,
-    conclusion,
-  };
+  return { resumen, hallazgos, riesgos, oportunidades, recomendaciones, conclusion };
 }
 
-function fallbackParseAiResponse(text: string): ParsedAiResponse | null {
-  const normalized = text.replace(/\r\n/g, '\n').trim();
-  if (!normalized) return null;
-
-  const bulletItems = parseListBlock(normalized);
-  const sentenceItems = normalized
-    .split(/(?<=[.!?])\s+/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-
-  const sourceItems = bulletItems.length > 0 ? bulletItems : sentenceItems;
-  const resumen = sentenceItems.slice(0, 2).join(' ').trim() || sourceItems[0] || normalized;
-
-  return {
-    resumen,
-    hallazgos: sourceItems.slice(0, 2),
-    riesgos: sourceItems.slice(2, 4),
-    oportunidades: sourceItems.slice(4, 6),
-    recomendaciones: sourceItems.slice(0, 3),
-    conclusion: sentenceItems.at(-1) ?? '',
-  };
-}
 
 function hasStructuredContent(parsed: ParsedAiResponse | null): parsed is ParsedAiResponse {
   if (!parsed) return false;
@@ -258,7 +239,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
         if (!isCurrentRequest) return;
 
         const reply = res.data.reply || (language === 'en' ? 'No recommendations available yet.' : 'Aun no hay recomendaciones disponibles.');
-        const parsed = parseAiResponse(reply) ?? fallbackParseAiResponse(reply);
+        const parsed = parseAiResponse(reply);
 
         setAiRecommendations(reply);
         setAiParsed(parsed);
