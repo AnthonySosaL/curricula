@@ -180,66 +180,52 @@ export function BusinessDashboard({ publicView = false }: Props) {
 
       try {
         const context = buildAIExecutiveSummary(snapshot);
-        const prompt = language === 'en'
-          ? [
-            context,
-            '',
-            'Respond in English using this EXACT tagged format:',
-            '[RESUMEN]',
-            '2 concise lines max.',
-            '[HALLAZGOS]',
-            '- key finding 1',
-            '- key finding 2',
-            '[RIESGOS]',
-            '- risk 1',
-            '- risk 2',
-            '[OPORTUNIDADES]',
-            '- opportunity 1',
-            '- opportunity 2',
-            '[RECOMENDACIONES]',
-            '- recommendation 1 (action + expected impact)',
-            '- recommendation 2 (action + expected impact)',
-            '- recommendation 3 (action + expected impact)',
-            '[CONCLUSION]',
-            'Max 2 lines.',
-          ].join('\n')
-          : [
-            context,
-            '',
-            'Responde en espanol usando este formato EXACTO con etiquetas:',
-            '[RESUMEN]',
-            'Maximo 2 lineas.',
-            '[HALLAZGOS]',
-            '- hallazgo clave 1',
-            '- hallazgo clave 2',
-            '[RIESGOS]',
-            '- riesgo 1',
-            '- riesgo 2',
-            '[OPORTUNIDADES]',
-            '- oportunidad 1',
-            '- oportunidad 2',
-            '[RECOMENDACIONES]',
-            '- recomendacion 1 (accion + impacto esperado)',
-            '- recomendacion 2 (accion + impacto esperado)',
-            '- recomendacion 3 (accion + impacto esperado)',
-            '[CONCLUSION]',
-            'Maximo 2 lineas.',
-          ].join('\n');
+        const lang = language === 'en' ? 'English' : 'Spanish';
+        const prompt = [
+          context,
+          '',
+          `Respond in ${lang}. Return ONLY a JSON object with these exact keys:`,
+          '{"resumen":"2 sentence summary","hallazgos":["finding1","finding2"],"riesgos":["risk1","risk2"],"oportunidades":["opp1","opp2"],"recomendaciones":["rec1 (action+impact)","rec2 (action+impact)","rec3 (action+impact)"],"conclusion":"2 sentence conclusion"}',
+          'No markdown, no extra text. Only the JSON.',
+          '[RECOMENDACIONES]', // trigger isExecutiveDashboardPrompt detection
+        ].join('\n');
 
         const res = await api.post<{ reply: string }>(
           '/chat',
-          {
-            messages: [{ role: 'user', content: prompt }],
-          },
-          {
-            signal: controller.signal,
-          },
+          { messages: [{ role: 'user', content: prompt }] },
+          { signal: controller.signal },
         );
 
         if (!isCurrentRequest) return;
 
-        const reply = res.data.reply || (language === 'en' ? 'No recommendations available yet.' : 'Aun no hay recomendaciones disponibles.');
-        const parsed = parseAiResponse(reply);
+        const rawReply = res.data.reply ?? '';
+
+        // Try JSON parse first (backend uses json_object mode for executive requests)
+        let parsed: ParsedAiResponse | null = null;
+        try {
+          const jsonStart = rawReply.indexOf('{');
+          const jsonEnd = rawReply.lastIndexOf('}');
+          if (jsonStart !== -1 && jsonEnd !== -1) {
+            const jsonStr = rawReply.slice(jsonStart, jsonEnd + 1);
+            const obj = JSON.parse(jsonStr) as Partial<ParsedAiResponse>;
+            parsed = {
+              resumen: stripMd(String(obj.resumen ?? '')),
+              hallazgos: (Array.isArray(obj.hallazgos) ? obj.hallazgos : []).map(s => stripMd(String(s))),
+              riesgos: (Array.isArray(obj.riesgos) ? obj.riesgos : []).map(s => stripMd(String(s))),
+              oportunidades: (Array.isArray(obj.oportunidades) ? obj.oportunidades : []).map(s => stripMd(String(s))),
+              recomendaciones: (Array.isArray(obj.recomendaciones) ? obj.recomendaciones : []).map(s => stripMd(String(s))),
+              conclusion: stripMd(String(obj.conclusion ?? '')),
+            };
+            if (!parsed.resumen && !parsed.hallazgos.length) parsed = null;
+          }
+        } catch {
+          // JSON parse failed — fall through to tag parser
+        }
+
+        // Fallback: tag-based line parser
+        if (!parsed) parsed = parseAiResponse(rawReply);
+
+        const reply = rawReply || (language === 'en' ? 'No recommendations available yet.' : 'Aun no hay recomendaciones disponibles.');
 
         setAiRecommendations(reply);
         setAiParsed(parsed);
