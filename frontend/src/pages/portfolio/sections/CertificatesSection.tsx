@@ -1,40 +1,43 @@
 import { Award, Download, ExternalLink, Calendar } from 'lucide-react';
 import { useInView } from '@/hooks/useInView';
 import { SectionHeader } from './SkillsSection';
-import { profile } from '@/data/portfolio';
-
-const CERTS = [
-  {
-    name: 'AWS Academy Graduate',
-    detail: 'Cloud Foundations',
-    issuer: 'Amazon Web Services (AWS)',
-    date: 'Abril 2026',
-    color: '#FF9900',
-    bg: '#FFF8EE',
-    badge: '☁️',
-    file: (profile.links as { certificate?: string }).certificate,
-    verify: null as string | null,
-  },
-];
+import { usePortfolioData } from '@/data/portfolio';
+import { useI18n } from '@/lib/i18n';
 
 export function CertificatesSection() {
+  const { profile } = usePortfolioData();
+  const { language } = useI18n();
   const { ref: headerRef, inView: headerIn } = useInView();
   const { ref: cardsRef, inView: cardsIn } = useInView({ threshold: 0.1 });
 
+  const certs = [
+    {
+      name: 'AWS Academy Graduate',
+      detail: 'Cloud Foundations',
+      issuer: 'Amazon Web Services (AWS)',
+      date: language === 'en' ? 'April 2026' : 'Abril 2026',
+      color: '#FF9900',
+      bg: '#FFF8EE',
+      badge: '☁️',
+      file: (profile.links as { certificate?: string }).certificate,
+      verify: null as string | null,
+    },
+  ];
+
   return (
-    <section id="certificados" className="py-16 px-4 bg-white">
+    <section id="certificados" className="py-16 px-4 bg-[var(--color-card)] border-y border-[var(--color-border)]">
       <div className="max-w-4xl mx-auto">
         <div ref={headerRef}>
           <SectionHeader
-            label="Certificaciones"
-            title="Credenciales"
-            subtitle="Certificaciones oficiales obtenidas"
+            label={language === 'en' ? 'Certifications' : 'Certificaciones'}
+            title={language === 'en' ? 'Credentials' : 'Credenciales'}
+            subtitle={language === 'en' ? 'Official certifications earned' : 'Certificaciones oficiales obtenidas'}
             inView={headerIn}
           />
         </div>
 
         <div ref={cardsRef} className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {CERTS.map((cert, i) => (
+          {certs.map((cert, i) => (
             <div
               key={cert.name}
               className="group relative bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border)] overflow-hidden hover:shadow-[var(--shadow-md)] hover:-translate-y-1 transition-all"
@@ -77,10 +80,10 @@ export function CertificatesSection() {
                     <a
                       href={cert.file}
                       download
-                      className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium py-2 px-3 rounded-xl border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors bg-white"
+                      className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium py-2 px-3 rounded-xl border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors bg-[var(--color-card)]"
                     >
                       <Download size={13} />
-                      Descargar
+                      {language === 'en' ? 'Download' : 'Descargar'}
                     </a>
                   )}
                   {cert.verify && (
@@ -91,7 +94,7 @@ export function CertificatesSection() {
                       className="flex items-center justify-center gap-1.5 text-xs font-medium py-2 px-3 rounded-xl bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)] transition-colors"
                     >
                       <ExternalLink size={13} />
-                      Verificar
+                      {language === 'en' ? 'Verify' : 'Verificar'}
                     </a>
                   )}
                 </div>

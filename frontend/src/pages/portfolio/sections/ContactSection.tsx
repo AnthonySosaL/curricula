@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Mail, Phone, MapPin, Copy, Check } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from '@/components/ui/BrandIcons';
-import { profile } from '@/data/portfolio';
+import { usePortfolioData } from '@/data/portfolio';
 import { useInView } from '@/hooks/useInView';
 import { SectionHeader } from './SkillsSection';
+import { useI18n } from '@/lib/i18n';
 
 function CopyButton({ text, title }: { text: string; title: string }) {
   const [copied, setCopied] = useState(false);
@@ -27,6 +28,8 @@ function CopyButton({ text, title }: { text: string; title: string }) {
 }
 
 export function ContactSection() {
+  const { profile } = usePortfolioData();
+  const { language } = useI18n();
   const { ref: headerRef, inView: headerIn } = useInView();
   const { ref: cardsRef, inView: cardsIn } = useInView({ threshold: 0.1 });
   const { ref: locationRef, inView: locationIn } = useInView({ threshold: 0.3 });
@@ -39,16 +42,16 @@ export function ContactSection() {
       href: null,
       iconColor: 'bg-blue-50 text-[var(--color-primary)]',
       borderHover: 'hover:border-blue-300',
-      extra: <CopyButton text={profile.email} title="Copiar email" />,
+      extra: <CopyButton text={profile.email} title={language === 'en' ? 'Copy email' : 'Copiar email'} />,
     },
     {
       icon: Phone,
-      label: 'Teléfono',
+      label: language === 'en' ? 'Phone' : 'Telefono',
       value: profile.phone,
       href: null,
       iconColor: 'bg-green-50 text-[var(--color-success)]',
       borderHover: 'hover:border-green-300',
-      extra: <CopyButton text={profile.phone} title="Copiar teléfono" />,
+      extra: <CopyButton text={profile.phone} title={language === 'en' ? 'Copy phone' : 'Copiar telefono'} />,
     },
     {
       icon: GithubIcon,
@@ -71,13 +74,13 @@ export function ContactSection() {
   ];
 
   return (
-    <section id="contacto" className="py-24 px-4 bg-white">
+    <section id="contacto" className="py-24 px-4 bg-[var(--color-card)]">
       <div className="max-w-3xl mx-auto">
         <div ref={headerRef}>
           <SectionHeader
-            label="Contacto"
-            title="Hablemos"
-            subtitle="¿Tienes un proyecto en mente o quieres trabajar juntos? Contáctame."
+            label={language === 'en' ? 'Contact' : 'Contacto'}
+            title={language === 'en' ? "Let's talk" : 'Hablemos'}
+            subtitle={language === 'en' ? 'Do you have a project in mind or want to work together? Contact me.' : 'Tienes un proyecto en mente o quieres trabajar juntos? Contactame.'}
             inView={headerIn}
           />
         </div>
@@ -132,7 +135,7 @@ export function ContactSection() {
             <MapPin size={20} className="text-[var(--color-accent)]" />
           </div>
           <div>
-            <p className="text-xs text-[var(--color-text-muted)] font-medium uppercase tracking-wide">Ubicación</p>
+            <p className="text-xs text-[var(--color-text-muted)] font-medium uppercase tracking-wide">{language === 'en' ? 'Location' : 'Ubicacion'}</p>
             <p className="text-sm font-semibold text-[var(--color-text)]">{profile.location}</p>
           </div>
           <div className="ml-auto flex items-center gap-1.5 text-xs text-[var(--color-success)] font-medium">
@@ -140,7 +143,7 @@ export function ContactSection() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-success)] opacity-60" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-success)]" />
             </span>
-            Disponible
+            {language === 'en' ? 'Available' : 'Disponible'}
           </div>
         </div>
       </div>

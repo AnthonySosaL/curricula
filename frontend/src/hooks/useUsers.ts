@@ -4,10 +4,15 @@ import type { User } from '@/types/api';
 
 const USERS_KEY = ['users'] as const;
 
-export function useUsers() {
+interface UseUsersOptions {
+  enabled?: boolean;
+}
+
+export function useUsers(options?: UseUsersOptions) {
   return useQuery({
     queryKey: USERS_KEY,
     queryFn: () => api.get<User[]>('/users').then((r) => r.data),
+    enabled: options?.enabled,
   });
 }
 

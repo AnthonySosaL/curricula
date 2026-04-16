@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 
 interface Phase {
@@ -11,6 +11,7 @@ interface Phase {
 interface VideoSectionGroupProps {
   children: ReactNode;
   videoSrc: string;
+  mobileVideoSrc?: string;
   overlay?: string;
   phases?: Phase[];
 }
@@ -33,6 +34,7 @@ function setFade(el: HTMLElement | null, visible: boolean, delay = 0) {
 export function VideoSectionGroup({
   children,
   videoSrc,
+  mobileVideoSrc,
   overlay = 'bg-black/50',
   phases = [],
 }: VideoSectionGroupProps) {
@@ -49,6 +51,15 @@ export function VideoSectionGroup({
   const p2Label = useRef<HTMLSpanElement>(null);
   const p2Title = useRef<HTMLHeadingElement>(null);
   const p2Sub   = useRef<HTMLParagraphElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 900px), (pointer: coarse)');
+    const onChange = () => setIsMobile(media.matches);
+    onChange();
+    media.addEventListener('change', onChange);
+    return () => media.removeEventListener('change', onChange);
+  }, []);
 
   useEffect(() => {
     const cachePos = () => {
@@ -62,52 +73,60 @@ export function VideoSectionGroup({
 
     const firstPhase  = phases[0];
     const secondPhase = phases[1];
-    let rafId: number;
-    let lastY = -1;
+    let rafId = 0;
+    let queued = false;
 
-    const tick = () => {
+    const update = () => {
+      queued = false;
       const y = window.scrollY;
-      if (y !== lastY) {
-        lastY = y;
-        const scrollable = groupScrollableRef.current;
-        const p = scrollable > 0
-          ? Math.max(0, Math.min(1, (y - groupTopRef.current) / scrollable))
-          : 0;
+      const scrollable = groupScrollableRef.current;
+      const p = scrollable > 0
+        ? Math.max(0, Math.min(1, (y - groupTopRef.current) / scrollable))
+        : 0;
 
-        // Scrub video — no setState, direct property
-        const vid = videoRef.current;
-        if (vid && vid.readyState >= 2 && vid.duration) {
-          vid.currentTime = p * vid.duration;
-        }
-
-        // Phase text — direct DOM style, no React re-render
-        if (firstPhase) {
-          const [es, ee] = getEntryWindow(firstPhase);
-          const vis = p >= es && p < ee;
-          setFade(p1Label.current, vis, 0);
-          setFade(p1Title.current, vis, 60);
-          setFade(p1Sub.current,   vis, 120);
-        }
-        if (secondPhase) {
-          const [es, ee] = getEntryWindow(secondPhase);
-          const vis = p >= es && p < ee;
-          setFade(p2Label.current, vis, 0);
-          setFade(p2Title.current, vis, 60);
-          setFade(p2Sub.current,   vis, 120);
-        }
+      // En mobile dejamos el video estatico para evitar lag.
+      const vid = videoRef.current;
+      if (!isMobile && vid && vid.readyState >= 2 && vid.duration) {
+        vid.currentTime = p * vid.duration;
       }
-      rafId = requestAnimationFrame(tick);
+
+      // Phase text — direct DOM style, no React re-render
+      if (firstPhase) {
+        const [es, ee] = getEntryWindow(firstPhase);
+        const vis = p >= es && p < ee;
+        setFade(p1Label.current, vis, 0);
+        setFade(p1Title.current, vis, 60);
+        setFade(p1Sub.current,   vis, 120);
+      }
+      if (secondPhase) {
+        const [es, ee] = getEntryWindow(secondPhase);
+        const vis = p >= es && p < ee;
+        setFade(p2Label.current, vis, 0);
+        setFade(p2Title.current, vis, 60);
+        setFade(p2Sub.current,   vis, 120);
+      }
     };
 
-    rafId = requestAnimationFrame(tick);
+    const queueUpdate = () => {
+      if (queued) return;
+      queued = true;
+      rafId = requestAnimationFrame(update);
+    };
+
+    const onScroll = () => queueUpdate();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    queueUpdate();
+
     return () => {
-      cancelAnimationFrame(rafId);
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', cachePos);
     };
-  }, [phases]);
+  }, [phases, isMobile]);
 
   const firstPhase  = phases[0];
   const secondPhase = phases[1];
+  const resolvedVideoSrc = isMobile && mobileVideoSrc ? mobileVideoSrc : videoSrc;
 
   return (
     <div ref={groupRef} className="relative">
@@ -119,11 +138,25 @@ export function VideoSectionGroup({
       >
         <video
           ref={videoRef}
-          src={videoSrc}
+          src={resolvedVideoSrc}
           muted
           playsInline
-          preload="auto"
-          onLoadedMetadata={(e) => { (e.target as HTMLVideoElement).currentTime = 0; }}
+          preload={isMobile ? 'metadata' : 'auto'}
+          onLoadedMetadata={(e) => {
+            const v = e.target as HTMLVideoElement;
+            if (isMobile) {
+              const previewTime = Math.max(0, Math.min(3, v.duration - 0.05));
+              v.currentTime = Number.isFinite(previewTime) ? previewTime : 0;
+            } else {
+              v.currentTime = 0;
+            }
+            if (isMobile) v.pause();
+          }}
+          onSeeked={(e) => {
+            if (!isMobile) return;
+            const v = e.target as HTMLVideoElement;
+            v.pause();
+          }}
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className={`absolute inset-0 ${overlay}`} />

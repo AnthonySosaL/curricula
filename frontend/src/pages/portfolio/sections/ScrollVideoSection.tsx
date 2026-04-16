@@ -1,12 +1,16 @@
-import { useEffect, useRef } from 'react';
-import { profile } from '@/data/portfolio';
+import { useEffect, useRef, useState } from 'react';
+import { usePortfolioData } from '@/data/portfolio';
 import { GithubIcon, LinkedinIcon } from '@/components/ui/BrandIcons';
 import { Mail, Download, ChevronDown } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 // phase thresholds
 const HERO_END = 0.25;
 const MAIN_END = 0.70;
 
+const DESKTOP_HEIGHT = '250vh';
+const MOBILE_HEIGHT = '230vh';
+const MOBILE_LOW_END_HEIGHT = '260vh';
 function applyFade(el: HTMLDivElement | null, visible: boolean) {
   if (!el) return;
   el.style.opacity      = visible ? '1' : '0';
@@ -15,10 +19,14 @@ function applyFade(el: HTMLDivElement | null, visible: boolean) {
 }
 
 export function ScrollVideoSection() {
+  const { profile } = usePortfolioData();
+  const { language } = useI18n();
   const sectionRef  = useRef<HTMLDivElement>(null);
   const videoRef    = useRef<HTMLVideoElement>(null);
   const topRef      = useRef(0);
   const scrollableRef = useRef(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isLowEndDevice, setIsLowEndDevice] = useState(false);
 
   // Phase panel refs
   const heroRef    = useRef<HTMLDivElement>(null);
@@ -26,6 +34,20 @@ export function ScrollVideoSection() {
   const leavingRef = useRef<HTMLDivElement>(null);
   // Progress bar ref
   const barRef     = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 900px), (pointer: coarse)');
+    const onChange = () => setIsMobile(media.matches);
+    onChange();
+    media.addEventListener('change', onChange);
+    return () => media.removeEventListener('change', onChange);
+  }, []);
+
+  useEffect(() => {
+    const cpuCores = navigator.hardwareConcurrency ?? 4;
+    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4;
+    setIsLowEndDevice(cpuCores <= 4 || memory <= 4);
+  }, []);
 
   useEffect(() => {
     const cachePos = () => {
@@ -42,55 +64,174 @@ export function ScrollVideoSection() {
     applyFade(mainRef.current, false);
     applyFade(leavingRef.current, false);
 
-    let rafId: number;
+    const seekThrottle = isMobile ? (isLowEndDevice ? 150 : 110) : 55;
+    const seekEpsilon = isMobile ? (isLowEndDevice ? 0.28 : 0.20) : 0.10;
+    const smoothFactor = isMobile ? 1 : 0.24;
+    const sensitivity = isMobile ? (isLowEndDevice ? 1.25 : 1.15) : 1;
+    const playbackVelocityThreshold = isMobile ? 0.0013 : 0.0018;
+    const maxPlaybackRate = isMobile ? (isLowEndDevice ? 1.6 : 1.95) : 2.2;
+
+    let rafId = 0;
+    let running = false;
     let lastPhase = -1; // -1=uninit, 0=hero, 1=main, 2=leaving
+    let lastSeekTime = 0;
+    let lastY = window.scrollY;
+    let targetP = 0;
+    let displayP = 0;
+    let lastP = 0;
+    let lastTime = performance.now();
+    let playbackMode = false;
+    let lastScrollAt = performance.now();
 
-    const tick = () => {
+    const readTargetProgress = () => {
       const scrollable = scrollableRef.current;
-      if (scrollable > 0) {
-        const y = window.scrollY;
-        const p = Math.max(0, Math.min(1, (y - topRef.current) / scrollable));
+      if (scrollable <= 0) return;
+      const raw = (window.scrollY - topRef.current) / scrollable;
+      targetP = Math.max(0, Math.min(1, raw * sensitivity));
+    };
 
-        // Scrub video
-        const vid = videoRef.current;
-        if (vid && vid.readyState >= 2 && vid.duration) {
-          vid.currentTime = 1 + p * (vid.duration - 1);
-        }
+    const stopPlayback = () => {
+      const vid = videoRef.current;
+      if (!vid) return;
+      if (!vid.paused) vid.pause();
+      vid.playbackRate = 1;
+      playbackMode = false;
+    };
 
-        // Progress bar — always update (cheap, no layout)
-        if (barRef.current) barRef.current.style.width = `${p * 100}%`;
+    const runFrame = () => {
+      const now = performance.now();
+      const y = window.scrollY;
+      const dt = Math.max(1, now - lastTime);
 
-        // Phase transitions — only update DOM on change
-        const phase = p < HERO_END ? 0 : p < MAIN_END ? 1 : 2;
-        if (phase !== lastPhase) {
-          lastPhase = phase;
-          applyFade(heroRef.current,    phase === 0);
-          applyFade(mainRef.current,    phase === 1);
-          applyFade(leavingRef.current, phase === 2);
+      displayP += (targetP - displayP) * smoothFactor;
+      if (Math.abs(targetP - displayP) < 0.001) displayP = targetP;
+
+      const vid = videoRef.current;
+      if (vid && vid.readyState >= 2 && vid.duration) {
+        const dp = displayP - lastP;
+        const dy = y - lastY;
+        const velocity = Math.abs(dp) / dt;
+
+        if (isMobile) {
+          // En mobile el video queda fijo para eliminar lag de decode/seek.
+          if (playbackMode || !vid.paused || vid.playbackRate !== 1) {
+            stopPlayback();
+          }
+        } else {
+          const targetTime = 1 + displayP * (vid.duration - 1);
+          const deltaTime = targetTime - vid.currentTime;
+          const canSeek = now - lastSeekTime >= seekThrottle;
+
+          // Desktop mantiene seek sincronizado.
+          if (dy > 0 && velocity > playbackVelocityThreshold) {
+            const nextRate = Math.min(maxPlaybackRate, Math.max(0.85, velocity * 1300));
+            vid.playbackRate = nextRate;
+            if (vid.paused) {
+              void vid.play().catch(() => {
+                playbackMode = false;
+              });
+            }
+            playbackMode = true;
+          } else {
+            if (playbackMode) stopPlayback();
+            if (canSeek && Math.abs(deltaTime) > seekEpsilon) {
+              vid.currentTime = targetTime;
+              lastSeekTime = now;
+            }
+          }
         }
       }
-      rafId = requestAnimationFrame(tick);
+
+      // Progress bar — always update (cheap, no layout)
+      if (barRef.current) barRef.current.style.width = `${displayP * 100}%`;
+
+      // Phase transitions — only update DOM on change
+      const phase = displayP < HERO_END ? 0 : displayP < MAIN_END ? 1 : 2;
+      if (phase !== lastPhase) {
+        lastPhase = phase;
+        applyFade(heroRef.current,    phase === 0);
+        applyFade(mainRef.current,    phase === 1);
+        applyFade(leavingRef.current, phase === 2);
+      }
+
+      lastP = displayP;
+      lastY = y;
+      lastTime = now;
+
+      const recentlyScrolled = now - lastScrollAt < 180;
+      const needsSmoothing = Math.abs(targetP - displayP) > 0.001;
+      const shouldKeepRunning = recentlyScrolled || needsSmoothing;
+
+      if (shouldKeepRunning) {
+        rafId = requestAnimationFrame(runFrame);
+      } else {
+        running = false;
+        stopPlayback();
+      }
     };
 
-    rafId = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', cachePos);
+    const startLoop = () => {
+      if (running) return;
+      running = true;
+      rafId = requestAnimationFrame(runFrame);
     };
-  }, []);
+
+    const onScroll = () => {
+      lastScrollAt = performance.now();
+      readTargetProgress();
+      startLoop();
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    readTargetProgress();
+    displayP = targetP;
+    startLoop();
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', cachePos);
+
+      stopPlayback();
+    };
+  }, [isMobile, isLowEndDevice]);
+
+  const sectionHeight = isMobile
+    ? (isLowEndDevice ? MOBILE_LOW_END_HEIGHT : MOBILE_HEIGHT)
+    : DESKTOP_HEIGHT;
+  const videoSrc = isMobile ? '/scroll-video-web-720.mp4' : '/scroll-video-web.mp4';
 
   return (
-    <section ref={sectionRef} id="inicio" style={{ height: '250vh' }} className="relative">
+    <section
+      ref={sectionRef}
+      id="inicio"
+      style={{ height: sectionHeight, touchAction: 'pan-y' }}
+      className="relative"
+    >
       <div className="sticky top-0 h-screen overflow-hidden">
 
         {/* Video */}
         <video
           ref={videoRef}
-          src="/scroll-video-web.mp4"
+          src={videoSrc}
           muted
           playsInline
-          preload="auto"
-          onLoadedMetadata={(e) => { (e.target as HTMLVideoElement).currentTime = 1; }}
+          preload={isMobile ? 'metadata' : 'auto'}
+          onLoadedMetadata={(e) => {
+            const v = e.target as HTMLVideoElement;
+            if (isMobile) {
+              const previewTime = Math.max(0, Math.min(3, v.duration - 0.05));
+              v.currentTime = Number.isFinite(previewTime) ? previewTime : 0;
+            } else {
+              v.currentTime = 1;
+            }
+            if (isMobile) v.pause();
+          }}
+          onSeeked={(e) => {
+            if (!isMobile) return;
+            const v = e.target as HTMLVideoElement;
+            v.pause();
+          }}
           className="absolute inset-0 w-full h-full object-cover"
         />
 
@@ -126,7 +267,7 @@ export function ScrollVideoSection() {
               <span className="animate-ping absolute inset-0 rounded-full bg-green-400 opacity-75" />
               <span className="relative rounded-full h-2 w-2 bg-green-400" />
             </span>
-            {profile.location} · Disponible para proyectos
+            {profile.location} · {language === 'en' ? 'Available for projects' : 'Disponible para proyectos'}
           </p>
 
           <h1 className="text-5xl sm:text-6xl font-bold text-white mb-3 leading-tight drop-shadow-xl">
@@ -142,7 +283,7 @@ export function ScrollVideoSection() {
               className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-medium text-sm hover:bg-blue-500 transition-all hover:-translate-y-0.5 shadow-lg"
             >
               <Mail size={16} />
-              Contáctame
+              {language === 'en' ? 'Contact me' : 'Contactame'}
             </a>
             <a
               href={profile.links.cv}
@@ -150,7 +291,7 @@ export function ScrollVideoSection() {
               className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white border border-white/30 rounded-xl font-medium text-sm hover:bg-white/20 transition-all hover:-translate-y-0.5"
             >
               <Download size={16} />
-              Descargar CV
+              {language === 'en' ? 'Download CV' : 'Descargar CV'}
             </a>
           </div>
 
@@ -169,7 +310,7 @@ export function ScrollVideoSection() {
           {/* Scroll hint */}
           <a href="#habilidades" className="flex flex-col items-center gap-1 text-white/45 hover:text-white/80 transition-colors animate-bounce">
             <ChevronDown size={20} />
-            <span className="text-xs uppercase tracking-widest">Scroll</span>
+            <span className="text-xs uppercase tracking-widest">{language === 'en' ? 'Scroll' : 'Scroll'}</span>
           </a>
         </div>
 
@@ -180,26 +321,27 @@ export function ScrollVideoSection() {
           style={{ opacity: 0, transform: 'translateY(20px)', transition: 'opacity 0.6s ease, transform 0.6s ease', pointerEvents: 'none', willChange: 'opacity, transform' }}
         >
           <span className="text-xs uppercase tracking-widest text-orange-300 font-semibold mb-4 px-3 py-1 rounded-full border border-orange-300/40 bg-black/20">
-            Full Stack Developer
+            {profile.title}
           </span>
 
           <h2
             className="text-4xl sm:text-5xl font-bold text-white leading-tight mb-5 drop-shadow-xl"
             style={{ textShadow: '0 4px 30px rgba(0,0,0,0.6)' }}
           >
-            Transformo ideas<br />en soluciones reales
+            {language === 'en' ? 'I turn ideas' : 'Transformo ideas'}<br />{language === 'en' ? 'into real solutions' : 'en soluciones reales'}
           </h2>
 
           <p className="text-base sm:text-lg text-white/80 max-w-xl leading-relaxed mb-8">
-            Desarrollo sistemas de impacto en entornos gubernamentales y empresas privadas,
-            desde el frontend hasta la infraestructura.
+            {language === 'en'
+              ? 'I build impactful systems for government and private companies, from frontend to infrastructure.'
+              : 'Desarrollo sistemas de impacto en entornos gubernamentales y empresas privadas, desde el frontend hasta la infraestructura.'}
           </p>
 
           <div className="flex items-center gap-10">
             {[
-              { value: '3+', label: 'años exp.' },
-              { value: '4', label: 'empresas' },
-              { value: '30+', label: 'tecnologías' },
+              { value: '3+', label: language === 'en' ? 'years exp.' : 'anos exp.' },
+              { value: '4', label: language === 'en' ? 'companies' : 'empresas' },
+              { value: '30+', label: language === 'en' ? 'technologies' : 'tecnologias' },
             ].map(({ value, label }) => (
               <div key={label} className="text-center">
                 <p className="text-3xl font-bold text-white drop-shadow">{value}</p>
@@ -215,7 +357,7 @@ export function ScrollVideoSection() {
           className="absolute inset-0 flex flex-col items-center justify-center text-center"
           style={{ opacity: 0, transform: 'translateY(20px)', transition: 'opacity 0.6s ease, transform 0.6s ease', pointerEvents: 'none', willChange: 'opacity, transform' }}
         >
-          <p className="text-white/50 text-sm uppercase tracking-[0.25em]">Explorando habilidades</p>
+          <p className="text-white/50 text-sm uppercase tracking-[0.25em]">{language === 'en' ? 'Exploring skills' : 'Explorando habilidades'}</p>
           <div className="w-px h-10 bg-gradient-to-b from-white/40 to-transparent mx-auto mt-3" />
         </div>
 

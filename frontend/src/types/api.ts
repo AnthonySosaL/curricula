@@ -22,3 +22,29 @@ export interface AuthResponse {
   user: User;
   token: string;
 }
+
+export interface AnalyticsTrendPoint {
+  day: string;
+  visits: number;
+  aiRequests: number;
+}
+
+export interface AnalyticsSummaryResponse {
+  totals: {
+    totalVisits: number;
+    aiRequests: number;
+    authEntryOpens: number;
+    dashboardViews: number;
+    totalUsers: number;
+  };
+  roles: {
+    admins: number;
+    instructors: number;
+    students: number;
+  };
+  conversionRate: number;
+  aiPerVisit: number;
+  dashboardAdoption: number;
+  lastVisitAt: string | null;
+  trend: AnalyticsTrendPoint[];
+}

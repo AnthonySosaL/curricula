@@ -6,6 +6,7 @@ import PortfolioPage from '@/pages/portfolio/PortfolioPage';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import DashboardPage from '@/pages/dashboard/DashboardPage';
+import PublicDashboardPage from '@/pages/dashboard/PublicDashboardPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
 const queryClient = new QueryClient({
@@ -26,7 +27,12 @@ export default function App() {
           <Route path="/login"    element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
-          {/* Panel de admin — protegido con JWT */}
+          {/* Dashboard publico sin sesion con mismo layout */}
+          <Route element={<AppLayout />}>
+            <Route path="/dashboard-public" element={<PublicDashboardPage />} />
+          </Route>
+
+          {/* Dashboard privado — protegido con JWT */}
           <Route
             element={
               <ProtectedRoute>

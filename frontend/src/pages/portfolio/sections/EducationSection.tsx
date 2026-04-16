@@ -1,21 +1,24 @@
 import { GraduationCap, MapPin, Languages } from 'lucide-react';
-import { education, languages } from '@/data/portfolio';
+import { usePortfolioData } from '@/data/portfolio';
 import { useInView } from '@/hooks/useInView';
 import { SectionHeader } from './SkillsSection';
+import { useI18n } from '@/lib/i18n';
 
 export function EducationSection() {
+  const { education, languages } = usePortfolioData();
+  const { language } = useI18n();
   const { ref: headerRef, inView: headerIn } = useInView();
   const { ref: cardsRef, inView: cardsIn } = useInView({ threshold: 0.1 });
   const { ref: langRef, inView: langIn } = useInView({ threshold: 0.3 });
 
   return (
-    <section id="educacion" className="py-24 px-4 bg-[var(--color-bg)]">
+    <section id="educacion" className="py-24 px-4 bg-[var(--color-surface-soft)] border-b border-[var(--color-border)]">
       <div className="max-w-3xl mx-auto">
         <div ref={headerRef}>
           <SectionHeader
-            label="Educación"
-            title="Formación académica"
-            subtitle="Mi base académica y formación continua"
+            label={language === 'en' ? 'Education' : 'Educacion'}
+            title={language === 'en' ? 'Academic background' : 'Formacion academica'}
+            subtitle={language === 'en' ? 'My academic base and continuous learning' : 'Mi base academica y formacion continua'}
             inView={headerIn}
           />
         </div>
@@ -24,7 +27,7 @@ export function EducationSection() {
           {education.map((edu, i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl border border-[var(--color-border)] p-6 flex items-start gap-4 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all"
+              className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-6 flex items-start gap-4 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all"
               style={{
                 opacity: cardsIn ? 1 : 0,
                 transform: cardsIn ? 'translateX(0)' : 'translateX(-24px)',
@@ -58,7 +61,7 @@ export function EducationSection() {
         {/* Idiomas con barras animadas */}
         <div
           ref={langRef}
-          className="mt-6 bg-white rounded-2xl border border-[var(--color-border)] p-6 shadow-[var(--shadow-sm)]"
+          className="mt-6 bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-6 shadow-[var(--shadow-sm)]"
           style={{
             opacity: langIn ? 1 : 0,
             transform: langIn ? 'translateY(0)' : 'translateY(20px)',
@@ -70,7 +73,7 @@ export function EducationSection() {
               <Languages size={16} className="text-[var(--color-primary)]" />
             </div>
             <h3 className="font-semibold text-[var(--color-text)] text-sm uppercase tracking-wide">
-              Idiomas
+              {language === 'en' ? 'Languages' : 'Idiomas'}
             </h3>
           </div>
           <div className="space-y-5">

@@ -38,6 +38,7 @@ export function useLogout() {
 
   return () => {
     logout();
-    navigate('/login');
+    navigate('/', { replace: true });
+    window.location.assign('/');
   };
 }

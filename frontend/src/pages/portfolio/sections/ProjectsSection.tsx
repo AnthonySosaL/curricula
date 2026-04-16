@@ -1,21 +1,24 @@
 import { ExternalLink } from 'lucide-react';
 import { GithubIcon } from '@/components/ui/BrandIcons';
-import { projects } from '@/data/portfolio';
+import { usePortfolioData } from '@/data/portfolio';
 import { useInView } from '@/hooks/useInView';
 import { SectionHeader } from './SkillsSection';
+import { useI18n } from '@/lib/i18n';
 
 export function ProjectsSection() {
+  const { projects } = usePortfolioData();
+  const { language } = useI18n();
   const { ref: headerRef, inView: headerIn } = useInView();
   const { ref: gridRef, inView: gridIn } = useInView({ threshold: 0.05 });
 
   return (
-    <section id="proyectos" className="py-24 px-4 bg-white">
+    <section id="proyectos" className="py-24 px-4 bg-[var(--color-bg)] border-t border-[var(--color-border)]">
       <div className="max-w-5xl mx-auto">
         <div ref={headerRef}>
           <SectionHeader
-            label="Proyectos"
-            title="Lo que he construido"
-            subtitle="Proyectos personales y profesionales que demuestran mis capacidades"
+            label={language === 'en' ? 'Projects' : 'Proyectos'}
+            title={language === 'en' ? 'What I have built' : 'Lo que he construido'}
+            subtitle={language === 'en' ? 'Personal and professional projects that show my capabilities' : 'Proyectos personales y profesionales que demuestran mis capacidades'}
             inView={headerIn}
           />
         </div>
@@ -46,7 +49,7 @@ export function ProjectsSection() {
                   <div>
                     {project.featured && (
                       <span className="inline-block mb-1.5 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                        ⭐ Destacado
+                        ⭐ {language === 'en' ? 'Featured' : 'Destacado'}
                       </span>
                     )}
                     <h3 className="font-bold text-[var(--color-text)] text-lg leading-snug">
@@ -88,7 +91,7 @@ export function ProjectsSection() {
                     className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors"
                   >
                     <GithubIcon size={14} />
-                    Ver código
+                    {language === 'en' ? 'View code' : 'Ver codigo'}
                   </a>
                   {project.demo && (
                     <a
@@ -98,7 +101,7 @@ export function ProjectsSection() {
                       className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors"
                     >
                       <ExternalLink size={14} />
-                      Demo en vivo
+                      {language === 'en' ? 'Live demo' : 'Demo en vivo'}
                     </a>
                   )}
                   <span className="ml-auto">

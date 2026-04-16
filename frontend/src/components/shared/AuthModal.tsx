@@ -1,29 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { X, Mail, Lock, User, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { X, Mail, Lock, User, Eye, EyeOff, ShieldCheck, LineChart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useLogin, useRegister } from '@/hooks/useAuth';
+import { useI18n } from '@/lib/i18n';
 
-const loginSchema = z.object({
-  email: z.string().email('Email inválido'),
-  password: z.string().min(8, 'Mínimo 8 caracteres'),
-});
+type LoginValues = {
+  email: string;
+  password: string;
+};
 
-const registerSchema = z
-  .object({
-    name: z.string().min(2, 'Mínimo 2 caracteres'),
-    email: z.string().email('Email inválido'),
-    password: z.string().min(8, 'Mínimo 8 caracteres'),
-    confirmPassword: z.string(),
-  })
-  .refine((d) => d.password === d.confirmPassword, {
-    message: 'Las contraseñas no coinciden',
-    path: ['confirmPassword'],
-  });
-
-type LoginValues = z.infer<typeof loginSchema>;
-type RegisterValues = z.infer<typeof registerSchema>;
+type RegisterValues = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 interface Props {
   open: boolean;
@@ -76,6 +70,25 @@ export function AuthModal({ open, onClose, defaultTab = 'login' }: Props) {
   const [tab, setTab] = useState<'login' | 'register'>(defaultTab);
   const login = useLogin();
   const register = useRegister();
+  const navigate = useNavigate();
+  const { t } = useI18n();
+
+  const loginSchema = useMemo(() => z.object({
+    email: z.string().email(t('auth.invalidEmail')),
+    password: z.string().min(8, t('auth.min8Chars')),
+  }), [t]);
+
+  const registerSchema = useMemo(() => z
+    .object({
+      name: z.string().min(2, t('auth.min2Chars')),
+      email: z.string().email(t('auth.invalidEmail')),
+      password: z.string().min(8, t('auth.min8Chars')),
+      confirmPassword: z.string(),
+    })
+    .refine((d) => d.password === d.confirmPassword, {
+      message: t('auth.passwordsNoMatch'),
+      path: ['confirmPassword'],
+    }), [t]);
 
   useEffect(() => { setTab(defaultTab); }, [defaultTab]);
 
@@ -107,41 +120,55 @@ export function AuthModal({ open, onClose, defaultTab = 'login' }: Props) {
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-[0_25px_60px_-10px_rgba(0,0,0,0.3)] animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-md bg-[var(--color-card)] rounded-2xl shadow-[0_25px_60px_-10px_rgba(0,0,0,0.3)] animate-in fade-in zoom-in-95 duration-200 border border-[var(--color-border)]">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-[var(--color-primary-light)] flex items-center justify-center">
               <ShieldCheck size={18} className="text-[var(--color-primary)]" />
             </div>
             <div>
-              <h2 className="font-bold text-[var(--color-text)] text-lg leading-none">Panel Admin</h2>
-              <p className="text-xs text-[var(--color-text-muted)] mt-0.5">Acceso restringido</p>
+              <h2 className="font-bold text-[var(--color-text)] text-lg leading-none">{t('brand.dashboardLogin')}</h2>
+              <p className="text-xs text-[var(--color-text-muted)] mt-0.5">{t('auth.professionalAccess')}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-slate-100 transition-colors text-[var(--color-text-muted)]"
+            className="p-2 rounded-lg hover:bg-[var(--color-surface-soft)] transition-colors text-[var(--color-text-muted)]"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex mx-6 mt-5 bg-slate-100 rounded-xl p-1">
-          {(['login', 'register'] as const).map((t) => (
+        <div className="flex mx-6 mt-5 bg-[var(--color-surface-soft)] rounded-xl p-1">
+          {(['login', 'register'] as const).map((tabKey) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
+              key={tabKey}
+              onClick={() => setTab(tabKey)}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                tab === t
-                  ? 'bg-white text-[var(--color-primary)] shadow-[var(--shadow-sm)]'
+                tab === tabKey
+                  ? 'bg-[var(--color-card)] text-[var(--color-primary)] shadow-[var(--shadow-sm)]'
                   : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
               }`}
             >
-              {t === 'login' ? 'Iniciar sesión' : 'Registrarse'}
+              {tabKey === 'login' ? t('auth.login') : t('auth.register')}
             </button>
           ))}
+        </div>
+
+        <div className="mx-6 mt-3">
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              navigate('/dashboard-public');
+            }}
+            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-secondary)] text-sm hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+          >
+            <span>{t('auth.noSessionPublic')}</span>
+            <LineChart size={15} />
+          </button>
         </div>
 
         {/* Forms */}
@@ -149,18 +176,18 @@ export function AuthModal({ open, onClose, defaultTab = 'login' }: Props) {
           {tab === 'login' ? (
             <form onSubmit={loginForm.handleSubmit((d) => login.mutate(d))} className="space-y-4">
               <InputField
-                icon={Mail} label="Email" type="email" placeholder="tu@email.com"
+                icon={Mail} label={t('auth.email')} type="email" placeholder="tu@email.com"
                 error={loginForm.formState.errors.email?.message}
                 {...loginForm.register('email')}
               />
               <InputField
-                icon={Lock} label="Contraseña" type="password" placeholder="••••••••"
+                icon={Lock} label={t('auth.password')} type="password" placeholder="••••••••"
                 showToggle error={loginForm.formState.errors.password?.message}
                 {...loginForm.register('password')}
               />
               {login.error && (
                 <p className="text-sm text-[var(--color-danger)] bg-red-50 px-3 py-2 rounded-xl">
-                  Credenciales inválidas
+                  {t('auth.invalidCredentials')}
                 </p>
               )}
               <button
@@ -168,7 +195,9 @@ export function AuthModal({ open, onClose, defaultTab = 'login' }: Props) {
                 disabled={login.isPending}
                 className="w-full bg-[var(--color-primary)] text-white py-2.5 rounded-xl font-medium text-sm hover:bg-[var(--color-primary-dark)] transition-colors disabled:opacity-50 mt-2"
               >
-                {login.isPending ? 'Ingresando...' : 'Ingresar al panel'}
+                {login.isPending
+                  ? t('auth.signingIn')
+                  : t('auth.loginToDashboard')}
               </button>
             </form>
           ) : (
@@ -179,28 +208,28 @@ export function AuthModal({ open, onClose, defaultTab = 'login' }: Props) {
               className="space-y-4"
             >
               <InputField
-                icon={User} label="Nombre completo" type="text" placeholder="Juan Pérez"
+                icon={User} label={t('auth.fullName')} type="text" placeholder="Juan Perez"
                 error={registerForm.formState.errors.name?.message}
                 {...registerForm.register('name')}
               />
               <InputField
-                icon={Mail} label="Email" type="email" placeholder="tu@email.com"
+                icon={Mail} label={t('auth.email')} type="email" placeholder="tu@email.com"
                 error={registerForm.formState.errors.email?.message}
                 {...registerForm.register('email')}
               />
               <InputField
-                icon={Lock} label="Contraseña" type="password" placeholder="••••••••"
+                icon={Lock} label={t('auth.password')} type="password" placeholder="••••••••"
                 showToggle error={registerForm.formState.errors.password?.message}
                 {...registerForm.register('password')}
               />
               <InputField
-                icon={Lock} label="Confirmar contraseña" type="password" placeholder="••••••••"
+                icon={Lock} label={t('auth.confirmPassword')} type="password" placeholder="••••••••"
                 showToggle error={registerForm.formState.errors.confirmPassword?.message}
                 {...registerForm.register('confirmPassword')}
               />
               {register.error && (
                 <p className="text-sm text-[var(--color-danger)] bg-red-50 px-3 py-2 rounded-xl">
-                  No se pudo crear la cuenta. El email puede estar en uso.
+                  {t('auth.registerFailed')}
                 </p>
               )}
               <button
@@ -208,7 +237,9 @@ export function AuthModal({ open, onClose, defaultTab = 'login' }: Props) {
                 disabled={register.isPending}
                 className="w-full bg-[var(--color-primary)] text-white py-2.5 rounded-xl font-medium text-sm hover:bg-[var(--color-primary-dark)] transition-colors disabled:opacity-50 mt-2"
               >
-                {register.isPending ? 'Creando cuenta...' : 'Crear cuenta'}
+                {register.isPending
+                  ? t('auth.creatingAccount')
+                  : t('auth.createAccount')}
               </button>
             </form>
           )}

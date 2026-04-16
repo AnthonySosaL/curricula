@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link } from 'react-router-dom';
 import { useRegister } from '@/hooks/useAuth';
+import { useI18n } from '@/lib/i18n';
 
 const schema = z
   .object({
@@ -19,6 +20,7 @@ const schema = z
 type FormValues = z.infer<typeof schema>;
 
 export default function RegisterPage() {
+  const { language } = useI18n();
   const register = useRegister();
   const {
     register: field,
@@ -32,17 +34,17 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)] px-4 py-8">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-[var(--shadow-lg)] p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-[var(--color-text)] mb-2">Crear cuenta</h1>
+        <h1 className="text-2xl font-bold text-[var(--color-text)] mb-2">{language === 'en' ? 'Create account' : 'Crear cuenta'}</h1>
         <p className="text-[var(--color-text-secondary)] text-sm mb-6">
-          Únete a Curricula y empieza a aprender
+          {language === 'en' ? 'Join Curricula and start learning' : 'Unete a Curricula y empieza a aprender'}
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {[
-            { name: 'name' as const, label: 'Nombre completo', type: 'text', placeholder: 'Juan Pérez' },
+            { name: 'name' as const, label: language === 'en' ? 'Full name' : 'Nombre completo', type: 'text', placeholder: 'Juan Perez' },
             { name: 'email' as const, label: 'Email', type: 'email', placeholder: 'tu@email.com' },
-            { name: 'password' as const, label: 'Contraseña', type: 'password', placeholder: '••••••••' },
-            { name: 'confirmPassword' as const, label: 'Confirmar contraseña', type: 'password', placeholder: '••••••••' },
+            { name: 'password' as const, label: language === 'en' ? 'Password' : 'Contrasena', type: 'password', placeholder: '••••••••' },
+            { name: 'confirmPassword' as const, label: language === 'en' ? 'Confirm password' : 'Confirmar contrasena', type: 'password', placeholder: '••••••••' },
           ].map(({ name, label, type, placeholder }) => (
             <div key={name}>
               <label className="block text-sm font-medium text-[var(--color-text)] mb-1">
@@ -62,7 +64,7 @@ export default function RegisterPage() {
 
           {register.error && (
             <p className="text-sm text-[var(--color-danger)] bg-[#fef2f2] px-3 py-2 rounded-lg">
-              No se pudo crear la cuenta. El email puede estar en uso.
+              {language === 'en' ? 'Could not create account. The email may already be in use.' : 'No se pudo crear la cuenta. El email puede estar en uso.'}
             </p>
           )}
 
@@ -71,14 +73,14 @@ export default function RegisterPage() {
             disabled={register.isPending}
             className="w-full bg-[var(--color-primary)] text-white py-2 rounded-lg font-medium text-sm hover:bg-[var(--color-primary-dark)] transition-colors disabled:opacity-50"
           >
-            {register.isPending ? 'Creando cuenta...' : 'Crear cuenta'}
+            {register.isPending ? (language === 'en' ? 'Creating account...' : 'Creando cuenta...') : (language === 'en' ? 'Create account' : 'Crear cuenta')}
           </button>
         </form>
 
         <p className="mt-4 text-center text-sm text-[var(--color-text-secondary)]">
-          ¿Ya tienes cuenta?{' '}
+          {language === 'en' ? 'Already have an account?' : 'Ya tienes cuenta?'}{' '}
           <Link to="/login" className="text-[var(--color-primary)] font-medium hover:underline">
-            Inicia sesión
+            {language === 'en' ? 'Sign in' : 'Inicia sesion'}
           </Link>
         </p>
       </div>

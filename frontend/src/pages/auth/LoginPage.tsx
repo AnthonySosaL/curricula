@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link } from 'react-router-dom';
 import { useLogin } from '@/hooks/useAuth';
+import { useI18n } from '@/lib/i18n';
 
 const schema = z.object({
   email: z.string().email('Email inválido'),
@@ -12,6 +13,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export default function LoginPage() {
+  const { language } = useI18n();
   const login = useLogin();
   const {
     register,
@@ -22,9 +24,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)] px-4 py-8">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-[var(--shadow-lg)] p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-[var(--color-text)] mb-2">Iniciar sesión</h1>
+        <h1 className="text-2xl font-bold text-[var(--color-text)] mb-2">{language === 'en' ? 'Sign in' : 'Iniciar sesion'}</h1>
         <p className="text-[var(--color-text-secondary)] text-sm mb-6">
-          Bienvenido de nuevo a Curricula
+          {language === 'en' ? 'Welcome back to Curricula' : 'Bienvenido de nuevo a Curricula'}
         </p>
 
         <form onSubmit={handleSubmit((d) => login.mutate(d))} className="space-y-4">
@@ -45,7 +47,7 @@ export default function LoginPage() {
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text)] mb-1">
-              Contraseña
+              {language === 'en' ? 'Password' : 'Contrasena'}
             </label>
             <input
               {...register('password')}
@@ -60,7 +62,7 @@ export default function LoginPage() {
 
           {login.error && (
             <p className="text-sm text-[var(--color-danger)] bg-[#fef2f2] px-3 py-2 rounded-lg">
-              Credenciales inválidas. Verifica tu email y contraseña.
+              {language === 'en' ? 'Invalid credentials. Check your email and password.' : 'Credenciales invalidas. Verifica tu email y contrasena.'}
             </p>
           )}
 
@@ -69,14 +71,14 @@ export default function LoginPage() {
             disabled={login.isPending}
             className="w-full bg-[var(--color-primary)] text-white py-2 rounded-lg font-medium text-sm hover:bg-[var(--color-primary-dark)] transition-colors disabled:opacity-50"
           >
-            {login.isPending ? 'Ingresando...' : 'Ingresar'}
+            {login.isPending ? (language === 'en' ? 'Signing in...' : 'Ingresando...') : (language === 'en' ? 'Sign in' : 'Ingresar')}
           </button>
         </form>
 
         <p className="mt-4 text-center text-sm text-[var(--color-text-secondary)]">
-          ¿No tienes cuenta?{' '}
+          {language === 'en' ? 'No account yet?' : 'No tienes cuenta?'}{' '}
           <Link to="/register" className="text-[var(--color-primary)] font-medium hover:underline">
-            Regístrate
+            {language === 'en' ? 'Register' : 'Registrate'}
           </Link>
         </p>
       </div>
