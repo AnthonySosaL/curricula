@@ -6,6 +6,7 @@ node_modules/
 .env.local
 .env.production
 .env.*.local
+.env.curricula
 
 # ── Build outputs ────────────────────────────────────────────
 dist/
@@ -44,3 +45,5 @@ frontend/public/scroll-video-fixed.mp4
 video.mp4
 video2.mp4
 video3.mp4
+
+.vercel

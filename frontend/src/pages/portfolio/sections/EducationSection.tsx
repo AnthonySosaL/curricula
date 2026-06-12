@@ -4,7 +4,7 @@ import { useInView } from '@/hooks/useInView';
 import { SectionHeader } from './SkillsSection';
 import { useI18n } from '@/lib/i18n';
 
-export function EducationSection() {
+export function EducationSection({ className = 'bg-[var(--color-surface-soft)]' }: { className?: string }) {
   const { education, languages } = usePortfolioData();
   const { language } = useI18n();
   const { ref: headerRef, inView: headerIn } = useInView();
@@ -12,7 +12,7 @@ export function EducationSection() {
   const { ref: langRef, inView: langIn } = useInView({ threshold: 0.3 });
 
   return (
-    <section id="educacion" className="py-24 px-4 bg-[var(--color-surface-soft)] border-b border-[var(--color-border)]">
+    <section id="educacion" className={`py-24 px-4 border-b border-[var(--color-border)] ${className}`}>
       <div className="max-w-3xl mx-auto">
         <div ref={headerRef}>
           <SectionHeader
@@ -69,7 +69,7 @@ export function EducationSection() {
           }}
         >
           <div className="flex items-center gap-2 mb-5">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
               <Languages size={16} className="text-[var(--color-primary)]" />
             </div>
             <h3 className="font-semibold text-[var(--color-text)] text-sm uppercase tracking-wide">
@@ -87,7 +87,7 @@ export function EducationSection() {
                 </div>
                 <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[var(--color-primary)] to-blue-400"
+                    className="h-full rounded-full bg-gradient-to-r from-[var(--color-primary)] to-orange-400"
                     style={{
                       width: langIn ? `${percent}%` : '0%',
                       transition: `width 1s cubic-bezier(0.22, 1, 0.36, 1) ${i * 200 + 400}ms`,

@@ -4,7 +4,7 @@ import { SectionHeader } from './SkillsSection';
 import { usePortfolioData } from '@/data/portfolio';
 import { useI18n } from '@/lib/i18n';
 
-export function CertificatesSection() {
+export function CertificatesSection({ className = 'bg-[var(--color-card)]' }: { className?: string }) {
   const { profile } = usePortfolioData();
   const { language } = useI18n();
   const { ref: headerRef, inView: headerIn } = useInView();
@@ -25,7 +25,7 @@ export function CertificatesSection() {
   ];
 
   return (
-    <section id="certificados" className="py-16 px-4 bg-[var(--color-card)] border-y border-[var(--color-border)]">
+    <section id="certificados" className={`py-16 px-4 border-y border-[var(--color-border)] ${className}`}>
       <div className="max-w-4xl mx-auto">
         <div ref={headerRef}>
           <SectionHeader

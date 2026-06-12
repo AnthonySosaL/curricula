@@ -28,7 +28,7 @@ interface Props {
 function InputField({
   icon: Icon, label, type, placeholder, error, showToggle, ...rest
 }: {
-  icon: React.ElementType;
+  icon: React.ComponentType<{ size?: number | string; className?: string }>;
   label: string;
   type: string;
   placeholder: string;

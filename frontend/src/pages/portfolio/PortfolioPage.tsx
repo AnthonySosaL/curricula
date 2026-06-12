@@ -10,6 +10,7 @@ import { EducationSection } from './sections/EducationSection';
 import { ContactSection } from './sections/ContactSection';
 import { CertificatesSection } from './sections/CertificatesSection';
 import { ChatWidget } from './sections/ChatWidget';
+import { BootLoadingScreen } from './sections/BootLoadingScreen';
 import { AuthModal } from '@/components/shared/AuthModal';
 import { GlobalControls } from '@/components/shared/GlobalControls';
 import { cn } from '@/lib/utils';
@@ -27,6 +28,21 @@ const MOBILE_BOOT_VIDEOS = [
   '/scroll-video-web-720.mp4',
   '/scroll-video2-web-720.mp4',
   '/scroll-video3-web-720.mp4',
+];
+
+const ROBOT_MODEL_URL = '/models/RobotExpressive.glb';
+
+// Chorros de pintura bajo la navbar: anchos/largos variados = borde derretido organico
+const PAINT_DRIPS = [
+  { left: '4%',  w: 7,  h: 22, dur: 6.5, delay: 0 },
+  { left: '12%', w: 10, h: 30, dur: 7.5, delay: 0.8 },
+  { left: '23%', w: 6,  h: 16, dur: 5.6, delay: 1.6 },
+  { left: '34%', w: 12, h: 34, dur: 8.2, delay: 0.4 },
+  { left: '47%', w: 7,  h: 20, dur: 6.0, delay: 2.1 },
+  { left: '58%', w: 9,  h: 26, dur: 7.0, delay: 1.2 },
+  { left: '69%', w: 6,  h: 15, dur: 5.2, delay: 2.8 },
+  { left: '80%', w: 11, h: 32, dur: 8.8, delay: 0.2 },
+  { left: '91%', w: 8,  h: 24, dur: 6.8, delay: 1.9 },
 ];
 
 const NAV_LINKS = [
@@ -58,7 +74,7 @@ function useActiveSection() {
   return active;
 }
 
-function Navbar({ onDashboardLoginClick }: { onDashboardLoginClick: () => void }) {
+function Navbar({ onDashboardLoginClick, entered }: { onDashboardLoginClick: () => void; entered: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const active = useActiveSection();
@@ -86,13 +102,38 @@ function Navbar({ onDashboardLoginClick }: { onDashboardLoginClick: () => void }
   return (
     <header
       className={cn(
-        'fixed top-0 inset-x-0 z-50 transition-all duration-300',
+        'fixed top-0 inset-x-0 z-50',
         isDark
-          ? 'bg-slate-950/85 backdrop-blur-md border-b border-slate-800/90'
-          : 'bg-white/90 backdrop-blur-md border-b border-[var(--color-border)]',
+          ? 'bg-[#1a0808]/85 backdrop-blur-md border-b border-red-900/60'
+          : 'bg-[#fff8f6]/90 backdrop-blur-md border-b border-red-200/80',
         scrolled ? 'shadow-[var(--shadow-md)]' : 'shadow-[var(--shadow-sm)]',
       )}
+      style={{
+        // Entrada lenta desde arriba cuando termina el boot loader
+        transform: entered ? 'translateY(0)' : 'translateY(-110%)',
+        transition: 'transform 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.25s, background-color 0.3s ease, box-shadow 0.3s ease',
+      }}
     >
+      {/* Borde fundido: gradiente fluyendo + pintura derritiendose + gotitas que caen */}
+      <div className="nav-flow-border" aria-hidden="true" />
+      {PAINT_DRIPS.map((d) => (
+        <span
+          key={d.left}
+          className="nav-paint-drip"
+          style={{
+            left: d.left,
+            width: `${d.w}px`,
+            height: `${d.h}px`,
+            animationDuration: `${d.dur}s`,
+            animationDelay: `${d.delay}s`,
+          }}
+          aria-hidden="true"
+        />
+      ))}
+      {/* Gotitas desprendiendose de los chorros mas largos */}
+      <span className="nav-drip" style={{ left: 'calc(34% + 4px)', top: 'calc(100% + 26px)', animationDelay: '0.9s' }} aria-hidden="true" />
+      <span className="nav-drip" style={{ left: 'calc(80% + 3px)', top: 'calc(100% + 24px)', animationDelay: '2.2s', animationDuration: '4.1s' }} aria-hidden="true" />
+      <span className="nav-drip" style={{ left: 'calc(12% + 3px)', top: 'calc(100% + 22px)', animationDelay: '3.1s', animationDuration: '3.8s' }} aria-hidden="true" />
       <nav className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         <span className="font-bold text-lg tracking-tight text-[var(--color-primary)]">
           {profile.name.split(' ')[0]}
@@ -108,10 +149,10 @@ function Navbar({ onDashboardLoginClick }: { onDashboardLoginClick: () => void }
                 className={cn(
                   'relative px-2.5 xl:px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors whitespace-nowrap',
                   active === id
-                    ? (isDark ? 'text-blue-300 bg-slate-800/90' : 'text-[var(--color-primary)] bg-blue-50')
+                    ? (isDark ? 'text-red-300 bg-slate-800/90' : 'text-[var(--color-primary)] bg-red-50')
                     : (isDark
-                      ? 'text-slate-300 hover:text-blue-300 hover:bg-slate-800/75'
-                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-blue-50'),
+                      ? 'text-slate-300 hover:text-red-300 hover:bg-slate-800/75'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-red-50'),
                 )}
               >
                 {label}
@@ -152,7 +193,7 @@ function Navbar({ onDashboardLoginClick }: { onDashboardLoginClick: () => void }
         <div
           className={cn(
             'lg:hidden px-4 pb-4 border-b',
-            isDark ? 'bg-slate-950/95 border-slate-800/90' : 'bg-white border-[var(--color-border)]',
+            isDark ? 'bg-[#1a0808]/95 border-red-900/60' : 'bg-[var(--color-card)] border-[var(--color-border)]',
           )}
         >
           <ul className="space-y-1">
@@ -164,10 +205,10 @@ function Navbar({ onDashboardLoginClick }: { onDashboardLoginClick: () => void }
                   className={cn(
                     'block px-3 py-2 rounded-lg text-sm font-medium transition-colors',
                     active === id
-                      ? (isDark ? 'text-blue-300 bg-slate-800/90' : 'text-[var(--color-primary)] bg-blue-50')
+                      ? (isDark ? 'text-red-300 bg-slate-800/90' : 'text-[var(--color-primary)] bg-red-50')
                       : (isDark
-                        ? 'text-slate-300 hover:text-blue-300 hover:bg-slate-800/75'
-                        : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-blue-50'),
+                        ? 'text-slate-300 hover:text-red-300 hover:bg-slate-800/75'
+                        : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-red-50'),
                   )}
                 >
                   {label}
@@ -177,7 +218,7 @@ function Navbar({ onDashboardLoginClick }: { onDashboardLoginClick: () => void }
             <li>
               <button
                 onClick={() => { setOpen(false); onDashboardLoginClick(); }}
-                className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-[var(--color-primary)] hover:bg-blue-50 transition-colors"
+                className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-[var(--color-primary)] hover:bg-red-50 transition-colors"
               >
                 {t('brand.dashboardLogin')}
               </button>
@@ -220,36 +261,11 @@ function SideScrollProgress() {
         <div className="h-36 sm:h-48 w-1 rounded-full bg-black/20 backdrop-blur-sm overflow-hidden border border-white/25">
           <div
             ref={fillRef}
-            className="w-full bg-gradient-to-t from-[var(--color-primary)] to-cyan-300 transition-[height] duration-150"
+            className="w-full bg-gradient-to-t from-red-600 to-amber-300 transition-[height] duration-150"
             style={{ height: '0%' }}
           />
         </div>
         <span ref={pctRef} className="text-[10px] font-semibold text-white/80 bg-black/40 px-1.5 py-0.5 rounded-md">0%</span>
-      </div>
-    </div>
-  );
-}
-
-function PortfolioLoadingScreen({ progress }: { progress: number }) {
-  const { t } = useI18n();
-
-  return (
-    <div className="fixed inset-0 z-[200] bg-[radial-gradient(circle_at_15%_20%,#1d4ed8_0%,#0b1020_36%,#020617_100%)] flex items-center justify-center px-6">
-      <div className="w-full max-w-md">
-        <p className="text-xs uppercase tracking-[0.24em] text-cyan-200/85 mb-2">Portfolio Loading</p>
-        <h2 className="text-white text-2xl sm:text-3xl font-bold mb-4">{t('portfolio.loadingTitle')}</h2>
-
-        <div className="w-full h-3 rounded-full bg-white/10 border border-white/15 overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-500 transition-[width] duration-200"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-
-        <div className="mt-3 flex items-center justify-between text-sm text-white/80">
-          <span>{t('portfolio.loadingSubtitle')}</span>
-          <span className="font-bold text-cyan-200">{progress}%</span>
-        </div>
       </div>
     </div>
   );
@@ -286,20 +302,29 @@ function usePortfolioBootLoader() {
       setProgress(Math.min(100, Math.round(display)));
 
       if (display >= 100 && canFinish()) {
+        // 600ms da tiempo al fade-out del boot loader antes de desmontarlo
         window.setTimeout(() => {
           if (!cancelled) setReady(true);
-        }, 220);
+        }, 600);
         return;
       }
 
       raf = requestAnimationFrame(sync);
     };
 
+    const totalResources = sources.length + 1; // videos + modelo 3D del robot
+
     const markDone = () => {
       loaded += 1;
-      target = Math.round((loaded / sources.length) * 100);
-      if (loaded >= sources.length) target = 100;
+      target = Math.round((loaded / totalResources) * 100);
+      if (loaded >= totalResources) target = 100;
     };
+
+    // Precarga el GLB del robot para que el avatar 3D aparezca al instante
+    fetch(ROBOT_MODEL_URL)
+      .then((r) => (r.ok ? r.arrayBuffer() : null))
+      .catch(() => null)
+      .then(() => { if (!cancelled) markDone(); });
 
     const videos: HTMLVideoElement[] = [];
     sources.forEach((src) => {
@@ -415,9 +440,9 @@ export default function PortfolioPage() {
 
   return (
     <div className="bg-[var(--color-bg)] min-h-screen">
-      {!bootReady && <PortfolioLoadingScreen progress={bootProgress} />}
-      <Navbar onDashboardLoginClick={handleDashboardLoginClick} />
-      <ScrollVideoSection />
+      {!bootReady && <BootLoadingScreen progress={bootProgress} />}
+      <Navbar onDashboardLoginClick={handleDashboardLoginClick} entered={bootReady} />
+      <ScrollVideoSection started={bootReady} />
       <VideoSectionGroup
         videoSrc="/scroll-video2-web.mp4"
         mobileVideoSrc="/scroll-video2-web-720.mp4"
@@ -432,11 +457,23 @@ export default function PortfolioPage() {
       >
         <ExperienceSection className={videoSectionOverlay} />
       </VideoSectionGroup>
+      <VideoSectionGroup
+        videoSrc="/scroll-video4-web.mp4"
+        mobileVideoSrc="/scroll-video4-web-720.mp4"
+        overlay="bg-black/30"
+      >
+        <ProjectsSection className={videoSectionOverlay} />
+        <CertificatesSection className={videoSectionOverlay} />
+      </VideoSectionGroup>
+      <VideoSectionGroup
+        videoSrc="/scroll-video5-web.mp4"
+        mobileVideoSrc="/scroll-video5-web-720.mp4"
+        overlay="bg-black/30"
+      >
+        <EducationSection className={videoSectionOverlay} />
+        <ContactSection className={videoSectionOverlay} />
+      </VideoSectionGroup>
       <div className="relative z-10">
-        <ProjectsSection />
-        <CertificatesSection />
-        <EducationSection />
-        <ContactSection />
         <Footer />
       </div>
       <BackToTop />

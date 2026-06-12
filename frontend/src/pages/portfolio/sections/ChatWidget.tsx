@@ -177,13 +177,13 @@ export function ChatWidget() {
         style={{ maxHeight: '480px' }}
       >
         {/* Header */}
-        <div className={`flex items-center gap-3 p-4 border-b bg-gradient-to-r from-[var(--color-primary)] to-blue-500 rounded-t-2xl ${isDark ? 'border-slate-700/70' : 'border-[var(--color-border)]'}`}>
+        <div className={`flex items-center gap-3 p-4 border-b bg-gradient-to-r from-[var(--color-primary)] to-orange-500 rounded-t-2xl ${isDark ? 'border-slate-700/70' : 'border-[var(--color-border)]'}`}>
           <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
             <Bot size={18} className="text-white" />
           </div>
           <div className="flex-1">
             <p className="font-semibold text-white text-sm">{language === 'en' ? 'Anthony Assistant' : 'Asistente de Anthony'}</p>
-            <p className="text-blue-100 text-xs flex items-center gap-1">
+            <p className="text-red-100 text-xs flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-green-300 inline-block" />
               {language === 'en' ? 'AI · Replies in seconds' : 'IA · Responde en segundos'}
             </p>
@@ -203,7 +203,7 @@ export function ChatWidget() {
             <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
               <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
                 msg.role === 'assistant'
-                  ? (isDark ? 'bg-slate-800 text-blue-300' : 'bg-blue-50 text-[var(--color-primary)]')
+                  ? (isDark ? 'bg-slate-800 text-red-300' : 'bg-red-50 text-[var(--color-primary)]')
                   : (isDark ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-500')
               }`}>
                 {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
@@ -220,11 +220,11 @@ export function ChatWidget() {
           {loading && (
             <div className="flex flex-col gap-1.5">
               <div className="flex gap-2">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isDark ? 'bg-slate-800' : 'bg-blue-50'}`}>
-                  <Bot size={14} className={isDark ? 'text-blue-300' : 'text-[var(--color-primary)]'} />
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isDark ? 'bg-slate-800' : 'bg-red-50'}`}>
+                  <Bot size={14} className={isDark ? 'text-red-300' : 'text-[var(--color-primary)]'} />
                 </div>
                 <div className={`px-3 py-2 rounded-2xl rounded-tl-sm flex items-center gap-1.5 ${isDark ? 'bg-slate-800 border border-slate-700' : 'bg-[var(--color-bg)]'}`}>
-                  <Loader2 size={13} className={isDark ? 'animate-spin text-blue-300' : 'animate-spin text-[var(--color-primary)]'} />
+                  <Loader2 size={13} className={isDark ? 'animate-spin text-red-300' : 'animate-spin text-[var(--color-primary)]'} />
                   <span className="text-xs text-[var(--color-text-muted)]">
                     {slowLoad
                       ? (language === 'en' ? 'Waking up server (~30s)...' : 'Despertando servidor (~30s)...')
@@ -251,7 +251,7 @@ export function ChatWidget() {
                 onClick={() => send(s)}
                 className={`text-xs px-2.5 py-1 rounded-full border text-left leading-tight transition-colors ${
                   isDark
-                    ? 'border-slate-700 text-slate-200 bg-slate-800 hover:border-blue-400 hover:text-blue-300'
+                    ? 'border-slate-700 text-slate-200 bg-slate-800 hover:border-red-400 hover:text-red-300'
                     : 'border-[var(--color-border)] text-[var(--color-text-secondary)] bg-white hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
                 }`}
               >

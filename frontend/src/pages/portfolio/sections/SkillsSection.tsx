@@ -5,7 +5,7 @@ import { useI18n } from '@/lib/i18n';
 
 const CATEGORY_COLORS: Record<string, { badge: string; icon: string }> = {
   Frontend:               { badge: 'bg-violet-50 text-violet-700 border-violet-200', icon: 'bg-violet-100 text-violet-600' },
-  Backend:                { badge: 'bg-blue-50 text-blue-700 border-blue-200',       icon: 'bg-blue-100 text-blue-600' },
+  Backend:                { badge: 'bg-red-50 text-red-700 border-red-200',       icon: 'bg-red-100 text-red-600' },
   'Bases de datos & ORM': { badge: 'bg-green-50 text-green-700 border-green-200',    icon: 'bg-green-100 text-green-600' },
   'Databases & ORM':      { badge: 'bg-green-50 text-green-700 border-green-200',    icon: 'bg-green-100 text-green-600' },
   'Cloud & DevOps':       { badge: 'bg-amber-50 text-amber-700 border-amber-200',    icon: 'bg-amber-100 text-amber-600' },
@@ -26,20 +26,20 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
   const { language } = useI18n();
   const softSkills = language === 'en'
     ? [
-      { name: 'Leadership', icon: Target, level: 88, desc: 'Led teams in government projects', color: 'text-blue-600 bg-blue-50' },
+      { name: 'Leadership', icon: Target, level: 88, desc: 'Led teams in government projects', color: 'text-red-600 bg-red-50' },
       { name: 'Teamwork', icon: Users, level: 95, desc: 'Effective collaboration in remote and hybrid teams', color: 'text-green-600 bg-green-50' },
       { name: 'Problem solving', icon: Lightbulb, level: 90, desc: 'Diagnosis and resolution of complex technical problems', color: 'text-amber-600 bg-amber-50' },
       { name: 'Adaptability', icon: Zap, level: 92, desc: 'Fast adaptation to new technologies and environments', color: 'text-violet-600 bg-violet-50' },
       { name: 'Proactivity', icon: GitMerge, level: 87, desc: 'Proposes improvements before they are requested', color: 'text-rose-600 bg-rose-50' },
-      { name: 'Communication', icon: MessageSquare, level: 85, desc: 'Clear technical reporting for teams and clients', color: 'text-cyan-600 bg-cyan-50' },
+      { name: 'Communication', icon: MessageSquare, level: 85, desc: 'Clear technical reporting for teams and clients', color: 'text-orange-600 bg-orange-50' },
     ]
     : [
-      { name: 'Liderazgo', icon: Target, level: 88, desc: 'Coordine equipos en proyectos gubernamentales', color: 'text-blue-600 bg-blue-50' },
+      { name: 'Liderazgo', icon: Target, level: 88, desc: 'Coordine equipos en proyectos gubernamentales', color: 'text-red-600 bg-red-50' },
       { name: 'Trabajo en equipo', icon: Users, level: 95, desc: 'Colaboracion efectiva en entornos remotos e hibridos', color: 'text-green-600 bg-green-50' },
       { name: 'Resolucion de problemas', icon: Lightbulb, level: 90, desc: 'Diagnostico y solucion de problemas tecnicos complejos', color: 'text-amber-600 bg-amber-50' },
       { name: 'Adaptabilidad', icon: Zap, level: 92, desc: 'Me adapto rapido a nuevas tecnologias y entornos', color: 'text-violet-600 bg-violet-50' },
       { name: 'Proactividad', icon: GitMerge, level: 87, desc: 'Propongo mejoras antes de que sean solicitadas', color: 'text-rose-600 bg-rose-50' },
-      { name: 'Comunicacion', icon: MessageSquare, level: 85, desc: 'Reportes tecnicos claros para equipos y clientes', color: 'text-cyan-600 bg-cyan-50' },
+      { name: 'Comunicacion', icon: MessageSquare, level: 85, desc: 'Reportes tecnicos claros para equipos y clientes', color: 'text-orange-600 bg-orange-50' },
     ];
   const phases = language === 'en'
     ? [
@@ -209,7 +209,7 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
                 <p className="text-xs text-[var(--color-text-muted)] mb-2.5 leading-snug">{desc}</p>
                 <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[var(--color-primary)] to-blue-400"
+                    className="h-full rounded-full bg-gradient-to-r from-[var(--color-primary)] to-orange-400"
                     style={{ width: `${level}%` }}
                   />
                 </div>
@@ -305,7 +305,7 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
                     <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
                       <div
                         ref={el => { barRefs.current[i] = el; }}
-                        className="h-full rounded-full bg-gradient-to-r from-[var(--color-primary)] to-blue-400"
+                        className="h-full rounded-full bg-gradient-to-r from-[var(--color-primary)] to-orange-400"
                         style={{ width: '0%', transition: 'width 1s cubic-bezier(0.22, 1, 0.36, 1)' }}
                       />
                     </div>
@@ -332,7 +332,7 @@ export function SectionHeader({
 }: { label: string; title: string; subtitle?: string; inView?: boolean }) {
   return (
     <div className="text-center">
-      <span className="inline-block px-3 py-1 rounded-full bg-blue-50 text-[var(--color-primary)] text-xs font-semibold uppercase tracking-widest mb-3"
+      <span className="inline-block px-3 py-1 rounded-full bg-red-50 text-[var(--color-primary)] text-xs font-semibold uppercase tracking-widest mb-3"
         style={{ opacity: inView ? 1 : 0, transform: inView ? 'translateY(0)' : 'translateY(16px)', transition: 'opacity 0.5s ease, transform 0.5s ease' }}>
         {label}
       </span>

@@ -34,6 +34,12 @@ const dictionary: Dictionary = {
 
   'portfolio.loadingTitle': { es: 'Inicializando escena', en: 'Initializing scene' },
   'portfolio.loadingSubtitle': { es: 'Cargando videos y recursos visuales', en: 'Loading videos and visual assets' },
+  'boot.title': { es: 'Secuencia de arranque', en: 'Boot sequence' },
+  'boot.core': { es: 'Inicializando nucleo del sistema', en: 'Initializing system core' },
+  'boot.videos': { es: 'Cargando escenas de video', en: 'Loading video scenes' },
+  'boot.robot': { es: 'Despertando asistente 3D', en: 'Waking up the 3D assistant' },
+  'boot.ui': { es: 'Componiendo interfaz', en: 'Composing the interface' },
+  'boot.ready': { es: 'Todo listo, bienvenido', en: 'All set, welcome' },
   'portfolio.footerBuilt': { es: 'Hecho con React + NestJS + Neon', en: 'Built with React + NestJS + Neon' },
 
   'auth.email': { es: 'Email', en: 'Email' },

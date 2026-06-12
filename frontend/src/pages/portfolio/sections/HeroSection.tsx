@@ -54,7 +54,7 @@ export function HeroSection() {
             className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-2xl ring-4 ring-white/20"
           />
         ) : (
-          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 to-blue-400 flex items-center justify-center shadow-2xl border-4 border-white ring-4 ring-white/20">
+          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-red-500 to-orange-400 flex items-center justify-center shadow-2xl border-4 border-white ring-4 ring-white/20">
             <span className="text-4xl font-bold text-white">
               {profile.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
             </span>
@@ -64,7 +64,7 @@ export function HeroSection() {
 
       <div className="text-center max-w-2xl">
         {/* Badge disponible */}
-        <p className={`inline-flex items-center gap-2 text-blue-300 font-semibold text-sm uppercase tracking-widest mb-3 ${cls('delay-[80ms]')}`}>
+        <p className={`inline-flex items-center gap-2 text-red-300 font-semibold text-sm uppercase tracking-widest mb-3 ${cls('delay-[80ms]')}`}>
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
@@ -97,7 +97,7 @@ export function HeroSection() {
         <div className={`flex flex-wrap items-center justify-center gap-3 mb-8 ${cls('delay-[320ms]')}`}>
           <a
             href="#contacto"
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-medium text-sm hover:bg-blue-500 transition-all hover:-translate-y-0.5 shadow-lg"
+            className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-xl font-medium text-sm hover:bg-red-500 transition-all hover:-translate-y-0.5 shadow-lg"
           >
             <Mail size={16} />
             Contáctame

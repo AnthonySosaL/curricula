@@ -20,14 +20,14 @@ function CopyButton({ text, title }: { text: string; title: string }) {
     <button
       onClick={handleCopy}
       title={title}
-      className="ml-auto p-1.5 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-blue-50 transition-all shrink-0"
+      className="ml-auto p-1.5 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-red-50 transition-all shrink-0"
     >
       {copied ? <Check size={14} className="text-[var(--color-success)]" /> : <Copy size={14} />}
     </button>
   );
 }
 
-export function ContactSection() {
+export function ContactSection({ className = 'bg-[var(--color-card)]' }: { className?: string }) {
   const { profile } = usePortfolioData();
   const { language } = useI18n();
   const { ref: headerRef, inView: headerIn } = useInView();
@@ -40,8 +40,8 @@ export function ContactSection() {
       label: 'Email',
       value: profile.email,
       href: null,
-      iconColor: 'bg-blue-50 text-[var(--color-primary)]',
-      borderHover: 'hover:border-blue-300',
+      iconColor: 'bg-red-50 text-[var(--color-primary)]',
+      borderHover: 'hover:border-red-300',
       extra: <CopyButton text={profile.email} title={language === 'en' ? 'Copy email' : 'Copiar email'} />,
     },
     {
@@ -67,14 +67,14 @@ export function ContactSection() {
       label: 'LinkedIn',
       value: profile.links.linkedin.replace('https://www.', ''),
       href: profile.links.linkedin,
-      iconColor: 'bg-blue-50 text-blue-600',
-      borderHover: 'hover:border-blue-400',
+      iconColor: 'bg-red-50 text-red-600',
+      borderHover: 'hover:border-red-400',
       extra: null,
     },
   ];
 
   return (
-    <section id="contacto" className="py-24 px-4 bg-[var(--color-card)]">
+    <section id="contacto" className={`py-24 px-4 ${className}`}>
       <div className="max-w-3xl mx-auto">
         <div ref={headerRef}>
           <SectionHeader

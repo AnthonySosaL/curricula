@@ -5,14 +5,14 @@ import { useInView } from '@/hooks/useInView';
 import { SectionHeader } from './SkillsSection';
 import { useI18n } from '@/lib/i18n';
 
-export function ProjectsSection() {
+export function ProjectsSection({ className = 'bg-[var(--color-bg)]' }: { className?: string }) {
   const { projects } = usePortfolioData();
   const { language } = useI18n();
   const { ref: headerRef, inView: headerIn } = useInView();
   const { ref: gridRef, inView: gridIn } = useInView({ threshold: 0.05 });
 
   return (
-    <section id="proyectos" className="py-24 px-4 bg-[var(--color-bg)] border-t border-[var(--color-border)]">
+    <section id="proyectos" className={`py-24 px-4 border-t border-[var(--color-border)] ${className}`}>
       <div className="max-w-5xl mx-auto">
         <div ref={headerRef}>
           <SectionHeader

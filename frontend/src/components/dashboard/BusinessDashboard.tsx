@@ -3,6 +3,7 @@ import { Activity, Bot, ChartColumnBig, Eye, Gauge, RefreshCw, Sparkles, Users }
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useAnalyticsSummary } from '@/hooks/useAnalytics';
+import { useCounter } from '@/hooks/useCounter';
 import { buildAIExecutiveSummary, buildDashboardConclusion } from '@/lib/analytics';
 import { useI18n } from '@/lib/i18n';
 import { api } from '@/lib/api';
@@ -19,6 +20,16 @@ interface ParsedAiResponse {
   oportunidades: string[];
   recomendaciones: string[];
   conclusion: string;
+}
+
+// KPI con contador animado (los valores string, ej. "3.5%", se muestran estaticos)
+function KpiValue({ value }: { value: number | string }) {
+  const count = useCounter(typeof value === 'number' ? value : 0, 1400, typeof value === 'number');
+  return (
+    <p className="text-3xl font-bold text-[var(--color-text)] tabular-nums">
+      {typeof value === 'number' ? count : value}
+    </p>
+  );
 }
 
 function metricTone(value: number) {
@@ -263,7 +274,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
     {
       label: t('dashboard.visits'),
       value: totals?.totalVisits ?? 0,
-      color: 'bg-sky-500',
+      color: 'bg-orange-500',
     },
     {
       label: t('dashboard.aiUsage'),
@@ -304,7 +315,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
       value: totals?.totalVisits ?? 0,
       helper: t('dashboard.kpiVisitsHelp'),
       icon: Eye,
-      accent: 'bg-sky-100 text-sky-700',
+      accent: 'bg-orange-100 text-orange-700',
     },
     {
       title: t('dashboard.kpiAi'),
@@ -330,9 +341,11 @@ export function BusinessDashboard({ publicView = false }: Props) {
   ];
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6 bg-[var(--color-bg)] min-h-full">
+    <div className="dash-cascade p-4 sm:p-6 lg:p-8 space-y-6 bg-[var(--color-bg)] min-h-full">
       <section className="relative overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7">
-        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_10%_20%,rgba(37,99,235,0.12),transparent_38%),radial-gradient(circle_at_90%_80%,rgba(16,185,129,0.10),transparent_36%)]" />
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_10%_20%,rgba(220,38,38,0.10),transparent_38%),radial-gradient(circle_at_90%_80%,rgba(245,158,11,0.10),transparent_36%)]" />
+        {/* Linea fundida animada, misma identidad que la navbar */}
+        <div className="nav-flow-border" style={{ bottom: 0 }} aria-hidden="true" />
         <div className="relative flex flex-col gap-3">
           <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
             Dashboard Login Analytics
@@ -351,7 +364,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
       </section>
 
       {analyticsQuery.isLoading && (
-        <div className="rounded-2xl border border-blue-100 bg-blue-50 text-blue-900 px-4 py-3 text-sm">
+        <div className="rounded-2xl border border-red-100 bg-red-50 text-red-900 px-4 py-3 text-sm">
           {t('dashboard.loadingData')}
         </div>
       )}
@@ -380,7 +393,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
         {kpis.map((item) => {
           const Icon = item.icon;
           return (
-            <Card key={item.title} className="rounded-2xl">
+            <Card key={item.title} className="rounded-2xl dash-card">
               <CardBody className="space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-sm text-[var(--color-text-secondary)]">{item.title}</p>
@@ -388,7 +401,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
                     <Icon size={16} />
                   </span>
                 </div>
-                <p className="text-3xl font-bold text-[var(--color-text)]">{item.value}</p>
+                <KpiValue value={item.value} />
                 <p className="text-xs text-[var(--color-text-muted)]">{item.helper}</p>
               </CardBody>
             </Card>
@@ -397,7 +410,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
       </section>
 
       <section className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <Card className="xl:col-span-2 rounded-2xl">
+        <Card className="xl:col-span-2 rounded-2xl dash-card">
           <CardHeader className="flex items-center justify-between">
             <div>
               <h2 className="text-sm font-semibold text-[var(--color-text)]">{t('dashboard.trendTitle')}</h2>
@@ -414,12 +427,12 @@ export function BusinessDashboard({ publicView = false }: Props) {
                   <div key={point.day} className="flex flex-col items-center gap-2 h-full">
                     <div className="w-full flex items-end justify-center gap-1 flex-1">
                       <div
-                        className="w-2.5 rounded-full bg-sky-500/80"
+                        className="dash-bar w-2.5 rounded-full bg-orange-500/80"
                         style={{ height: visitHeight }}
                         title={`${t('dashboard.visits')} ${point.visits}`}
                       />
                       <div
-                        className="w-2.5 rounded-full bg-indigo-500/80"
+                        className="dash-bar w-2.5 rounded-full bg-red-500/80"
                         style={{ height: aiHeight }}
                         title={`${t('dashboard.aiUsage')} ${point.aiRequests}`}
                       />
@@ -432,7 +445,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
           </CardBody>
         </Card>
 
-        <Card className="rounded-2xl">
+        <Card className="rounded-2xl dash-card">
           <CardHeader>
             <h2 className="text-sm font-semibold text-[var(--color-text)]">{t('dashboard.funnelTitle')}</h2>
             <p className="text-xs text-[var(--color-text-muted)]">{t('dashboard.funnelSubtitle')}</p>
@@ -463,7 +476,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
       </section>
 
       <section className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <Card className="rounded-2xl">
+        <Card className="rounded-2xl dash-card">
           <CardHeader>
             <h2 className="text-sm font-semibold text-[var(--color-text)]">{t('dashboard.activityDistribution')}</h2>
           </CardHeader>
@@ -485,7 +498,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
           </CardBody>
         </Card>
 
-        <Card className="xl:col-span-2 rounded-2xl">
+        <Card className="xl:col-span-2 rounded-2xl dash-card">
           <CardHeader className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-sm font-semibold text-[var(--color-text)]">{t('dashboard.recommendations')}</h2>
@@ -526,11 +539,11 @@ export function BusinessDashboard({ publicView = false }: Props) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {aiParsed.hallazgos.length > 0 && (
-                    <div className="rounded-xl border border-blue-100 bg-blue-50 p-3">
-                      <p className="text-[11px] uppercase tracking-[0.12em] text-blue-800">
+                    <div className="rounded-xl border border-red-100 bg-red-50 p-3">
+                      <p className="text-[11px] uppercase tracking-[0.12em] text-red-800">
                         {language === 'en' ? 'Findings' : 'Hallazgos'}
                       </p>
-                      <ul className="mt-1 text-sm text-blue-900 space-y-1">
+                      <ul className="mt-1 text-sm text-red-900 space-y-1">
                         {aiParsed.hallazgos.map((item) => <li key={item}>• {item}</li>)}
                       </ul>
                     </div>

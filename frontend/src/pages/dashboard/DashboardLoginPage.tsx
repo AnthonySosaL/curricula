@@ -34,9 +34,9 @@ export default function DashboardLoginPage() {
               Elige como quieres entrar: con inicio de sesion para datos reales o sin iniciar sesion para una vista demo profesional.
             </p>
 
-            <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50/70 px-4 py-3">
-              <p className="text-sm font-semibold text-blue-900">Elige tu acceso</p>
-              <p className="text-xs text-blue-800 mt-1">1) Iniciar sesion para datos reales. 2) Entrar sin iniciar sesion para demo.</p>
+            <div className="mt-6 rounded-2xl border border-red-100 bg-red-50/70 px-4 py-3">
+              <p className="text-sm font-semibold text-red-900">Elige tu acceso</p>
+              <p className="text-xs text-red-800 mt-1">1) Iniciar sesion para datos reales. 2) Entrar sin iniciar sesion para demo.</p>
             </div>
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -78,7 +78,7 @@ export default function DashboardLoginPage() {
           </section>
 
           <aside className="rounded-3xl border border-[var(--color-border)] bg-white p-6 sm:p-7 shadow-[var(--shadow-md)]">
-            <div className="w-11 h-11 rounded-xl bg-blue-50 text-[var(--color-primary)] flex items-center justify-center">
+            <div className="w-11 h-11 rounded-xl bg-red-50 text-[var(--color-primary)] flex items-center justify-center">
               <Lock size={18} />
             </div>
             <h2 className="mt-4 text-xl font-bold text-[var(--color-text)]">Acceso profesional</h2>
@@ -93,9 +93,9 @@ export default function DashboardLoginPage() {
               <li>Prompt listo para analisis empresarial con IA</li>
             </ul>
 
-            <div className="mt-6 rounded-2xl border border-sky-100 bg-sky-50 p-4">
-              <p className="text-xs uppercase tracking-wide text-sky-700">Tip</p>
-              <p className="text-sm text-sky-900 mt-1">
+            <div className="mt-6 rounded-2xl border border-orange-100 bg-orange-50 p-4">
+              <p className="text-xs uppercase tracking-wide text-orange-700">Tip</p>
+              <p className="text-sm text-orange-900 mt-1">
                 Usa la vista demo en reuniones y luego inicia sesion para validar resultados contra datos reales.
               </p>
             </div>

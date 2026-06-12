@@ -172,7 +172,7 @@ export function VideoSectionGroup({
             <div className="absolute inset-x-0 top-24 sm:top-28 flex flex-col items-center text-center px-6">
               <span
                 ref={p1Label}
-                className="text-xs uppercase tracking-[0.18em] text-blue-200 font-semibold mb-3 px-3 py-1 rounded-full border border-blue-200/35 bg-black/35 backdrop-blur-sm"
+                className="text-xs uppercase tracking-[0.18em] text-red-200 font-semibold mb-3 px-3 py-1 rounded-full border border-red-200/35 bg-black/35 backdrop-blur-sm"
                 style={{ opacity: 0, transform: 'translateY(18px)', willChange: 'opacity, transform' }}
               >
                 {firstPhase.label}

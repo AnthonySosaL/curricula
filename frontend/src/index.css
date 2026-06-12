@@ -6,10 +6,10 @@
    ============================================================ */
 @layer base {
   :root {
-    /* Primarios */
-    --color-primary:       #2563eb;
-    --color-primary-light: #eff6ff;
-    --color-primary-dark:  #1e40af;
+    /* Primarios — paleta roja llamativa */
+    --color-primary:       #dc2626;
+    --color-primary-light: #fef2f2;
+    --color-primary-dark:  #991b1b;
 
     /* Éxito / Progreso */
     --color-success:       #16a34a;
@@ -24,16 +24,16 @@
     --color-warning:       #f97316;
     --color-info:          #0ea5e9;
 
-    /* Superficies */
-    --color-bg:            #f8fafc;
-    --color-card:          #ffffff;
-    --color-border:        #e2e8f0;
-    --color-surface-soft:  #f1f5f9;
+    /* Superficies — calidas con tinte rojizo para mantener la tematica */
+    --color-bg:            #fdf4f2;
+    --color-card:          #fffaf9;
+    --color-border:        #f1d9d4;
+    --color-surface-soft:  #f9e8e4;
 
-    /* Texto */
-    --color-text:          #0f172a;
-    --color-text-secondary:#475569;
-    --color-text-muted:    #94a3b8;
+    /* Texto — tonos calidos manteniendo contraste */
+    --color-text:          #220d0a;
+    --color-text-secondary:#6e4540;
+    --color-text-muted:    #b08a84;
     --color-text-inverse:  #ffffff;
 
     /* Sombras */
@@ -47,9 +47,9 @@
   }
 
   html[data-theme='dark'] {
-    --color-primary:       #60a5fa;
-    --color-primary-light: #1e293b;
-    --color-primary-dark:  #3b82f6;
+    --color-primary:       #f87171;
+    --color-primary-light: #2a0e0e;
+    --color-primary-dark:  #ef4444;
 
     --color-success:       #22c55e;
     --color-success-light: #052e16;
@@ -61,15 +61,15 @@
     --color-warning:       #fb923c;
     --color-info:          #38bdf8;
 
-    --color-bg:            #020617;
-    --color-card:          #0f172a;
-    --color-border:        #1e293b;
-    --color-surface-soft:  #1e293b;
+    --color-bg:            #160606;
+    --color-card:          #220b0b;
+    --color-border:        #3d1716;
+    --color-surface-soft:  #2e1010;
 
-    --color-text:          #e2e8f0;
-    --color-text-secondary:#94a3b8;
-    --color-text-muted:    #64748b;
-    --color-text-inverse:  #0f172a;
+    --color-text:          #f5e6e3;
+    --color-text-secondary:#cfa49e;
+    --color-text-muted:    #8f6962;
+    --color-text-inverse:  #220d0a;
   }
 
   * {
@@ -156,6 +156,220 @@
 .delay-350 { transition-delay: 350ms; }
 .delay-400 { transition-delay: 400ms; }
 .delay-500 { transition-delay: 500ms; }
+.delay-600 { transition-delay: 600ms; }
+.delay-700 { transition-delay: 700ms; }
+
+/* ============================================================
+   Reveal escalonado lento — fases del scroll-video
+   Los hijos con [data-reveal] entran despacio y en cascada
+   cuando el panel recibe .phase-on (ver applyFade)
+   ============================================================ */
+.phase-panel [data-reveal] {
+  opacity: 0;
+  transform: translateY(34px) scale(0.96);
+  transition:
+    opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.15s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 1.15s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+@media (hover: hover) and (pointer: fine) {
+  .phase-panel [data-reveal] { filter: blur(10px); }
+}
+.phase-panel.phase-on [data-reveal] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+.phase-panel:not(.phase-on) [data-reveal] {
+  transition-duration: 0.3s;
+  transition-delay: 0ms !important;
+}
+
+/* ============================================================
+   Boot loader — anillo, orbitas y log de arranque
+   ============================================================ */
+@keyframes boot-orbit-spin     { to { transform: rotate(360deg); } }
+@keyframes boot-orbit-spin-rev { to { transform: rotate(-360deg); } }
+@keyframes boot-core-pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.92; }
+  50%      { transform: scale(1.07); opacity: 1; }
+}
+@keyframes boot-line-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.boot-orbit      { animation: boot-orbit-spin 5.5s linear infinite; }
+.boot-orbit-rev  { animation: boot-orbit-spin-rev 8.5s linear infinite; }
+.boot-core       { animation: boot-core-pulse 2.4s ease-in-out infinite; }
+.boot-line       { animation: boot-line-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Fondo inmersivo del boot loader: estrellas, orbes y grid en perspectiva */
+@keyframes boot-stars-drift {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-120px); }
+}
+@keyframes boot-stars-twinkle {
+  0%, 100% { opacity: 0.9; }
+  50%      { opacity: 0.45; }
+}
+.boot-stars {
+  position: absolute;
+  top: 0; left: 0;
+  width: 2px; height: 2px;
+  border-radius: 9999px;
+  background: transparent;
+  animation:
+    boot-stars-drift 60s linear infinite,
+    boot-stars-twinkle 3.4s ease-in-out infinite;
+}
+.boot-stars--big {
+  width: 3px; height: 3px;
+  animation-duration: 90s, 5.2s;
+}
+
+@keyframes boot-orb-float {
+  from { transform: translate3d(-5%, -4%, 0) scale(1); }
+  to   { transform: translate3d(6%, 5%, 0) scale(1.18); }
+}
+.boot-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  opacity: 0.45;
+  animation: boot-orb-float 9s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes boot-grid-move {
+  from { background-position: 0 0; }
+  to   { background-position: 0 44px; }
+}
+.boot-grid {
+  position: absolute;
+  left: -40%; right: -40%; bottom: -6%;
+  height: 52%;
+  background-image:
+    linear-gradient(rgba(248, 113, 113, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(248, 113, 113, 0.18) 1px, transparent 1px);
+  background-size: 44px 44px;
+  transform: perspective(440px) rotateX(62deg);
+  transform-origin: center top;
+  animation: boot-grid-move 2.4s linear infinite;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 40%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 40%, black 100%);
+}
+
+/* ============================================================
+   Navbar — borde "fundido" que fluye y gotea
+   ============================================================ */
+@keyframes nav-flow { to { background-position: -200% 0; } }
+.nav-flow-border {
+  position: absolute;
+  left: 0; right: 0; bottom: -2px;
+  height: 2.5px;
+  background: linear-gradient(90deg, #dc2626, #fb923c, #ef4444, #fbbf24, #dc2626);
+  background-size: 200% 100%;
+  animation: nav-flow 4s linear infinite;
+  box-shadow: 0 2px 14px rgb(220 38 38 / 0.55);
+  pointer-events: none;
+}
+/* Chorros de pintura derritiendose: cuelgan del borde y se estiran despacio */
+@keyframes paint-melt {
+  0%   { transform: scaleY(0.45); }
+  50%  { transform: scaleY(1); }
+  100% { transform: scaleY(0.45); }
+}
+.nav-paint-drip {
+  position: absolute;
+  top: 100%;
+  margin-top: -1px;
+  border-radius: 0 0 9999px 9999px;
+  background: linear-gradient(to bottom, #b91c1c, #ef4444 55%, #f97316);
+  transform-origin: top center;
+  animation: paint-melt 7s ease-in-out infinite;
+  box-shadow: 0 2px 8px rgb(220 38 38 / 0.35);
+  pointer-events: none;
+}
+
+/* Gotita que se desprende del chorro y cae */
+@keyframes nav-drip {
+  0%   { transform: translateY(0) scale(0.6); opacity: 0; }
+  15%  { opacity: 0.95; transform: translateY(3px) scale(1); }
+  80%  { opacity: 0.8; }
+  100% { transform: translateY(34px) scale(0.9); opacity: 0; }
+}
+.nav-drip {
+  position: absolute;
+  width: 4px; height: 6px;
+  border-radius: 9999px;
+  background: linear-gradient(to bottom, #ef4444, #f97316);
+  animation: nav-drip 3.4s ease-in infinite;
+  pointer-events: none;
+}
+
+/* ============================================================
+   Dashboard — cascada de entrada, hover de cards y barras creciendo
+   ============================================================ */
+@keyframes dash-rise {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.dash-cascade > * { animation: dash-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.dash-cascade > *:nth-child(2) { animation-delay: 0.08s; }
+.dash-cascade > *:nth-child(3) { animation-delay: 0.16s; }
+.dash-cascade > *:nth-child(4) { animation-delay: 0.24s; }
+.dash-cascade > *:nth-child(5) { animation-delay: 0.32s; }
+.dash-cascade > *:nth-child(6) { animation-delay: 0.40s; }
+
+.dash-card { transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
+.dash-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px -8px rgb(220 38 38 / 0.28);
+  border-color: rgb(248 113 113 / 0.55);
+}
+
+@keyframes dash-bar-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.dash-bar { transform-origin: bottom; animation: dash-bar-grow 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+
+/* ============================================================
+   Indicador de scroll — mouse con rueda (desktop) y chevrons (touch)
+   Desaparece de forma permanente tras el primer scroll
+   ============================================================ */
+@keyframes scroll-wheel {
+  0%   { transform: translateY(0);    opacity: 1; }
+  70%  { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 0; }
+}
+.scroll-mouse {
+  width: 22px; height: 34px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 9999px;
+  display: flex;
+  justify-content: center;
+}
+.scroll-mouse::after {
+  content: '';
+  width: 3px; height: 7px;
+  margin-top: 5px;
+  border-radius: 9999px;
+  background: #f87171;
+  animation: scroll-wheel 1.8s ease-in-out infinite;
+}
+@keyframes swipe-chevron {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  50%      { opacity: 1;    transform: translateY(4px); }
+}
+.swipe-chev { animation: swipe-chevron 1.6s ease-in-out infinite; }
+
+/* ============================================================
+   Avatar 3D — halo animado del personaje
+   ============================================================ */
+@keyframes avatar-halo {
+  0%, 100% { box-shadow: 0 0 26px rgb(248 113 113 / 0.35), 0 0 60px rgb(220 38 38 / 0.20); }
+  50%      { box-shadow: 0 0 42px rgb(251 146 60 / 0.55), 0 0 95px rgb(220 38 38 / 0.35); }
+}
+.avatar-halo { animation: avatar-halo 3.2s ease-in-out infinite; }
 
 /* ============================================================
    Typing cursor blink
