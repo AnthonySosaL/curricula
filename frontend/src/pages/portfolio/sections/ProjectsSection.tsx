@@ -1,4 +1,3 @@
-import { ExternalLink } from 'lucide-react';
 import { GithubIcon } from '@/components/ui/BrandIcons';
 import { usePortfolioData } from '@/data/portfolio';
 import { useInView } from '@/hooks/useInView';
@@ -82,34 +81,12 @@ export function ProjectsSection({ className = 'bg-[var(--color-bg)]' }: { classN
                   ))}
                 </div>
 
-                {/* Links */}
-                <div className="flex items-center gap-3 mt-auto pt-4 border-t border-[var(--color-border)]">
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors"
-                  >
-                    <GithubIcon size={14} />
-                    {language === 'en' ? 'View code' : 'Ver codigo'}
-                  </a>
-                  {project.demo && (
-                    <a
-                      href={project.demo}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors"
-                    >
-                      <ExternalLink size={14} />
-                      {language === 'en' ? 'Live demo' : 'Demo en vivo'}
-                    </a>
-                  )}
-                  <span className="ml-auto">
-                    <span
-                      className="inline-block w-2 h-2 rounded-full"
-                      style={{ backgroundColor: project.color }}
-                    />
-                  </span>
+                {/* Pie decorativo — los links a repos/demos se agregaran cuando esten publicos */}
+                <div className="flex items-center mt-auto pt-4 border-t border-[var(--color-border)]">
+                  <span
+                    className="inline-block w-2 h-2 rounded-full"
+                    style={{ backgroundColor: project.color }}
+                  />
                 </div>
               </div>
             </div>

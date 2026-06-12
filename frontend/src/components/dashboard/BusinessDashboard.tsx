@@ -341,7 +341,15 @@ export function BusinessDashboard({ publicView = false }: Props) {
   ];
 
   return (
-    <div className="dash-cascade p-4 sm:p-6 lg:p-8 space-y-6 bg-[var(--color-bg)] min-h-full">
+    <div className="relative overflow-hidden p-4 sm:p-6 lg:p-8 bg-[var(--color-bg)] min-h-full">
+      {/* Fondo decorativo animado — orbes de luz y grid, misma identidad del boot loader */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <span className="boot-orb w-96 h-96 -top-24 -left-24 bg-red-500/25" />
+        <span className="boot-orb w-80 h-80 top-1/3 -right-20 bg-orange-500/20" style={{ animationDelay: '-3s' }} />
+        <span className="boot-orb w-96 h-96 -bottom-24 left-1/4 bg-red-600/20" style={{ animationDelay: '-6s' }} />
+        <div className="boot-grid" style={{ opacity: 0.35 }} />
+      </div>
+      <div className="dash-cascade relative space-y-6">
       <section className="relative overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7">
         <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_10%_20%,rgba(220,38,38,0.10),transparent_38%),radial-gradient(circle_at_90%_80%,rgba(245,158,11,0.10),transparent_36%)]" />
         {/* Linea fundida animada, misma identidad que la navbar */}
@@ -614,6 +622,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
           </CardBody>
         </Card>
       </section>
+      </div>
     </div>
   );
 }

@@ -427,7 +427,7 @@ export default function PortfolioPage() {
 
   const videoSectionOverlay = theme === 'dark'
     ? 'bg-black/55 backdrop-blur-md'
-    : 'bg-white/30 backdrop-blur-md';
+    : 'bg-white/55 backdrop-blur-lg';
 
   useEffect(() => {
     recordMetric('PORTFOLIO_VISIT');

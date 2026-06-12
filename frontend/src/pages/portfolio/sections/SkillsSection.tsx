@@ -332,7 +332,7 @@ export function SectionHeader({
 }: { label: string; title: string; subtitle?: string; inView?: boolean }) {
   return (
     <div className="text-center">
-      <span className="inline-block px-3 py-1 rounded-full bg-red-50 text-[var(--color-primary)] text-xs font-semibold uppercase tracking-widest mb-3"
+      <span className="inline-block px-3 py-1 rounded-full bg-[var(--color-primary)] text-white shadow-md text-xs font-semibold uppercase tracking-widest mb-3"
         style={{ opacity: inView ? 1 : 0, transform: inView ? 'translateY(0)' : 'translateY(16px)', transition: 'opacity 0.5s ease, transform 0.5s ease' }}>
         {label}
       </span>
