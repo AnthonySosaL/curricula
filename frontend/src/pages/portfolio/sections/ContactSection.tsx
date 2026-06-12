@@ -138,7 +138,6 @@ export function ContactSection({ className = '' }: { className?: string }) {
       badge={language === 'en' ? 'Contact' : 'Contacto'}
       phases={phases}
       className={className}
-      contentMinHeight="min(52vh, 480px)"
     />
   );
 }

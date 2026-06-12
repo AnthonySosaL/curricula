@@ -102,7 +102,6 @@ export function CertificatesSection({ className = '' }: { className?: string }) 
       badge={language === 'en' ? 'Certifications' : 'Certificaciones'}
       phases={phases}
       className={className}
-      contentMinHeight="min(42vh, 380px)"
     />
   );
 }

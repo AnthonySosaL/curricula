@@ -30,6 +30,8 @@ const dictionary: Dictionary = {
   'dashboard.recommendations': { es: 'Recomendaciones con IA', en: 'AI recommendations' },
   'dashboard.conclusion': { es: 'Conclusion automatica', en: 'Automatic conclusion' },
   'dashboard.loadingData': { es: 'Cargando datos reales del backend...', en: 'Loading real backend data...' },
+  'dashboard.loadingDashboard': { es: 'Cargando dashboard', en: 'Loading dashboard' },
+  'dashboard.loadingHint': { es: 'El servidor gratuito puede tardar unos segundos en despertar', en: 'The free server may take a few seconds to wake up' },
   'dashboard.retry': { es: 'Reintentar', en: 'Retry' },
 
   'portfolio.loadingTitle': { es: 'Inicializando escena', en: 'Initializing scene' },

@@ -11,8 +11,6 @@ interface Props {
   badge: string;
   phases: StoryPhase[];
   className?: string;
-  /** Altura del area de contenido en modo sticky (desktop) */
-  contentMinHeight?: string;
 }
 
 /**
@@ -20,9 +18,7 @@ interface Props {
  * en desktop la seccion es alta, el contenido queda pineado (sticky) y las
  * fases van apareciendo conforme el usuario desliza. En mobile se apilan.
  */
-export function ScrollStorySection({
-  id, badge, phases, className = '', contentMinHeight = 'min(56vh, 540px)',
-}: Props) {
+export function ScrollStorySection({ id, badge, phases, className = '' }: Props) {
   const sectionRef    = useRef<HTMLElement>(null);
   const topRef        = useRef(0);
   const scrollableRef = useRef(0);
@@ -129,10 +125,10 @@ export function ScrollStorySection({
       <div className={`sticky top-0 h-screen overflow-hidden flex flex-col justify-center px-4 ${className}`}>
         <div className="max-w-5xl mx-auto w-full">
 
-          <div className="text-center mb-5">{badgeEl}</div>
+          <div className="text-center mb-6">{badgeEl}</div>
 
           {/* Titulos por fase */}
-          <div className="relative text-center mb-7" style={{ minHeight: '64px' }}>
+          <div className="relative text-center mb-10" style={{ minHeight: '92px' }}>
             {phases.map((ph, i) => (
               <div
                 key={ph.title}
@@ -154,14 +150,15 @@ export function ScrollStorySection({
             ))}
           </div>
 
-          {/* Contenido por fase */}
-          <div className="relative" style={{ minHeight: contentMinHeight }}>
+          {/* Contenido por fase — apilado con grid: la altura la define el contenido real */}
+          <div className="grid">
             {phases.map((ph, i) => (
               <div
                 key={ph.title}
                 ref={(el) => { contentRefs.current[i] = el; }}
-                className="absolute inset-0"
+                className="flex items-center justify-center"
                 style={{
+                  gridArea: '1 / 1',
                   opacity: i === 0 ? 1 : 0,
                   transform: i === 0 ? 'translateY(0)' : 'translateY(28px)',
                   transition: 'opacity 0.5s ease, transform 0.5s ease',
@@ -169,14 +166,14 @@ export function ScrollStorySection({
                   willChange: 'opacity, transform',
                 }}
               >
-                {ph.content}
+                <div className="w-full">{ph.content}</div>
               </div>
             ))}
           </div>
 
           {/* Pills de progreso */}
           {phases.length > 1 && (
-            <div className="mt-7 flex items-center justify-center gap-2">
+            <div className="mt-10 flex items-center justify-center gap-2">
               {phases.map((ph, i) => (
                 <span
                   key={ph.title}

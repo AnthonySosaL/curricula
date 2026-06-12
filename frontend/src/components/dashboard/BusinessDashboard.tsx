@@ -372,8 +372,22 @@ export function BusinessDashboard({ publicView = false }: Props) {
       </section>
 
       {analyticsQuery.isLoading && (
-        <div className="rounded-2xl border border-red-100 bg-red-50 text-red-900 px-4 py-3 text-sm">
-          {t('dashboard.loadingData')}
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="relative w-20 h-20 mb-6">
+            <div className="absolute inset-0 rounded-full border-2 border-red-200/70" />
+            <div className="absolute inset-0 rounded-full border-t-2 border-[var(--color-primary)] animate-spin" />
+            <div className="absolute inset-2 boot-orbit">
+              <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24]" />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center text-[var(--color-primary)]">
+              <ChartColumnBig size={20} className="animate-pulse" />
+            </div>
+          </div>
+          <p className="text-base font-bold text-[var(--color-text)]">
+            {t('dashboard.loadingDashboard')}
+            <span className="cursor-blink" />
+          </p>
+          <p className="text-xs text-[var(--color-text-muted)] mt-2">{t('dashboard.loadingHint')}</p>
         </div>
       )}
 
@@ -397,6 +411,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
         </div>
       )}
 
+      {!analyticsQuery.isLoading && (<>
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {kpis.map((item) => {
           const Icon = item.icon;
@@ -622,6 +637,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
           </CardBody>
         </Card>
       </section>
+      </>)}
       </div>
     </div>
   );

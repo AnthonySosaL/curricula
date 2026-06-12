@@ -95,7 +95,6 @@ export function EducationSection({ className = '' }: { className?: string }) {
       badge={language === 'en' ? 'Education' : 'Educacion'}
       phases={phases}
       className={className}
-      contentMinHeight="min(48vh, 440px)"
     />
   );
 }
