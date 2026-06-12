@@ -27,8 +27,28 @@ model User {
   @@map("users")
 }
 
+model AnalyticsEvent {
+  id        String             @id @default(cuid())
+  type      AnalyticsEventType
+  path      String?
+  source    String?
+  meta      Json?
+  createdAt DateTime           @default(now())
+
+  @@index([type, createdAt])
+  @@index([createdAt])
+  @@map("analytics_events")
+}
+
 enum Role {
   ADMIN
   INSTRUCTOR
   STUDENT
+}
+
+enum AnalyticsEventType {
+  PORTFOLIO_VISIT
+  AI_REQUEST
+  AUTH_ENTRY_OPEN
+  DASHBOARD_VIEW
 }

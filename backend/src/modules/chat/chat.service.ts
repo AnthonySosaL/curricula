@@ -80,13 +80,14 @@ export class ChatService {
           ...(isExecutiveRequest
             ? [{
               role: 'system',
-              content: 'If the user requests a tagged executive dashboard analysis, strictly follow the requested sections and keep each section concise.',
+              content: 'You must respond ONLY with a valid JSON object. No markdown, no extra text. Keys: resumen (string, max 2 sentences), hallazgos (array of strings), riesgos (array of strings), oportunidades (array of strings), recomendaciones (array of strings, include action + expected impact), conclusion (string, max 2 sentences).',
             }]
             : []),
           ...messages.slice(-8),
         ],
-        max_tokens: isExecutiveRequest ? 520 : 300,
-        temperature: isExecutiveRequest ? 0.35 : 0.7,
+        max_tokens: isExecutiveRequest ? 800 : 300,
+        temperature: isExecutiveRequest ? 0.2 : 0.7,
+        ...(isExecutiveRequest ? { response_format: { type: 'json_object' } } : {}),
       }),
     });
 
