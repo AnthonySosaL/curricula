@@ -160,6 +160,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(false);
   const [aiSlowLoad, setAiSlowLoad] = useState(false);
+  const [aiRetryNonce, setAiRetryNonce] = useState(0);
 
   const automaticConclusion = useMemo(() => {
     if (!snapshot) return '';
@@ -189,6 +190,11 @@ export function BusinessDashboard({ publicView = false }: Props) {
       setAiError(false);
       setAiSlowLoad(false);
 
+      // Reintenta errores transitorios (rate limit de Groq, cold start de Render)
+      // mostrando "Generando analisis..." en lugar de soltar el error de inmediato.
+      const MAX_ATTEMPTS = 3;
+      try {
+        for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       try {
         const context = buildAIExecutiveSummary(snapshot);
         const lang = language === 'en' ? 'English' : 'Spanish';
@@ -240,16 +246,27 @@ export function BusinessDashboard({ publicView = false }: Props) {
 
         setAiRecommendations(reply);
         setAiParsed(parsed);
+        return;
       } catch (error) {
         const code = (error as { code?: string }).code;
         if (!isCurrentRequest || code === 'ERR_CANCELED') return;
 
+        if (attempt < MAX_ATTEMPTS) {
+          // Backoff progresivo: 4s, 8s
+          await new Promise((resolve) => setTimeout(resolve, attempt * 4000));
+          if (!isCurrentRequest) return;
+          continue;
+        }
+
         setAiParsed(null);
         setAiError(true);
+      }
+        }
       } finally {
-        if (!isCurrentRequest) return;
-        setAiLoading(false);
-        setAiSlowLoad(false);
+        if (isCurrentRequest) {
+          setAiLoading(false);
+          setAiSlowLoad(false);
+        }
       }
     };
 
@@ -260,7 +277,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
       clearTimeout(slowTimer);
       controller.abort();
     };
-  }, [snapshot, language]);
+  }, [snapshot, language, aiRetryNonce]);
 
   const totals = snapshot?.totals;
   const trend = snapshot?.trend ?? [];
@@ -546,8 +563,12 @@ export function BusinessDashboard({ publicView = false }: Props) {
                 )}
               </div>
             ) : aiError ? (
-              <div className="text-sm text-red-700 rounded-xl border border-red-100 bg-red-50 p-3">
-                {t('dashboard.aiError')}
+              <div className="text-sm text-red-700 rounded-xl border border-red-100 bg-red-50 p-3 flex items-center justify-between gap-3">
+                <span>{t('dashboard.aiError')}</span>
+                <Button variant="secondary" size="sm" onClick={() => setAiRetryNonce((n) => n + 1)}>
+                  <RefreshCw size={14} />
+                  {t('dashboard.retry')}
+                </Button>
               </div>
             ) : hasStructuredContent(aiParsed) ? (
               <div className="space-y-3">

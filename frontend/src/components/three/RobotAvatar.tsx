@@ -124,6 +124,11 @@ export default function RobotAvatar({ isMobile, onReady, className }: RobotAvata
         gl={{ antialias: !isMobile, alpha: true, powerPreference: 'high-performance' }}
         style={{ touchAction: 'pan-y' }}
         onPointerMissed={() => emoteRef.current?.()}
+        onCreated={({ gl }) => {
+          // Si el navegador recicla el contexto WebGL (tab en segundo plano),
+          // prevenir el default permite que three lo restaure en vez de quedar en negro
+          gl.domElement.addEventListener('webglcontextlost', (e) => e.preventDefault(), false);
+        }}
       >
         <hemisphereLight intensity={1.15} color="#e0f2fe" groundColor="#1e293b" />
         <directionalLight position={[2.5, 5, 4]} intensity={2.2} />
