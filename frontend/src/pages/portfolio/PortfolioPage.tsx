@@ -427,7 +427,7 @@ export default function PortfolioPage() {
 
   const videoSectionOverlay = theme === 'dark'
     ? 'bg-black/55 backdrop-blur-md'
-    : 'bg-white/55 backdrop-blur-lg';
+    : 'bg-white/30 backdrop-blur-md';
 
   useEffect(() => {
     recordMetric('PORTFOLIO_VISIT');
@@ -463,14 +463,26 @@ export default function PortfolioPage() {
         overlay="bg-black/30"
       >
         <ProjectsSection className={videoSectionOverlay} />
-        <CertificatesSection className={videoSectionOverlay} />
       </VideoSectionGroup>
       <VideoSectionGroup
         videoSrc="/scroll-video5-web.mp4"
         mobileVideoSrc="/scroll-video5-web-720.mp4"
         overlay="bg-black/30"
       >
+        <CertificatesSection className={videoSectionOverlay} />
+      </VideoSectionGroup>
+      <VideoSectionGroup
+        videoSrc="/scroll-video6-web.mp4"
+        mobileVideoSrc="/scroll-video6-web-720.mp4"
+        overlay="bg-black/30"
+      >
         <EducationSection className={videoSectionOverlay} />
+      </VideoSectionGroup>
+      <VideoSectionGroup
+        videoSrc="/scroll-video7-web.mp4"
+        mobileVideoSrc="/scroll-video7-web-720.mp4"
+        overlay="bg-black/30"
+      >
         <ContactSection className={videoSectionOverlay} />
       </VideoSectionGroup>
       <div className="relative z-10">

@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { Mail, Phone, MapPin, Copy, Check } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from '@/components/ui/BrandIcons';
 import { usePortfolioData } from '@/data/portfolio';
-import { useInView } from '@/hooks/useInView';
-import { SectionHeader } from './SkillsSection';
 import { useI18n } from '@/lib/i18n';
+import { ScrollStorySection, type StoryPhase } from './ScrollStorySection';
 
 function CopyButton({ text, title }: { text: string; title: string }) {
   const [copied, setCopied] = useState(false);
@@ -27,12 +26,9 @@ function CopyButton({ text, title }: { text: string; title: string }) {
   );
 }
 
-export function ContactSection({ className = 'bg-[var(--color-card)]' }: { className?: string }) {
+export function ContactSection({ className = '' }: { className?: string }) {
   const { profile } = usePortfolioData();
   const { language } = useI18n();
-  const { ref: headerRef, inView: headerIn } = useInView();
-  const { ref: cardsRef, inView: cardsIn } = useInView({ threshold: 0.1 });
-  const { ref: locationRef, inView: locationIn } = useInView({ threshold: 0.3 });
 
   const items = [
     {
@@ -73,80 +69,76 @@ export function ContactSection({ className = 'bg-[var(--color-card)]' }: { class
     },
   ];
 
-  return (
-    <section id="contacto" className={`py-24 px-4 ${className}`}>
-      <div className="max-w-3xl mx-auto">
-        <div ref={headerRef}>
-          <SectionHeader
-            label={language === 'en' ? 'Contact' : 'Contacto'}
-            title={language === 'en' ? "Let's talk" : 'Hablemos'}
-            subtitle={language === 'en' ? 'Do you have a project in mind or want to work together? Contact me.' : 'Tienes un proyecto en mente o quieres trabajar juntos? Contactame.'}
-            inView={headerIn}
-          />
-        </div>
-
-        <div ref={cardsRef} className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {items.map(({ icon: Icon, label, value, href, iconColor, borderHover, extra }, i) => {
-            const cardClass = `group flex items-center gap-4 p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:shadow-[var(--shadow-md)] hover:-translate-y-1 transition-all ${borderHover}`;
-            const cardStyle = {
-              opacity: cardsIn ? 1 : 0,
-              transform: cardsIn ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.97)',
-              transition: `opacity 0.5s ease ${i * 80}ms, transform 0.5s ease ${i * 80}ms, box-shadow 0.25s ease, border-color 0.25s ease`,
-            };
-            const inner = (
-              <>
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${iconColor} shrink-0 group-hover:scale-110 transition-transform duration-200`}>
-                  <Icon size={20} />
-                </div>
-                <div className="overflow-hidden flex-1 min-w-0">
-                  <p className="text-xs text-[var(--color-text-muted)] font-medium uppercase tracking-wide">
-                    {label}
-                  </p>
-                  <p className="text-sm font-semibold text-[var(--color-text)] truncate group-hover:text-[var(--color-primary)] transition-colors">
-                    {value}
-                  </p>
-                </div>
-                {extra}
-              </>
-            );
-            return href ? (
-              <a key={label} href={href} target="_blank" rel="noreferrer" className={cardClass} style={cardStyle}>
-                {inner}
-              </a>
-            ) : (
-              <div key={label} className={cardClass} style={cardStyle}>
-                {inner}
+  const content = (
+    <div className="max-w-3xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {items.map(({ icon: Icon, label, value, href, iconColor, borderHover, extra }) => {
+          const cardClass = `group flex items-center gap-4 p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:shadow-[var(--shadow-md)] hover:-translate-y-1 transition-all ${borderHover}`;
+          const inner = (
+            <>
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${iconColor} shrink-0 group-hover:scale-110 transition-transform duration-200`}>
+                <Icon size={20} />
               </div>
-            );
-          })}
-        </div>
+              <div className="overflow-hidden flex-1 min-w-0">
+                <p className="text-xs text-[var(--color-text-muted)] font-medium uppercase tracking-wide">
+                  {label}
+                </p>
+                <p className="text-sm font-semibold text-[var(--color-text)] truncate group-hover:text-[var(--color-primary)] transition-colors">
+                  {value}
+                </p>
+              </div>
+              {extra}
+            </>
+          );
+          return href ? (
+            <a key={label} href={href} target="_blank" rel="noreferrer" className={cardClass}>
+              {inner}
+            </a>
+          ) : (
+            <div key={label} className={cardClass}>
+              {inner}
+            </div>
+          );
+        })}
+      </div>
 
-        {/* Ubicación */}
-        <div
-          ref={locationRef}
-          className="mt-4 p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] flex items-center gap-4 hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all"
-          style={{
-            opacity: locationIn ? 1 : 0,
-            transform: locationIn ? 'translateY(0)' : 'translateY(16px)',
-            transition: 'opacity 0.55s ease 400ms, transform 0.55s ease 400ms',
-          }}
-        >
-          <div className="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
-            <MapPin size={20} className="text-[var(--color-accent)]" />
-          </div>
-          <div>
-            <p className="text-xs text-[var(--color-text-muted)] font-medium uppercase tracking-wide">{language === 'en' ? 'Location' : 'Ubicacion'}</p>
-            <p className="text-sm font-semibold text-[var(--color-text)]">{profile.location}</p>
-          </div>
-          <div className="ml-auto flex items-center gap-1.5 text-xs text-[var(--color-success)] font-medium">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-success)] opacity-60" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-success)]" />
-            </span>
-            {language === 'en' ? 'Available' : 'Disponible'}
-          </div>
+      {/* Ubicación */}
+      <div className="mt-4 p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] flex items-center gap-4 hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all">
+        <div className="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
+          <MapPin size={20} className="text-[var(--color-accent)]" />
+        </div>
+        <div>
+          <p className="text-xs text-[var(--color-text-muted)] font-medium uppercase tracking-wide">{language === 'en' ? 'Location' : 'Ubicacion'}</p>
+          <p className="text-sm font-semibold text-[var(--color-text)]">{profile.location}</p>
+        </div>
+        <div className="ml-auto flex items-center gap-1.5 text-xs text-[var(--color-success)] font-medium">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-success)] opacity-60" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-success)]" />
+          </span>
+          {language === 'en' ? 'Available' : 'Disponible'}
         </div>
       </div>
-    </section>
+    </div>
+  );
+
+  const phases: StoryPhase[] = [
+    {
+      title: language === 'en' ? "Let's talk" : 'Hablemos',
+      subtitle: language === 'en'
+        ? 'Do you have a project in mind or want to work together? Contact me.'
+        : 'Tienes un proyecto en mente o quieres trabajar juntos? Contactame.',
+      content,
+    },
+  ];
+
+  return (
+    <ScrollStorySection
+      id="contacto"
+      badge={language === 'en' ? 'Contact' : 'Contacto'}
+      phases={phases}
+      className={className}
+      contentMinHeight="min(52vh, 480px)"
+    />
   );
 }
