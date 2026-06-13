@@ -77,7 +77,11 @@ export function ChatWidget() {
 
     try {
       const res = await api.post<{ reply: string }>('/chat', {
-        messages: newMessages.filter((m) => m.role !== 'assistant' || newMessages.indexOf(m) > 0),
+        // Enviar SOLO { role, content }: el campo `actions` no es valido en el
+        // backend (lo rechaza el ValidationPipe) y rompia el 2do mensaje en adelante.
+        messages: newMessages
+          .filter((m) => m.role !== 'assistant' || newMessages.indexOf(m) > 0)
+          .map((m) => ({ role: m.role, content: m.content })),
       });
       // Botones contextuales (CV, certificado, redes) según lo que pidió el usuario
       const actions = detectChatActions(content, profile.links, language === 'en');
