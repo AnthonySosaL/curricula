@@ -1,77 +1,27 @@
-import { useState, useRef, useEffect, Fragment } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { recordMetric } from '@/lib/analytics';
 import { useI18n } from '@/lib/i18n';
 import { useUiPreferences } from '@/contexts/ui-preferences';
-
-function MarkdownText({ text }: { text: string }) {
-  // Split into lines and group consecutive bullet lines into lists
-  const lines = text.split('\n');
-  const elements: React.ReactNode[] = [];
-  let bulletGroup: string[] = [];
-  let key = 0;
-
-  const flushBullets = () => {
-    if (bulletGroup.length === 0) return;
-    elements.push(
-      <ul key={key++} className="list-disc list-outside pl-4 space-y-0.5 my-1">
-        {bulletGroup.map((b, i) => (
-          <li key={i}><InlineText text={b} /></li>
-        ))}
-      </ul>
-    );
-    bulletGroup = [];
-  };
-
-  for (const line of lines) {
-    const bulletMatch = line.match(/^[-*]\s+(.+)/);
-    if (bulletMatch) {
-      bulletGroup.push(bulletMatch[1]);
-    } else {
-      flushBullets();
-      if (line.trim() === '') {
-        elements.push(<br key={key++} />);
-      } else {
-        elements.push(<p key={key++} className="my-0.5"><InlineText text={line} /></p>);
-      }
-    }
-  }
-  flushBullets();
-
-  return <>{elements}</>;
-}
-
-function InlineText({ text }: { text: string }) {
-  // Handle **bold** and *italic*
-  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
-  return (
-    <>
-      {parts.map((part, i) => {
-        if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={i}>{part.slice(2, -2)}</strong>;
-        }
-        if (part.startsWith('*') && part.endsWith('*')) {
-          return <em key={i}>{part.slice(1, -1)}</em>;
-        }
-        return <Fragment key={i}>{part}</Fragment>;
-      })}
-    </>
-  );
-}
+import { usePortfolioData } from '@/data/portfolio';
+import { MarkdownText } from './chat-markdown';
+import { detectChatActions, ChatActions, type ChatAction } from './chat-actions';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  actions?: ChatAction[];
 }
 
 export function ChatWidget() {
   const { language } = useI18n();
   const { theme } = useUiPreferences();
+  const { profile } = usePortfolioData();
   const isDark = theme === 'dark';
   const suggestions = language === 'en'
-    ? ['What technologies do you master?', 'What is your work experience?', 'Are you available for projects?', 'How can I contact you?']
-    : ['¿Qué tecnologías dominas?', '¿Cuál es tu experiencia laboral?', '¿Estás disponible para proyectos?', '¿Cómo puedo contactarte?'];
+    ? ['What technologies do you master?', 'Can I see your CV?', 'Show me your LinkedIn', 'Are you available for projects?']
+    : ['¿Qué tecnologías dominas?', '¿Me pasas tu CV?', 'Muéstrame tu LinkedIn', '¿Estás disponible para proyectos?'];
 
   const welcomeMessage = language === 'en'
     ? 'Hi! I am Anthony\'s virtual assistant. I can answer questions about his experience, skills, and availability. How can I help you?'
@@ -129,7 +79,9 @@ export function ChatWidget() {
       const res = await api.post<{ reply: string }>('/chat', {
         messages: newMessages.filter((m) => m.role !== 'assistant' || newMessages.indexOf(m) > 0),
       });
-      setMessages((prev) => [...prev, { role: 'assistant', content: res.data.reply }]);
+      // Botones contextuales (CV, certificado, redes) según lo que pidió el usuario
+      const actions = detectChatActions(content, profile.links, language === 'en');
+      setMessages((prev) => [...prev, { role: 'assistant', content: res.data.reply, actions }]);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -214,6 +166,7 @@ export function ChatWidget() {
                   : 'bg-[var(--color-primary)] text-white rounded-tr-sm'
               }`}>
                 {msg.role === 'assistant' ? <MarkdownText text={msg.content} /> : msg.content}
+                {msg.role === 'assistant' && msg.actions && <ChatActions actions={msg.actions} />}
               </div>
             </div>
           ))}

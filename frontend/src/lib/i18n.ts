@@ -40,13 +40,13 @@ const dictionary: Dictionary = {
   'dashLoad.step3': { es: 'Preparando el panel', en: 'Preparing the panel' },
   'dashboard.retry': { es: 'Reintentar', en: 'Retry' },
 
-  'portfolio.loadingTitle': { es: 'Inicializando escena', en: 'Initializing scene' },
+  'portfolio.loadingTitle': { es: 'Cargando portafolio', en: 'Loading portfolio' },
   'portfolio.loadingSubtitle': { es: 'Cargando videos y recursos visuales', en: 'Loading videos and visual assets' },
-  'boot.title': { es: 'Secuencia de arranque', en: 'Boot sequence' },
-  'boot.core': { es: 'Inicializando nucleo del sistema', en: 'Initializing system core' },
+  'boot.title': { es: 'Curricula · Portafolio interactivo', en: 'Curricula · Interactive portfolio' },
+  'boot.core': { es: 'Preparando la experiencia', en: 'Preparing the experience' },
   'boot.videos': { es: 'Cargando escenas de video', en: 'Loading video scenes' },
-  'boot.robot': { es: 'Despertando asistente 3D', en: 'Waking up the 3D assistant' },
-  'boot.ui': { es: 'Componiendo interfaz', en: 'Composing the interface' },
+  'boot.robot': { es: 'Despertando al asistente 3D', en: 'Waking up the 3D assistant' },
+  'boot.ui': { es: 'Componiendo el portafolio', en: 'Composing the portfolio' },
   'boot.ready': { es: 'Todo listo, bienvenido', en: 'All set, welcome' },
   'portfolio.footerBuilt': { es: 'Hecho con React + NestJS + Neon', en: 'Built with React + NestJS + Neon' },
 

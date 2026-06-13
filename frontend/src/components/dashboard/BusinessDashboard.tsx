@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAnalyticsSummary } from '@/hooks/useAnalytics';
@@ -23,6 +23,15 @@ export function BusinessDashboard({ publicView = false }: Props) {
 
   const ai = useAiAnalysis(snapshot, language);
 
+  // Tiempo minimo visible del loader: si los datos llegan muy rapido, igual se
+  // ve la animacion un momento al entrar (evita el parpadeo).
+  const [minTimePassed, setMinTimePassed] = useState(false);
+  useEffect(() => {
+    const t = window.setTimeout(() => setMinTimePassed(true), 1800);
+    return () => window.clearTimeout(t);
+  }, []);
+  const showLoader = analyticsQuery.isLoading || !minTimePassed;
+
   const automaticConclusion = useMemo(
     () => (snapshot ? buildDashboardConclusion(snapshot) : ''),
     [snapshot],
@@ -31,7 +40,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
   return (
     <div className="relative overflow-hidden p-4 sm:p-6 lg:p-8 bg-[var(--color-bg)] min-h-full">
       {/* Pantalla de carga a pantalla completa mientras llegan los datos del backend */}
-      {analyticsQuery.isLoading && <DashboardLoadingScreen />}
+      {showLoader && <DashboardLoadingScreen />}
 
       {/* Fondo decorativo animado — orbes de luz y grid, misma identidad del boot loader */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -68,13 +77,13 @@ export function BusinessDashboard({ publicView = false }: Props) {
           </div>
         )}
 
-        {!analyticsQuery.isLoading && !analyticsQuery.isError && snapshot && snapshot.totals.totalVisits === 0 && (
+        {!showLoader && !analyticsQuery.isError && snapshot && snapshot.totals.totalVisits === 0 && (
           <div className="rounded-2xl border border-amber-100 bg-amber-50 text-amber-900 px-4 py-3 text-sm">
             {t('dashboard.noDataYet')}
           </div>
         )}
 
-        {!analyticsQuery.isLoading && (
+        {!showLoader && (
           <>
             <DashboardMetrics snapshot={snapshot} />
             <section className="grid grid-cols-1 xl:grid-cols-3 gap-4">
