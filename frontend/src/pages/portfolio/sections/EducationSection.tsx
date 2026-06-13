@@ -12,7 +12,8 @@ export function EducationSection({ className = '' }: { className?: string }) {
       {education.map((edu, i) => (
         <div
           key={i}
-          className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-6 flex items-start gap-4 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all"
+          data-card
+          className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-6 flex items-start gap-4 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5"
         >
           <div className="w-12 h-12 rounded-xl bg-green-50 border border-green-200 flex items-center justify-center shrink-0">
             <GraduationCap size={22} className="text-[var(--color-success)]" />
@@ -41,7 +42,7 @@ export function EducationSection({ className = '' }: { className?: string }) {
 
   const languagesContent = (
     <div className="max-w-3xl mx-auto">
-      <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-6 shadow-[var(--shadow-sm)]">
+      <div data-card className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-6 shadow-[var(--shadow-sm)]">
         <div className="flex items-center gap-2 mb-5">
           <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
             <Languages size={16} className="text-[var(--color-primary)]" />

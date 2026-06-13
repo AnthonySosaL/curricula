@@ -73,7 +73,7 @@ export function ContactSection({ className = '' }: { className?: string }) {
     <div className="max-w-3xl mx-auto">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {items.map(({ icon: Icon, label, value, href, iconColor, borderHover, extra }) => {
-          const cardClass = `group flex items-center gap-4 p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:shadow-[var(--shadow-md)] hover:-translate-y-1 transition-all ${borderHover}`;
+          const cardClass = `group flex items-center gap-4 p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:shadow-[var(--shadow-md)] hover:-translate-y-1 ${borderHover}`;
           const inner = (
             <>
               <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${iconColor} shrink-0 group-hover:scale-110 transition-transform duration-200`}>
@@ -91,11 +91,11 @@ export function ContactSection({ className = '' }: { className?: string }) {
             </>
           );
           return href ? (
-            <a key={label} href={href} target="_blank" rel="noreferrer" className={cardClass}>
+            <a key={label} data-card href={href} target="_blank" rel="noreferrer" className={cardClass}>
               {inner}
             </a>
           ) : (
-            <div key={label} className={cardClass}>
+            <div key={label} data-card className={cardClass}>
               {inner}
             </div>
           );
@@ -103,7 +103,7 @@ export function ContactSection({ className = '' }: { className?: string }) {
       </div>
 
       {/* Ubicación */}
-      <div className="mt-4 p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] flex items-center gap-4 hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all">
+      <div data-card className="mt-4 p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] flex items-center gap-4 hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5">
         <div className="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
           <MapPin size={20} className="text-[var(--color-accent)]" />
         </div>

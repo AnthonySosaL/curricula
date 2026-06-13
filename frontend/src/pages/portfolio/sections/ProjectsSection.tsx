@@ -13,7 +13,7 @@ interface ProjectItem {
 
 function ProjectCard({ project, language }: { project: ProjectItem; language: string }) {
   return (
-    <div className="project-card group bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border)] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 flex flex-col">
+    <div data-card className="project-card group bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border)] overflow-hidden hover:-translate-y-1.5 flex flex-col">
       {/* Barra de color con gradiente */}
       <div
         className="h-1.5 w-full"

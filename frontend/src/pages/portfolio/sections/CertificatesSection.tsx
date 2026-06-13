@@ -26,7 +26,8 @@ export function CertificatesSection({ className = '' }: { className?: string }) 
       {certs.map((cert) => (
         <div
           key={cert.name}
-          className="group relative w-full sm:w-80 bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border)] overflow-hidden hover:shadow-[var(--shadow-md)] hover:-translate-y-1 transition-all"
+          data-card
+          className="group relative w-full sm:w-80 bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border)] overflow-hidden hover:shadow-[var(--shadow-md)] hover:-translate-y-1"
         >
           {/* Barra superior con color del proveedor */}
           <div className="h-1" style={{ backgroundColor: cert.color }} />

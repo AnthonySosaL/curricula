@@ -26,6 +26,7 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
   const titleRefs   = useRef<(HTMLDivElement | null)[]>([]);
   const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const pillRefs    = useRef<(HTMLSpanElement | null)[]>([]);
+  const mobileRefs  = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 900px), (pointer: coarse)');
@@ -60,7 +61,12 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
         el.style.pointerEvents = i === phase ? 'auto' : 'none';
       };
       titleRefs.current.forEach((el, i) => place(el, i, 14));
-      contentRefs.current.forEach((el, i) => place(el, i, 28));
+      contentRefs.current.forEach((el, i) => {
+        place(el, i, 28);
+        // .story-active dispara el escalonado de las tarjetas hijas [data-card].
+        // Al salir y volver a la fase, el reveal se reproduce de nuevo.
+        el?.classList.toggle('story-active', i === phase);
+      });
       pillRefs.current.forEach((el, i) => {
         if (!el) return;
         el.style.width      = i === phase ? '28px' : '8px';
@@ -88,6 +94,24 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
     };
   }, [isMobile, phases.length]);
 
+  // Mobile: revela cada bloque (titulo + tarjetas escalonadas) al entrar en viewport
+  useEffect(() => {
+    if (!isMobile) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('story-active');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.18, rootMargin: '0px 0px -10% 0px' },
+    );
+    mobileRefs.current.forEach((el) => el && observer.observe(el));
+    return () => observer.disconnect();
+  }, [isMobile, phases.length]);
+
   const badgeEl = (
     <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-xs font-semibold uppercase tracking-widest">
       {badge}
@@ -100,10 +124,16 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
       <section id={id} ref={sectionRef} className={`relative px-4 py-14 ${className}`}>
         <div className="max-w-5xl mx-auto w-full">
           <div className="text-center mb-6">{badgeEl}</div>
-          <div className="space-y-12">
-            {phases.map((ph) => (
-              <div key={ph.title}>
-                <div className="text-center mb-6">
+          <div className="space-y-14">
+            {phases.map((ph, i) => (
+              <div
+                key={ph.title}
+                ref={(el) => { mobileRefs.current[i] = el; }}
+              >
+                <div
+                  className="text-center mb-6 transition-all duration-700"
+                  data-card
+                >
                   <h2 className="text-3xl font-bold text-white drop-shadow-lg">{ph.title}</h2>
                   {ph.subtitle && (
                     <p className="mt-1.5 text-white/75 text-sm max-w-lg mx-auto drop-shadow">{ph.subtitle}</p>
@@ -156,7 +186,7 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
               <div
                 key={ph.title}
                 ref={(el) => { contentRefs.current[i] = el; }}
-                className="flex items-center justify-center"
+                className={`flex items-center justify-center ${i === 0 ? 'story-active' : ''}`}
                 style={{
                   gridArea: '1 / 1',
                   opacity: i === 0 ? 1 : 0,
