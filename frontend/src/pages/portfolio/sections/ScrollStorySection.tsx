@@ -118,32 +118,29 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
     </span>
   );
 
-  // Mobile: fases apiladas sin sticky, mismo criterio que SkillsSection
+  // Mobile: cada fase es su PROPIA pantalla completa, separada y con entrada
+  // animada al deslizar (en vez de apiladas/amontonadas).
   if (isMobile) {
     return (
-      <section id={id} ref={sectionRef} className={`relative px-4 py-14 ${className}`}>
-        <div className="max-w-5xl mx-auto w-full">
-          <div className="text-center mb-6">{badgeEl}</div>
-          <div className="space-y-14">
-            {phases.map((ph, i) => (
-              <div
-                key={ph.title}
-                ref={(el) => { mobileRefs.current[i] = el; }}
-              >
-                <div
-                  className="text-center mb-6 transition-all duration-700"
-                  data-card
-                >
-                  <h2 className="text-3xl font-bold text-white drop-shadow-lg">{ph.title}</h2>
-                  {ph.subtitle && (
-                    <p className="mt-1.5 text-white/75 text-sm max-w-lg mx-auto drop-shadow">{ph.subtitle}</p>
-                  )}
-                </div>
-                {ph.content}
+      <section id={id} ref={sectionRef} className="relative">
+        {phases.map((ph, i) => (
+          <div
+            key={ph.title}
+            ref={(el) => { mobileRefs.current[i] = el; }}
+            className={`min-h-[100svh] flex flex-col justify-center px-4 py-16 border-b border-white/10 ${className}`}
+          >
+            <div className="max-w-5xl mx-auto w-full">
+              <div className="text-center mb-7" data-card>
+                {badgeEl}
+                <h2 className="mt-3 text-3xl font-bold text-white drop-shadow-lg">{ph.title}</h2>
+                {ph.subtitle && (
+                  <p className="mt-1.5 text-white/75 text-sm max-w-lg mx-auto drop-shadow">{ph.subtitle}</p>
+                )}
               </div>
-            ))}
+              {ph.content}
+            </div>
           </div>
-        </div>
+        ))}
       </section>
     );
   }
