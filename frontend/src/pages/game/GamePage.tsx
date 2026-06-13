@@ -4,7 +4,7 @@ import { Canvas } from '@react-three/fiber';
 import { ArrowLeft, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import { getTopScores, submitScore, type ScoreEntry } from '@/lib/scores';
-import { RunnerScene, type RunnerHandle } from './RunnerScene';
+import { RunnerScene, type RunnerHandle, type Difficulty } from './RunnerScene';
 import { GameOverlay } from './GameOverlay';
 
 type Status = 'start' | 'playing' | 'over';
@@ -20,6 +20,7 @@ export default function GamePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [difficulty, setDifficulty] = useState<Difficulty>('medium');
 
   useEffect(() => {
     const m = window.matchMedia('(max-width: 900px), (pointer: coarse)');
@@ -43,7 +44,7 @@ export default function GamePage() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  const play = () => { setSubmitted(false); setStatus('playing'); game.current?.start(); };
+  const play = () => { setSubmitted(false); setStatus('playing'); game.current?.start(difficulty); };
 
   const handleGameOver = (score: number) => {
     setFinalScore(score);
@@ -82,8 +83,8 @@ export default function GamePage() {
         </Suspense>
       </Canvas>
 
-      {/* Top bar: volver + score */}
-      <div className="absolute top-0 inset-x-0 flex items-center justify-between p-4 pointer-events-none">
+      {/* Top bar: volver + score (z-30 para quedar SOBRE el overlay) */}
+      <div className="absolute top-0 inset-x-0 z-30 flex items-center justify-between p-4 pointer-events-none">
         <Link
           to="/"
           className="pointer-events-auto flex items-center gap-1.5 text-sm text-white/80 hover:text-white bg-black/30 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-white/15"
@@ -121,6 +122,8 @@ export default function GamePage() {
           submitted={submitted}
           submitting={submitting}
           en={en}
+          difficulty={difficulty}
+          onDifficulty={setDifficulty}
           onPlay={play}
           onSubmit={handleSubmit}
         />

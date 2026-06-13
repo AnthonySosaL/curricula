@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Play, RotateCcw, Trophy } from 'lucide-react';
 import type { ScoreEntry } from '@/lib/scores';
+import type { Difficulty } from './RunnerScene';
 
 interface Props {
   mode: 'start' | 'over';
@@ -9,9 +10,17 @@ interface Props {
   submitted: boolean;
   submitting: boolean;
   en: boolean;
+  difficulty: Difficulty;
+  onDifficulty: (d: Difficulty) => void;
   onPlay: () => void;
   onSubmit: (name: string) => void;
 }
+
+const DIFF_LABELS: Record<Difficulty, { es: string; en: string }> = {
+  easy: { es: 'Fácil', en: 'Easy' },
+  medium: { es: 'Medio', en: 'Medium' },
+  hard: { es: 'Difícil', en: 'Hard' },
+};
 
 function Leaderboard({ top, en }: { top: ScoreEntry[]; en: boolean }) {
   return (
@@ -38,7 +47,7 @@ function Leaderboard({ top, en }: { top: ScoreEntry[]; en: boolean }) {
   );
 }
 
-export function GameOverlay({ mode, finalScore, top, submitted, submitting, en, onPlay, onSubmit }: Props) {
+export function GameOverlay({ mode, finalScore, top, submitted, submitting, en, difficulty, onDifficulty, onPlay, onSubmit }: Props) {
   const [name, setName] = useState(() => localStorage.getItem('runner_name') ?? '');
   const isHighEnough = top.length < 5 || finalScore > (top[top.length - 1]?.score ?? 0);
 
@@ -53,9 +62,24 @@ export function GameOverlay({ mode, finalScore, top, submitted, submitting, en, 
                 ? 'Dodge or jump the red barriers. It gets faster!'
                 : 'Esquiva o salta las barreras rojas. ¡Cada vez más rápido!'}
             </p>
-            <p className="text-[11px] text-white/45 mb-5">
+            <p className="text-[11px] text-white/45 mb-4">
               {en ? '← → / A D to move · Space / ↑ / tap to jump' : '← → / A D para moverte · Espacio / ↑ / toca para saltar'}
             </p>
+            <div className="flex gap-2 mb-5">
+              {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => (
+                <button
+                  key={d}
+                  onClick={() => onDifficulty(d)}
+                  className={`flex-1 py-2 rounded-xl text-sm font-medium border transition-colors ${
+                    difficulty === d
+                      ? 'bg-[var(--color-primary)] border-transparent text-white'
+                      : 'border-white/15 text-white/55 hover:text-white hover:border-white/30'
+                  }`}
+                >
+                  {en ? DIFF_LABELS[d].en : DIFF_LABELS[d].es}
+                </button>
+              ))}
+            </div>
           </>
         ) : (
           <>

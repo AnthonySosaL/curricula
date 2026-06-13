@@ -324,22 +324,22 @@ export function ScrollVideoSection({ started = true }: { started?: boolean }) {
             </span>
           </Link>
 
-          {/* Indicador de scroll — discreto, desaparece tras el primer deslizamiento */}
+          {/* Indicador de scroll — rojo y visible, desaparece tras el primer deslizamiento */}
           <a
             data-reveal
             href="#habilidades"
-            className={`delay-600 flex flex-col items-center gap-2 text-white/40 hover:text-white/75 transition-all duration-700 ${hasScrolled ? 'opacity-0! pointer-events-none' : ''}`}
+            className={`delay-600 flex flex-col items-center gap-2 text-red-400 hover:text-red-300 transition-all duration-700 ${hasScrolled ? 'opacity-0! pointer-events-none' : ''}`}
             aria-hidden={hasScrolled}
           >
             {isMobile ? (
-              <span className="flex flex-col items-center -space-y-2.5">
-                <ChevronDown size={18} className="swipe-chev" />
-                <ChevronDown size={18} className="swipe-chev" style={{ animationDelay: '0.2s' }} />
+              <span className="flex flex-col items-center -space-y-2">
+                <ChevronDown size={28} className="swipe-chev" />
+                <ChevronDown size={28} className="swipe-chev" style={{ animationDelay: '0.2s' }} />
               </span>
             ) : (
               <span className="scroll-mouse" />
             )}
-            <span className="text-[10px] uppercase tracking-[0.25em]">
+            <span className="text-xs font-bold uppercase tracking-[0.3em] drop-shadow-[0_2px_6px_rgba(220,38,38,0.6)]">
               {language === 'en' ? 'Scroll' : 'Desliza'}
             </span>
           </a>

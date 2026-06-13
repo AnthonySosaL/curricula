@@ -86,9 +86,11 @@ export function ChatWidget() {
           .slice(-10)
           .map((m) => ({ role: m.role, content: m.content })),
       });
-      // Botones contextuales (CV, certificado, redes) según lo que pidió el usuario
-      const actions = detectChatActions(content, profile.links, language === 'en');
-      setMessages((prev) => [...prev, { role: 'assistant', content: res.data.reply, actions }]);
+      // Botones contextuales: detecta tanto en la pregunta como en la RESPUESTA,
+      // así si la IA ofrece el CV/redes aunque no se lo pidan, el botón aparece.
+      const reply = res.data.reply ?? '';
+      const actions = detectChatActions(`${content}\n${reply}`, profile.links, language === 'en');
+      setMessages((prev) => [...prev, { role: 'assistant', content: reply, actions }]);
     } catch {
       setMessages((prev) => [
         ...prev,
