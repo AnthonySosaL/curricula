@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePortfolioData } from '@/data/portfolio';
 import { GithubIcon, LinkedinIcon } from '@/components/ui/BrandIcons';
-import { Mail, Download, ChevronDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Mail, Download, ChevronDown, Gamepad2 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import { Avatar3D } from '@/components/three/Avatar3D';
 
@@ -308,6 +309,20 @@ export function ScrollVideoSection({ started = true }: { started?: boolean }) {
               <LinkedinIcon size={18} />
             </a>
           </div>
+
+          {/* Botón al mini-juego Robot Runner */}
+          <Link
+            data-reveal
+            to="/juego"
+            className="delay-500 group mb-9 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-red-600 to-orange-500 text-white text-sm font-semibold shadow-lg hover:brightness-110 hover:-translate-y-0.5 transition-all"
+          >
+            <Gamepad2 size={18} className="group-hover:rotate-12 transition-transform" />
+            {language === 'en' ? 'Play: Robot Runner' : 'Juega: Robot Runner'}
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inset-0 rounded-full bg-amber-300 opacity-80" />
+              <span className="relative rounded-full h-2 w-2 bg-amber-300" />
+            </span>
+          </Link>
 
           {/* Indicador de scroll — discreto, desaparece tras el primer deslizamiento */}
           <a
