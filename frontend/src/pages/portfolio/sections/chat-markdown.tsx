@@ -1,5 +1,20 @@
 import { Fragment } from 'react';
 
+// Limpia "basura" que a veces genera el LLM: placeholders en <...>, etiquetas HTML,
+// URLs crudas (el boton ya las maneja) e instrucciones tipo "(haga clic aqui...)".
+function cleanReply(text: string): string {
+  return text
+    .replace(/<[^>]*>/g, '')                                  // <boton...>, <button>, <https://...>
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')                  // markdown [texto](url) -> texto
+    .replace(/\b(?:https?:\/\/|www\.)[^\s)<>]+/gi, '')        // URLs crudas
+    .replace(/\((?:[^)]*?(?:haga clic|hacer clic|click|por favor)[^)]*?)\)/gi, '') // "(Por favor, haga clic...)"
+    .replace(/\(\s*[:：.]?\s*\)/g, '')                         // parentesis vacios
+    .replace(/[ \t]+([.,;:])/g, '$1')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 // Negritas/itálicas inline
 function InlineText({ text }: { text: string }) {
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
@@ -16,7 +31,7 @@ function InlineText({ text }: { text: string }) {
 
 // Render ligero de markdown: párrafos y listas con viñetas
 export function MarkdownText({ text }: { text: string }) {
-  const lines = text.split('\n');
+  const lines = cleanReply(text).split('\n');
   const elements: React.ReactNode[] = [];
   let bulletGroup: string[] = [];
   let key = 0;
