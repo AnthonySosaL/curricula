@@ -77,10 +77,13 @@ export function ChatWidget() {
 
     try {
       const res = await api.post<{ reply: string }>('/chat', {
-        // Enviar SOLO { role, content }: el campo `actions` no es valido en el
-        // backend (lo rechaza el ValidationPipe) y rompia el 2do mensaje en adelante.
+        // Enviar SOLO { role, content } y solo los ultimos 10 mensajes:
+        // - `actions` no es valido en el backend (lo rechaza el ValidationPipe)
+        // - el cap de 10 evita superar @ArrayMaxSize y permite chatear sin limite
+        //   (el backend igual solo usa los ultimos 8 para el LLM)
         messages: newMessages
           .filter((m) => m.role !== 'assistant' || newMessages.indexOf(m) > 0)
+          .slice(-10)
           .map((m) => ({ role: m.role, content: m.content })),
       });
       // Botones contextuales (CV, certificado, redes) según lo que pidió el usuario
