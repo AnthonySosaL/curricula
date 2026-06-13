@@ -1,16 +1,6 @@
-import { useMemo } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { usePortfolioData } from '@/data/portfolio';
-
-// Genera posiciones aleatorias una sola vez: cada punto es una sombra del mismo div
-function makeStarField(count: number) {
-  return Array.from({ length: count }, () => {
-    const x = Math.round(Math.random() * 100);
-    const y = Math.round(Math.random() * 130);
-    const alpha = (0.25 + Math.random() * 0.65).toFixed(2);
-    return `${x}vw ${y}vh 0 rgba(255, 255, 255, ${alpha})`;
-  }).join(', ');
-}
+import { ImmersiveBackdrop } from '@/components/ui/ImmersiveBackdrop';
 
 const STEPS = [
   { at: 0,  key: 'boot.core' },
@@ -28,22 +18,12 @@ export function BootLoadingScreen({ progress }: { progress: number }) {
   const initials = profile.name.split(' ').map((n) => n[0]).join('').slice(0, 2);
   const offset = RING_C * (1 - Math.min(100, progress) / 100);
   const done = progress >= 100;
-  const stars = useMemo(() => ({ small: makeStarField(80), big: makeStarField(24) }), []);
 
   return (
     <div
       className={`fixed inset-0 z-[200] overflow-hidden bg-[radial-gradient(circle_at_15%_20%,#b91c1c_0%,#1c0808_38%,#0a0203_100%)] flex items-center justify-center px-6 transition-opacity duration-500 ${done ? 'opacity-0' : 'opacity-100'}`}
     >
-      {/* Fondo inmersivo: estrellas que derivan, orbes de luz y grid en perspectiva */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <span className="boot-stars" style={{ boxShadow: stars.small }} />
-        <span className="boot-stars boot-stars--big" style={{ boxShadow: stars.big, animationDelay: '-1.8s' }} />
-        <span className="boot-orb w-72 h-72 -top-16 -left-16 bg-red-600/60" />
-        <span className="boot-orb w-96 h-96 -bottom-24 -right-20 bg-orange-700/60" style={{ animationDelay: '-4.5s' }} />
-        <div className="boot-grid" />
-        {/* Vineta para enfocar el centro */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_30%,rgba(10,2,3,0.6)_100%)]" />
-      </div>
+      <ImmersiveBackdrop />
 
       <div className="relative flex flex-col items-center w-full max-w-sm">
         {/* Nucleo central con anillo de progreso y orbitas */}

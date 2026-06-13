@@ -32,6 +32,12 @@ const dictionary: Dictionary = {
   'dashboard.loadingData': { es: 'Cargando datos reales del backend...', en: 'Loading real backend data...' },
   'dashboard.loadingDashboard': { es: 'Cargando dashboard', en: 'Loading dashboard' },
   'dashboard.loadingHint': { es: 'El servidor gratuito puede tardar unos segundos en despertar', en: 'The free server may take a few seconds to wake up' },
+  'dashLoad.kicker': { es: 'Panel ejecutivo', en: 'Executive panel' },
+  'dashLoad.title': { es: 'Cargando dashboard', en: 'Loading dashboard' },
+  'dashLoad.subtitle': { es: 'Tu radar de negocio en tiempo real', en: 'Your real-time business radar' },
+  'dashLoad.step1': { es: 'Conectando con el servidor', en: 'Connecting to the server' },
+  'dashLoad.step2': { es: 'Obteniendo metricas en tiempo real', en: 'Fetching real-time metrics' },
+  'dashLoad.step3': { es: 'Preparando el panel', en: 'Preparing the panel' },
   'dashboard.retry': { es: 'Reintentar', en: 'Retry' },
 
   'portfolio.loadingTitle': { es: 'Inicializando escena', en: 'Initializing scene' },

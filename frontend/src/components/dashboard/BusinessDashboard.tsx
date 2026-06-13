@@ -4,6 +4,7 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useAnalyticsSummary } from '@/hooks/useAnalytics';
 import { useCounter } from '@/hooks/useCounter';
+import { DashboardLoadingScreen } from './DashboardLoadingScreen';
 import { buildAIExecutiveSummary, buildDashboardConclusion } from '@/lib/analytics';
 import { useI18n } from '@/lib/i18n';
 import { api } from '@/lib/api';
@@ -359,6 +360,8 @@ export function BusinessDashboard({ publicView = false }: Props) {
 
   return (
     <div className="relative overflow-hidden p-4 sm:p-6 lg:p-8 bg-[var(--color-bg)] min-h-full">
+      {/* Pantalla de carga a pantalla completa mientras llegan los datos del backend */}
+      {analyticsQuery.isLoading && <DashboardLoadingScreen />}
       {/* Fondo decorativo animado — orbes de luz y grid, misma identidad del boot loader */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <span className="boot-orb w-96 h-96 -top-24 -left-24 bg-red-500/25" />
@@ -387,26 +390,6 @@ export function BusinessDashboard({ publicView = false }: Props) {
           </p>
         </div>
       </section>
-
-      {analyticsQuery.isLoading && (
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="relative w-20 h-20 mb-6">
-            <div className="absolute inset-0 rounded-full border-2 border-red-200/70" />
-            <div className="absolute inset-0 rounded-full border-t-2 border-[var(--color-primary)] animate-spin" />
-            <div className="absolute inset-2 boot-orbit">
-              <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24]" />
-            </div>
-            <div className="absolute inset-0 flex items-center justify-center text-[var(--color-primary)]">
-              <ChartColumnBig size={20} className="animate-pulse" />
-            </div>
-          </div>
-          <p className="text-base font-bold text-[var(--color-text)]">
-            {t('dashboard.loadingDashboard')}
-            <span className="cursor-blink" />
-          </p>
-          <p className="text-xs text-[var(--color-text-muted)] mt-2">{t('dashboard.loadingHint')}</p>
-        </div>
-      )}
 
       {analyticsQuery.isError && (
         <div className="rounded-2xl border border-red-100 bg-red-50 text-red-900 px-4 py-3 text-sm flex items-center justify-between gap-3">
