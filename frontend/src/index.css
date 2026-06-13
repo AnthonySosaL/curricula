@@ -98,6 +98,18 @@
   html {
     scroll-behavior: smooth;
   }
+
+  /* Accesibilidad: respeta a quien prefiere menos movimiento (y ahorra bateria).
+     Las animaciones decorativas e infinitas se calman; el contenido queda en su
+     estado final visible (los reveals dejan de animar pero se muestran). */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 /* ============================================================
