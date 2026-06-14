@@ -253,10 +253,10 @@ export function ScrollVideoSection({ started = true }: { started?: boolean }) {
         {/* Overlay */}
         <div className="absolute inset-0 bg-black/55" />
 
-        {/* FASE HERO — nombre, foto, CTAs */}
+        {/* FASE HERO — nombre, foto, CTAs (pt para no quedar bajo la navbar fija) */}
         <div
           ref={heroRef}
-          className="phase-panel absolute inset-0 flex flex-col items-center justify-center text-center px-6"
+          className="phase-panel absolute inset-0 flex flex-col items-center justify-center text-center px-6 pt-20 pb-6"
           style={{ opacity: 1, transform: 'translateY(0)', transition: 'opacity 0.6s ease, transform 0.6s ease', willChange: 'opacity, transform' }}
         >
           {/* Personaje 3D interactivo (clic/tap para que reaccione) */}
@@ -277,7 +277,7 @@ export function ScrollVideoSection({ started = true }: { started?: boolean }) {
             {profile.name}
           </h1>
           <p data-reveal className="delay-300 text-xl text-white/85 mb-1">{profile.title}</p>
-          <p data-reveal className="delay-350 text-sm text-white/55 mb-8 tracking-wide">{profile.subtitle}</p>
+          <p data-reveal className="delay-350 text-sm text-white/55 mb-6 tracking-wide">{profile.subtitle}</p>
 
           {/* CTAs */}
           <div data-reveal className="delay-400 flex flex-wrap items-center justify-center gap-3 mb-6">
@@ -299,7 +299,7 @@ export function ScrollVideoSection({ started = true }: { started?: boolean }) {
           </div>
 
           {/* Social */}
-          <div data-reveal className="delay-500 flex items-center gap-3 mb-10">
+          <div data-reveal className="delay-500 flex items-center gap-3 mb-6">
             <a href={profile.links.github} target="_blank" rel="noreferrer"
               className="p-2.5 rounded-lg border border-white/20 text-white/70 hover:text-white hover:border-white/50 transition-all bg-white/10 backdrop-blur-sm">
               <GithubIcon size={18} />
@@ -314,7 +314,7 @@ export function ScrollVideoSection({ started = true }: { started?: boolean }) {
           <Link
             data-reveal
             to="/juego"
-            className="delay-500 group mb-9 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-red-600 to-orange-500 text-white text-sm font-semibold shadow-lg hover:brightness-110 hover:-translate-y-0.5 transition-all"
+            className="delay-500 group mb-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-red-600 to-orange-500 text-white text-sm font-semibold shadow-lg hover:brightness-110 hover:-translate-y-0.5 transition-all"
           >
             <Gamepad2 size={18} className="group-hover:rotate-12 transition-transform" />
             {language === 'en' ? 'Play: Robot Runner' : 'Juega: Robot Runner'}
