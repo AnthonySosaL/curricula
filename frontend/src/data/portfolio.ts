@@ -82,6 +82,15 @@ const esData = {
       color: '#16a34a',
     },
     {
+      name: 'ATLAS Lab · Investigación Cuantitativa',
+      description: 'Laboratorio de trading cuantitativo: generó y validó 34,751 estrategias con rigor estadístico (Deflated Sharpe, Monte Carlo, out-of-sample). Resultados publicados en vivo, incluidos los negativos.',
+      techs: ['Python', 'Pandas', 'Next.js', 'TypeScript', 'MetaTrader 5', 'Vercel'],
+      github: null as string | null,
+      demo: 'https://atlas-lab-one.vercel.app/' as string | null,
+      live: true,
+      color: '#dc2626',
+    },
+    {
       name: 'SIADI 2.0 · Estadisticas Ciudadanas',
       description: 'Sistema web de estadisticas de ciudadanos para el Ministerio de Telecomunicaciones.',
       techs: ['JavaScript', 'HTML5', 'CSS3', 'PostgreSQL', 'AlmaLinux', 'SSL'],
@@ -174,6 +183,15 @@ const enData = {
       github: 'https://github.com/AnthonySosaL',
       demo: null as string | null,
       color: '#16a34a',
+    },
+    {
+      name: 'ATLAS Lab · Quantitative Research',
+      description: 'Quantitative trading laboratory: generated and validated 34,751 strategies with statistical rigor (Deflated Sharpe, Monte Carlo, out-of-sample). Results published live, including the negative ones.',
+      techs: ['Python', 'Pandas', 'Next.js', 'TypeScript', 'MetaTrader 5', 'Vercel'],
+      github: null as string | null,
+      demo: 'https://atlas-lab-one.vercel.app/' as string | null,
+      live: true,
+      color: '#dc2626',
     },
     {
       name: 'SIADI 2.0 · Citizen Statistics',

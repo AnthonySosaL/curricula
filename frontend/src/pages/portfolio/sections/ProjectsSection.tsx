@@ -1,3 +1,4 @@
+import { Globe, ExternalLink } from 'lucide-react';
 import { GithubIcon } from '@/components/ui/BrandIcons';
 import { usePortfolioData } from '@/data/portfolio';
 import { useI18n } from '@/lib/i18n';
@@ -9,11 +10,14 @@ interface ProjectItem {
   techs: string[];
   color: string;
   featured?: boolean;
+  live?: boolean;
+  demo?: string | null;
 }
 
-function ProjectCard({ project, language }: { project: ProjectItem; language: string }) {
+function ProjectCardInner({ project, language }: { project: ProjectItem; language: string }) {
+  const isLive = Boolean(project.live && project.demo);
   return (
-    <div data-card className="project-card group bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border)] overflow-hidden hover:-translate-y-1.5 flex flex-col">
+    <>
       {/* Barra de color con gradiente */}
       <div
         className="h-1.5 w-full"
@@ -27,8 +31,27 @@ function ProjectCard({ project, language }: { project: ProjectItem; language: st
                 ⭐ {language === 'en' ? 'Featured' : 'Destacado'}
               </span>
             )}
-            <h3 className="font-bold text-[var(--color-text)] text-lg leading-snug">
+            {isLive && (
+              <span
+                className="inline-flex items-center gap-1 mb-1.5 text-xs font-semibold px-2 py-0.5 rounded-full border"
+                style={{
+                  backgroundColor: `${project.color}18`,
+                  color: project.color,
+                  borderColor: `${project.color}55`,
+                }}
+              >
+                🌐 {language === 'en' ? 'Live demo' : 'Demo pública'}
+              </span>
+            )}
+            <h3 className="font-bold text-[var(--color-text)] text-lg leading-snug flex items-center gap-1.5">
               {project.name}
+              {isLive && (
+                <ExternalLink
+                  size={14}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ color: project.color }}
+                />
+              )}
             </h3>
           </div>
           <div
@@ -36,7 +59,7 @@ function ProjectCard({ project, language }: { project: ProjectItem; language: st
             style={{ backgroundColor: `${project.color}18` }}
           >
             <div style={{ color: project.color }}>
-              <GithubIcon size={16} />
+              {isLive ? <Globe size={16} /> : <GithubIcon size={16} />}
             </div>
           </div>
         </div>
@@ -62,8 +85,46 @@ function ProjectCard({ project, language }: { project: ProjectItem; language: st
             className="inline-block w-2 h-2 rounded-full"
             style={{ backgroundColor: project.color }}
           />
+          {isLive && (
+            <span
+              className="ml-auto text-xs font-medium flex items-center gap-1"
+              style={{ color: project.color }}
+            >
+              {language === 'en' ? 'Visit site' : 'Visitar sitio'}
+              <ExternalLink size={11} />
+            </span>
+          )}
         </div>
       </div>
+    </>
+  );
+}
+
+function ProjectCard({ project, language }: { project: ProjectItem; language: string }) {
+  const isLive = Boolean(project.live && project.demo);
+  const base = 'project-card group bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border)] overflow-hidden flex flex-col transition-all';
+
+  // Card cliqueable SOLO si tiene live+demo (proyecto público visitable)
+  if (isLive) {
+    return (
+      <a
+        data-card
+        href={project.demo!}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${language === 'en' ? 'Open' : 'Abrir'} ${project.name}`}
+        className={`${base} cursor-pointer hover:-translate-y-2 hover:shadow-xl no-underline text-inherit`}
+        style={{ boxShadow: `0 0 0 1px ${project.color}22` }}
+      >
+        <ProjectCardInner project={project} language={language} />
+      </a>
+    );
+  }
+
+  // Card normal (no cliqueable)
+  return (
+    <div data-card className={`${base} hover:-translate-y-1.5`}>
+      <ProjectCardInner project={project} language={language} />
     </div>
   );
 }
