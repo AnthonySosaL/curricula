@@ -20,6 +20,7 @@ const esData = {
     title: 'Desarrollador Full Stack',
     subtitle: 'Ingenieria de Sistemas · Ecuador',
     bio: 'Estudiante de Ingenieria de Sistemas dinamico y proactivo, con experiencia real en desarrollo Full Stack, analisis de datos, automatizacion e inteligencia artificial.',
+    links: { ...commonProfile.links, cv: '/cv.pdf' },
   },
   skills: [
     { category: 'Frontend', items: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'shadcn/ui', 'React Native', 'Flutter', 'HTML5', 'CSS3'] },
@@ -123,6 +124,7 @@ const enData = {
     title: 'Full Stack Developer',
     subtitle: 'Systems Engineering · Ecuador',
     bio: 'Dynamic and proactive Systems Engineering student with real experience in Full Stack development, data analysis, automation and artificial intelligence.',
+    links: { ...commonProfile.links, cv: '/cv-en.pdf' },
   },
   skills: [
     { category: 'Frontend', items: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'shadcn/ui', 'React Native', 'Flutter', 'HTML5', 'CSS3'] },
