@@ -17,7 +17,7 @@ export function CertificatesSection({ className = '' }: { className?: string }) 
       bg: '#FFF8EE',
       badge: '☁️',
       file: (profile.links as { certificate?: string }).certificate,
-      verify: null as string | null,
+      verify: 'https://www.credly.com/go/7KSHyvoX' as string | null,
     },
   ];
 

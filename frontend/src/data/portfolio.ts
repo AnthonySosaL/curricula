@@ -19,7 +19,7 @@ const esData = {
     ...commonProfile,
     title: 'Desarrollador Full Stack',
     subtitle: 'Ingenieria de Sistemas · Ecuador',
-    bio: 'Estudiante de Ingenieria de Sistemas dinamico y proactivo, con experiencia real en desarrollo Full Stack, analisis de datos, automatizacion e inteligencia artificial.',
+    bio: 'Graduado de Ingenieria de Sistemas de la Informacion, dinamico y proactivo, con experiencia real en desarrollo Full Stack, analisis de datos, automatizacion e inteligencia artificial.',
     links: { ...commonProfile.links, cv: '/cv.pdf' },
   },
   skills: [
@@ -109,7 +109,7 @@ const esData = {
     },
   ],
   education: [
-    { institution: 'Pontificia Universidad Catolica del Ecuador', degree: 'Ingenieria de Sistemas de la Informacion · 8vo semestre', period: '2021 — Presente', location: 'Quito, Ecuador' },
+    { institution: 'Pontificia Universidad Catolica del Ecuador', degree: 'Ingenieria de Sistemas de la Informacion · Graduado', period: '2022 — 2026', location: 'Quito, Ecuador' },
     { institution: 'Unidad Educativa Santo Domingo de Guzman', degree: 'Bachillerato General Unificado', period: '2008 — 2021', location: 'Ecuador' },
   ],
   languages: [
@@ -123,7 +123,7 @@ const enData = {
     ...commonProfile,
     title: 'Full Stack Developer',
     subtitle: 'Systems Engineering · Ecuador',
-    bio: 'Dynamic and proactive Systems Engineering student with real experience in Full Stack development, data analysis, automation and artificial intelligence.',
+    bio: 'Information Systems Engineering graduate, dynamic and proactive, with real experience in Full Stack development, data analysis, automation and artificial intelligence.',
     links: { ...commonProfile.links, cv: '/cv-en.pdf' },
   },
   skills: [
@@ -213,7 +213,7 @@ const enData = {
     },
   ],
   education: [
-    { institution: 'Pontifical Catholic University of Ecuador', degree: 'Information Systems Engineering · 8th semester', period: '2021 — Present', location: 'Quito, Ecuador' },
+    { institution: 'Pontifical Catholic University of Ecuador', degree: 'Information Systems Engineering · Graduate', period: '2022 — 2026', location: 'Quito, Ecuador' },
     { institution: 'Santo Domingo de Guzman School', degree: 'Unified General Baccalaureate', period: '2008 — 2021', location: 'Ecuador' },
   ],
   languages: [

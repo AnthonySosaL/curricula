@@ -1,11 +1,14 @@
-import { GraduationCap, MapPin, Languages } from 'lucide-react';
+import { GraduationCap, MapPin, Languages, Award, Download, ExternalLink } from 'lucide-react';
 import { usePortfolioData } from '@/data/portfolio';
 import { useI18n } from '@/lib/i18n';
 import { ScrollStorySection, type StoryPhase } from './ScrollStorySection';
 
+const AWS_VERIFY_URL = 'https://www.credly.com/go/7KSHyvoX';
+
 export function EducationSection({ className = '' }: { className?: string }) {
-  const { education, languages } = usePortfolioData();
+  const { education, languages, profile } = usePortfolioData();
   const { language } = useI18n();
+  const certFile = (profile.links as { certificate?: string }).certificate;
 
   const educationContent = (
     <div className="max-w-3xl mx-auto space-y-4">
@@ -37,6 +40,49 @@ export function EducationSection({ className = '' }: { className?: string }) {
           </div>
         </div>
       ))}
+
+      <div
+        data-card
+        className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-6 flex items-start gap-4 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5"
+      >
+        <div className="w-12 h-12 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center shrink-0">
+          <Award size={22} className="text-[#FF9900]" />
+        </div>
+        <div className="flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <h3 className="font-bold text-[var(--color-text)]">
+                AWS Academy Graduate · Cloud Foundations
+              </h3>
+              <p className="text-[var(--color-primary)] text-sm font-medium">Amazon Web Services (AWS)</p>
+            </div>
+            <span className="inline-block px-3 py-1 rounded-full bg-orange-50 text-[#FF9900] text-xs font-medium shrink-0">
+              {language === 'en' ? 'April 2026' : 'Abril 2026'}
+            </span>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-4">
+            {certFile && (
+              <a
+                href={certFile}
+                download
+                className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors"
+              >
+                <Download size={13} />
+                {language === 'en' ? 'Download certificate' : 'Descargar certificado'}
+              </a>
+            )}
+            <a
+              href={AWS_VERIFY_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-primary)] hover:underline"
+            >
+              <ExternalLink size={13} />
+              {language === 'en' ? 'Verify on Credly' : 'Verificar en Credly'}
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
