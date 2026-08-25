@@ -99,7 +99,7 @@ export function DashboardAiPanel({
           {dataLoading ? t('dashboard.loadingSummary') : t('dashboard.ready')}
         </div>
 
-        {automaticConclusion && (
+        {automaticConclusion && !(hasStructuredContent(aiParsed) && aiParsed?.conclusion) && (
           <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-3">
             <p className="text-[11px] uppercase tracking-[0.12em] text-emerald-800">{t('dashboard.conclusion')}</p>
             <p className="text-sm text-emerald-900 mt-1">{automaticConclusion}</p>
