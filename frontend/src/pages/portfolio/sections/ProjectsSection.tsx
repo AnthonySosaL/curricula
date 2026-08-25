@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Globe, Info } from 'lucide-react';
 import { GithubIcon } from '@/components/ui/BrandIcons';
 import { usePortfolioData } from '@/data/portfolio';
 import { useI18n } from '@/lib/i18n';
-import { ScrollStorySection, type StoryPhase } from './ScrollStorySection';
 import { ProjectDetailsModal } from './ProjectDetailsModal';
 
 interface ProjectDetail {
@@ -23,6 +22,37 @@ interface ProjectItem {
   github: string | null;
   demo: string | null;
   details?: ProjectDetail;
+}
+
+/**
+ * Revela su contenido (incluidos los [data-card] hijos, ver index.css) cuando
+ * entra en viewport. A diferencia de ScrollStorySection, NO fuerza una altura
+ * de pantalla fija por bloque: la cantidad de proyectos crece con el tiempo y
+ * un contenedor "h-screen" pineado cortaba las filas que no cabian en una
+ * sola pantalla. Esto crece con el contenido, en cualquier tamaño de pantalla.
+ */
+function RevealBlock({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('story-active');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return <div ref={ref}>{children}</div>;
 }
 
 function ProjectCard({
@@ -145,33 +175,49 @@ export function ProjectsSection({ className = '' }: { className?: string }) {
     </div>
   );
 
-  const phases: StoryPhase[] = [
-    {
-      title: language === 'en' ? 'What I have built' : 'Lo que he construido',
-      subtitle: language === 'en'
-        ? 'Featured projects that show my capabilities'
-        : 'Proyectos destacados que demuestran mis capacidades',
-      content: grid(featured),
-    },
-    ...(rest.length > 0
-      ? [{
-          title: language === 'en' ? 'More projects' : 'Mas proyectos',
-          subtitle: language === 'en'
-            ? 'Personal projects, government and private sector work'
-            : 'Proyectos personales y trabajo para sector publico y privado',
-          content: grid(rest),
-        }]
-      : []),
-  ];
-
   return (
     <>
-      <ScrollStorySection
-        id="proyectos"
-        badge={language === 'en' ? 'Projects' : 'Proyectos'}
-        phases={phases}
-        className={className}
-      />
+      <section id="proyectos" className="relative">
+        <div className={`px-4 py-20 sm:py-24 ${className}`}>
+          <div className="max-w-5xl mx-auto w-full">
+            <div className="text-center mb-10">
+              <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-xs font-semibold uppercase tracking-widest">
+                {language === 'en' ? 'Projects' : 'Proyectos'}
+              </span>
+            </div>
+
+            <RevealBlock>
+              <div className="text-center mb-10">
+                <h2 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg">
+                  {language === 'en' ? 'What I have built' : 'Lo que he construido'}
+                </h2>
+                <p className="mt-1.5 text-white/75 text-sm max-w-lg mx-auto drop-shadow">
+                  {language === 'en'
+                    ? 'Featured projects that show my capabilities'
+                    : 'Proyectos destacados que demuestran mis capacidades'}
+                </p>
+              </div>
+              {grid(featured)}
+            </RevealBlock>
+
+            {rest.length > 0 && (
+              <RevealBlock>
+                <div className="text-center mt-16 sm:mt-20 mb-10 pt-16 sm:pt-20 border-t border-white/10">
+                  <h2 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg">
+                    {language === 'en' ? 'More projects' : 'Mas proyectos'}
+                  </h2>
+                  <p className="mt-1.5 text-white/75 text-sm max-w-lg mx-auto drop-shadow">
+                    {language === 'en'
+                      ? 'Personal projects, government and private sector work'
+                      : 'Proyectos personales y trabajo para sector publico y privado'}
+                  </p>
+                </div>
+                {grid(rest)}
+              </RevealBlock>
+            )}
+          </div>
+        </div>
+      </section>
       <ProjectDetailsModal project={selected} language={language} onClose={() => setSelected(null)} />
     </>
   );
