@@ -25,6 +25,23 @@ interface Props {
   onClose: () => void;
 }
 
+function StackChips({ items, color }: { items: string; color: string }) {
+  const chips = items.split('·').map((s) => s.trim()).filter(Boolean);
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {chips.map((chip) => (
+        <span
+          key={chip}
+          className="px-2 py-0.5 rounded-full text-[11px] font-medium border"
+          style={{ backgroundColor: `${color}0f`, color, borderColor: `${color}30` }}
+        >
+          {chip}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function ProjectDetailsModal({ project, language, onClose }: Props) {
   const en = language === 'en';
 
@@ -44,42 +61,44 @@ export function ProjectDetailsModal({ project, language, onClose }: Props) {
   const details = project.details;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
       <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={onClose} />
 
       <div
-        className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto bg-[var(--color-card)] rounded-2xl shadow-[0_25px_60px_-10px_rgba(0,0,0,0.35)] border border-[var(--color-border)] animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-lg max-h-[88vh] sm:max-h-[85vh] flex flex-col bg-[var(--color-card)] rounded-2xl shadow-[0_25px_60px_-10px_rgba(0,0,0,0.35)] border border-[var(--color-border)] animate-in fade-in zoom-in-95 duration-200 overflow-hidden"
         style={{ boxShadow: `0 0 0 1px ${project.color}33` }}
       >
-        {/* Barra de color */}
-        <div className="h-1.5 w-full sticky top-0 z-10" style={{ background: `linear-gradient(90deg, ${project.color}, ${project.color}88)` }} />
-
-        <div className="p-6">
-          <div className="flex items-start justify-between gap-3 mb-4">
-            <div className="flex items-center gap-3">
+        {/* Cabecera fija: barra de color + titulo + cerrar, siempre visible al hacer scroll */}
+        <div className="shrink-0 bg-[var(--color-card)]">
+          <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, ${project.color}, ${project.color}88)` }} />
+          <div className="flex items-start justify-between gap-3 px-5 sm:px-6 pt-4 pb-3">
+            <div className="flex items-center gap-3 min-w-0">
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                 style={{ backgroundColor: `${project.color}18` }}
               >
                 <Sparkles size={18} style={{ color: project.color }} />
               </div>
-              <h2 className="font-bold text-[var(--color-text)] text-lg leading-snug">{project.name}</h2>
+              <h2 className="font-bold text-[var(--color-text)] text-base sm:text-lg leading-snug">{project.name}</h2>
             </div>
             <button
               onClick={onClose}
-              className="p-2 -mt-1 -mr-1 rounded-lg hover:bg-[var(--color-surface-soft)] transition-colors text-[var(--color-text-muted)] shrink-0"
+              className="p-2 rounded-lg hover:bg-[var(--color-surface-soft)] transition-colors text-[var(--color-text-muted)] shrink-0"
               aria-label={en ? 'Close' : 'Cerrar'}
             >
               <X size={18} />
             </button>
           </div>
+        </div>
 
+        {/* Cuerpo con scroll propio */}
+        <div className="overflow-y-auto px-5 sm:px-6 pb-6">
           <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-5">
             {details?.summary ?? project.description}
           </p>
 
           {details?.numbers && details.numbers.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-5">
+            <div className="flex flex-wrap gap-2 mb-6">
               {details.numbers.map((n) => (
                 <span
                   key={n}
@@ -93,15 +112,15 @@ export function ProjectDetailsModal({ project, language, onClose }: Props) {
           )}
 
           {details?.highlights && details.highlights.length > 0 && (
-            <div className="mb-5">
-              <p className="text-[11px] uppercase tracking-[0.12em] text-[var(--color-text-muted)] font-semibold mb-2">
+            <div className="mb-6">
+              <p className="text-[11px] uppercase tracking-[0.14em] text-[var(--color-text-muted)] font-semibold mb-3">
                 {en ? 'Highlights' : 'Lo destacado'}
               </p>
-              <ul className="space-y-2">
+              <ul className="space-y-2.5">
                 {details.highlights.map((h) => (
                   <li key={h} className="text-sm text-[var(--color-text-secondary)] leading-relaxed pl-4 relative">
                     <span
-                      className="absolute left-0 top-[0.55em] w-1.5 h-1.5 rounded-full"
+                      className="absolute left-0 top-[0.6em] w-1.5 h-1.5 rounded-full"
                       style={{ backgroundColor: project.color }}
                     />
                     {h}
@@ -112,34 +131,23 @@ export function ProjectDetailsModal({ project, language, onClose }: Props) {
           )}
 
           {details?.stack && details.stack.length > 0 && (
-            <div className="mb-5">
-              <p className="text-[11px] uppercase tracking-[0.12em] text-[var(--color-text-muted)] font-semibold mb-2">
+            <div className="mb-6">
+              <p className="text-[11px] uppercase tracking-[0.14em] text-[var(--color-text-muted)] font-semibold mb-3">
                 {en ? 'Stack' : 'Tecnologias'}
               </p>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {details.stack.map((s) => (
-                  <div key={s.label} className="text-sm bg-[var(--color-surface-soft)] rounded-xl px-3 py-2">
-                    <span className="font-semibold text-[var(--color-text)]">{s.label}: </span>
-                    <span className="text-[var(--color-text-secondary)]">{s.items}</span>
+                  <div key={s.label}>
+                    <p className="text-xs font-semibold text-[var(--color-text)] mb-1.5">{s.label}</p>
+                    <StackChips items={s.items} color={project.color} />
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          <div className="flex flex-wrap gap-1.5 mb-5">
-            {project.techs.map((t) => (
-              <span
-                key={t}
-                className="px-2 py-0.5 rounded-full bg-white text-slate-600 text-xs border border-[var(--color-border)]"
-              >
-                {t}
-              </span>
-            ))}
-          </div>
-
           {(project.github || project.demo) && (
-            <div className="flex gap-2 pt-4 border-t border-[var(--color-border)]">
+            <div className="flex flex-col sm:flex-row gap-2 pt-5 border-t border-[var(--color-border)]">
               {project.github && (
                 <a
                   href={project.github}

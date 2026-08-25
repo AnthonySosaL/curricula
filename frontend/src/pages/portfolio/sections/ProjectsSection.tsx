@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Globe, ExternalLink, Info } from 'lucide-react';
+import { Globe, Info } from 'lucide-react';
 import { GithubIcon } from '@/components/ui/BrandIcons';
 import { usePortfolioData } from '@/data/portfolio';
 import { useI18n } from '@/lib/i18n';
@@ -44,8 +44,8 @@ function ProjectCard({
         style={{ background: `linear-gradient(90deg, ${project.color}, ${project.color}88)` }}
       />
       <div className="p-6 flex flex-col flex-1">
-        <div className="flex items-start justify-between gap-2 mb-3">
-          <div>
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div className="min-w-0 flex-1">
             {project.featured && (
               <span className="inline-block mb-1.5 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
                 ⭐ {language === 'en' ? 'Featured' : 'Destacado'}
@@ -63,7 +63,7 @@ function ProjectCard({
                 🌐 {language === 'en' ? 'Live demo' : 'Demo pública'}
               </span>
             )}
-            <h3 className="font-bold text-[var(--color-text)] text-lg leading-snug">
+            <h3 className="font-bold text-[var(--color-text)] text-lg leading-snug text-balance">
               {project.name}
             </h3>
           </div>
@@ -114,16 +114,17 @@ function ProjectCard({
         </div>
 
         {/* Boton de info: abre el modal con el detalle completo del proyecto */}
-        <button
-          type="button"
-          onClick={() => onOpenDetails(project)}
-          className="flex items-center justify-center gap-1.5 mt-auto pt-4 border-t border-[var(--color-border)] text-xs font-semibold transition-colors"
-          style={{ color: project.color }}
-        >
-          <Info size={13} />
-          {language === 'en' ? 'View details' : 'Ver detalles'}
-          <ExternalLink size={11} className="opacity-0 group-hover:opacity-60 transition-opacity" />
-        </button>
+        <div className="mt-auto pt-4 border-t border-[var(--color-border)]">
+          <button
+            type="button"
+            onClick={() => onOpenDetails(project)}
+            className="w-full flex items-center justify-center gap-1.5 text-xs font-semibold py-2.5 rounded-xl border transition-colors hover:brightness-95"
+            style={{ color: project.color, borderColor: `${project.color}40`, backgroundColor: `${project.color}0d` }}
+          >
+            <Info size={13} />
+            {language === 'en' ? 'View details' : 'Ver detalles'}
+          </button>
+        </div>
       </div>
     </div>
   );
