@@ -1,8 +1,17 @@
-import { Globe, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { Globe, ExternalLink, Info } from 'lucide-react';
 import { GithubIcon } from '@/components/ui/BrandIcons';
 import { usePortfolioData } from '@/data/portfolio';
 import { useI18n } from '@/lib/i18n';
 import { ScrollStorySection, type StoryPhase } from './ScrollStorySection';
+import { ProjectDetailsModal } from './ProjectDetailsModal';
+
+interface ProjectDetail {
+  summary: string;
+  highlights: string[];
+  stack: { label: string; items: string }[];
+  numbers?: string[];
+}
 
 interface ProjectItem {
   name: string;
@@ -11,13 +20,24 @@ interface ProjectItem {
   color: string;
   featured?: boolean;
   live?: boolean;
-  demo?: string | null;
+  github: string | null;
+  demo: string | null;
+  details?: ProjectDetail;
 }
 
-function ProjectCardInner({ project, language }: { project: ProjectItem; language: string }) {
+function ProjectCard({
+  project, language, onOpenDetails,
+}: { project: ProjectItem; language: string; onOpenDetails: (p: ProjectItem) => void }) {
   const isLive = Boolean(project.live && project.demo);
+  const hasGithub = Boolean(project.github);
+  const hasDemo = Boolean(project.demo);
+
   return (
-    <>
+    <div
+      data-card
+      className="project-card group bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border)] overflow-hidden flex flex-col transition-all hover:-translate-y-1.5"
+      style={{ boxShadow: `0 0 0 1px ${project.color}22` }}
+    >
       {/* Barra de color con gradiente */}
       <div
         className="h-1.5 w-full"
@@ -43,24 +63,38 @@ function ProjectCardInner({ project, language }: { project: ProjectItem; languag
                 🌐 {language === 'en' ? 'Live demo' : 'Demo pública'}
               </span>
             )}
-            <h3 className="font-bold text-[var(--color-text)] text-lg leading-snug flex items-center gap-1.5">
+            <h3 className="font-bold text-[var(--color-text)] text-lg leading-snug">
               {project.name}
-              {isLive && (
-                <ExternalLink
-                  size={14}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ color: project.color }}
-                />
-              )}
             </h3>
           </div>
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-            style={{ backgroundColor: `${project.color}18` }}
-          >
-            <div style={{ color: project.color }}>
-              {isLive ? <Globe size={16} /> : <GithubIcon size={16} />}
-            </div>
+
+          {/* Iconos de enlaces reales: GitHub solo si hay repo, web solo si hay demo */}
+          <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
+            {hasGithub && (
+              <a
+                href={project.github!}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                aria-label={language === 'en' ? 'View repository' : 'Ver repositorio'}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text)] bg-[var(--color-surface-soft)] hover:bg-slate-200 transition-colors"
+              >
+                <GithubIcon size={15} />
+              </a>
+            )}
+            {hasDemo && (
+              <a
+                href={project.demo!}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                aria-label={language === 'en' ? 'Visit site' : 'Visitar sitio'}
+                className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+                style={{ backgroundColor: `${project.color}18`, color: project.color }}
+              >
+                <Globe size={15} />
+              </a>
+            )}
           </div>
         </div>
 
@@ -79,52 +113,18 @@ function ProjectCardInner({ project, language }: { project: ProjectItem; languag
           ))}
         </div>
 
-        {/* Pie decorativo — los links a repos/demos se agregaran cuando esten publicos */}
-        <div className="flex items-center mt-auto pt-4 border-t border-[var(--color-border)]">
-          <span
-            className="inline-block w-2 h-2 rounded-full"
-            style={{ backgroundColor: project.color }}
-          />
-          {isLive && (
-            <span
-              className="ml-auto text-xs font-medium flex items-center gap-1"
-              style={{ color: project.color }}
-            >
-              {language === 'en' ? 'Visit site' : 'Visitar sitio'}
-              <ExternalLink size={11} />
-            </span>
-          )}
-        </div>
+        {/* Boton de info: abre el modal con el detalle completo del proyecto */}
+        <button
+          type="button"
+          onClick={() => onOpenDetails(project)}
+          className="flex items-center justify-center gap-1.5 mt-auto pt-4 border-t border-[var(--color-border)] text-xs font-semibold transition-colors"
+          style={{ color: project.color }}
+        >
+          <Info size={13} />
+          {language === 'en' ? 'View details' : 'Ver detalles'}
+          <ExternalLink size={11} className="opacity-0 group-hover:opacity-60 transition-opacity" />
+        </button>
       </div>
-    </>
-  );
-}
-
-function ProjectCard({ project, language }: { project: ProjectItem; language: string }) {
-  const isLive = Boolean(project.live && project.demo);
-  const base = 'project-card group bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border)] overflow-hidden flex flex-col transition-all';
-
-  // Card cliqueable SOLO si tiene live+demo (proyecto público visitable)
-  if (isLive) {
-    return (
-      <a
-        data-card
-        href={project.demo!}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`${language === 'en' ? 'Open' : 'Abrir'} ${project.name}`}
-        className={`${base} cursor-pointer hover:-translate-y-2 hover:shadow-xl no-underline text-inherit`}
-        style={{ boxShadow: `0 0 0 1px ${project.color}22` }}
-      >
-        <ProjectCardInner project={project} language={language} />
-      </a>
-    );
-  }
-
-  // Card normal (no cliqueable)
-  return (
-    <div data-card className={`${base} hover:-translate-y-1.5`}>
-      <ProjectCardInner project={project} language={language} />
     </div>
   );
 }
@@ -132,13 +132,14 @@ function ProjectCard({ project, language }: { project: ProjectItem; language: st
 export function ProjectsSection({ className = '' }: { className?: string }) {
   const { projects } = usePortfolioData();
   const { language } = useI18n();
+  const [selected, setSelected] = useState<ProjectItem | null>(null);
   const featured = projects.slice(0, 2);
   const rest = projects.slice(2);
 
   const grid = (items: ProjectItem[]) => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {items.map((p) => (
-        <ProjectCard key={p.name} project={p} language={language} />
+        <ProjectCard key={p.name} project={p} language={language} onOpenDetails={setSelected} />
       ))}
     </div>
   );
@@ -155,19 +156,22 @@ export function ProjectsSection({ className = '' }: { className?: string }) {
       ? [{
           title: language === 'en' ? 'More projects' : 'Mas proyectos',
           subtitle: language === 'en'
-            ? 'Work for government and private sector'
-            : 'Trabajo para sector publico y privado',
+            ? 'Personal projects, government and private sector work'
+            : 'Proyectos personales y trabajo para sector publico y privado',
           content: grid(rest),
         }]
       : []),
   ];
 
   return (
-    <ScrollStorySection
-      id="proyectos"
-      badge={language === 'en' ? 'Projects' : 'Proyectos'}
-      phases={phases}
-      className={className}
-    />
+    <>
+      <ScrollStorySection
+        id="proyectos"
+        badge={language === 'en' ? 'Projects' : 'Proyectos'}
+        phases={phases}
+        className={className}
+      />
+      <ProjectDetailsModal project={selected} language={language} onClose={() => setSelected(null)} />
+    </>
   );
 }
