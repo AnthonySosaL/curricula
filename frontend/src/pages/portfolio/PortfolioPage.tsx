@@ -13,6 +13,7 @@ import { ChatWidget } from './sections/ChatWidget';
 import { BootLoadingScreen } from './sections/BootLoadingScreen';
 import { AuthModal } from '@/components/shared/AuthModal';
 import { GlobalControls } from '@/components/shared/GlobalControls';
+import { ScrollSnapController } from '@/components/shared/ScrollSnapController';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/lib/i18n';
 import { recordMetric } from '@/lib/analytics';
@@ -441,6 +442,7 @@ export default function PortfolioPage() {
   return (
     <div className="bg-[var(--color-bg)] min-h-screen">
       {!bootReady && <BootLoadingScreen progress={bootProgress} />}
+      <ScrollSnapController />
       <Navbar onDashboardLoginClick={handleDashboardLoginClick} entered={bootReady} />
       <ScrollVideoSection started={bootReady} />
       <VideoSectionGroup

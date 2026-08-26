@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { registerSnapSpan } from '@/lib/scrollSnap';
 
 export interface StoryPhase {
   id?: string;
@@ -49,6 +50,12 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
     cachePos();
     window.addEventListener('resize', cachePos, { passive: true });
 
+    const unregister = registerSnapSpan(id, () => ({
+      top: topRef.current,
+      scrollable: scrollableRef.current,
+      phaseCount: phases.length,
+    }));
+
     let rafId = 0;
     let lastPhase = -1;
 
@@ -92,6 +99,7 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener('resize', cachePos);
+      unregister();
     };
   }, [isMobile, phases.length]);
 

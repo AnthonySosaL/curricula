@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Users, Lightbulb, Zap, Target, GitMerge, MessageSquare } from 'lucide-react';
+import { registerSnapSpan } from '@/lib/scrollSnap';
 import { usePortfolioData } from '@/data/portfolio';
 import { useI18n } from '@/lib/i18n';
 
@@ -87,6 +88,12 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
     cachePos();
     window.addEventListener('resize', cachePos, { passive: true });
 
+    const unregister = registerSnapSpan('habilidades', () => ({
+      top: topRef.current,
+      scrollable: scrollableRef.current,
+      phaseCount: 2,
+    }));
+
     let rafId: number;
     let lastPhase = -1;
 
@@ -153,6 +160,7 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener('resize', cachePos);
+      unregister();
     };
   }, [isMobile]);
 
