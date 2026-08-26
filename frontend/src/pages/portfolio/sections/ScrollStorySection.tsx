@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 export interface StoryPhase {
+  id?: string;
   title: string;
   subtitle?: string;
   content: ReactNode;
@@ -125,7 +126,7 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
       <section id={id} ref={sectionRef} className="relative">
         {phases.map((ph, i) => (
           <div
-            key={ph.title}
+            key={ph.id ?? ph.title}
             ref={(el) => { mobileRefs.current[i] = el; }}
             className={`min-h-[100svh] flex flex-col justify-center px-4 py-16 border-b border-white/10 ${className}`}
           >
@@ -158,7 +159,7 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
           <div className="relative text-center mb-10" style={{ minHeight: '92px' }}>
             {phases.map((ph, i) => (
               <div
-                key={ph.title}
+                key={ph.id ?? ph.title}
                 ref={(el) => { titleRefs.current[i] = el; }}
                 className="absolute inset-0 flex flex-col items-center justify-center"
                 style={{
@@ -181,7 +182,7 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
           <div className="grid">
             {phases.map((ph, i) => (
               <div
-                key={ph.title}
+                key={ph.id ?? ph.title}
                 ref={(el) => { contentRefs.current[i] = el; }}
                 className={`flex items-center justify-center ${i === 0 ? 'story-active' : ''}`}
                 style={{
@@ -203,7 +204,7 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
             <div className="mt-10 flex items-center justify-center gap-2">
               {phases.map((ph, i) => (
                 <span
-                  key={ph.title}
+                  key={ph.id ?? ph.title}
                   ref={(el) => { pillRefs.current[i] = el; }}
                   className="h-1.5 rounded-full transition-all duration-300"
                   style={{

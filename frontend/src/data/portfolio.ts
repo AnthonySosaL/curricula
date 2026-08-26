@@ -71,7 +71,8 @@ const esData = {
       description: 'SaaS para gestion de firmas electronicas, clientes, planes y pagos.',
       techs: ['NestJS', 'Next.js 16', 'Prisma', 'PostgreSQL', 'AWS S3', 'Docker'],
       github: null as string | null,
-      demo: null as string | null,
+      demo: 'https://solucionesnexus.com/' as string | null,
+      live: true,
       color: '#2563eb',
       details: {
         summary: 'SaaS completo para gestión de firmas electrónicas, clientes, planes y pagos en línea, con arquitectura modular y despliegue en contenedores.',
@@ -86,6 +87,9 @@ const esData = {
           { label: 'Backend', items: 'NestJS · Prisma ORM · PostgreSQL · JWT' },
           { label: 'Frontend', items: 'Next.js 16 · React 19 · Tailwind CSS · shadcn/ui · Nivo' },
           { label: 'Cloud', items: 'AWS S3 · Payphone · Docker · Railway' },
+        ],
+        links: [
+          { label: 'Portal de distribuidores', url: 'https://distribuidores.solucionesnexus.com/' },
         ],
       },
     },
@@ -327,7 +331,8 @@ const enData = {
       description: 'SaaS for electronic signature management, clients, plans and payments.',
       techs: ['NestJS', 'Next.js 16', 'Prisma', 'PostgreSQL', 'AWS S3', 'Docker'],
       github: null as string | null,
-      demo: null as string | null,
+      demo: 'https://solucionesnexus.com/' as string | null,
+      live: true,
       color: '#2563eb',
       details: {
         summary: 'Complete SaaS for electronic signature management, clients, plans, and online payments, with modular architecture and containerized deployment.',
@@ -342,6 +347,9 @@ const enData = {
           { label: 'Backend', items: 'NestJS · Prisma ORM · PostgreSQL · JWT' },
           { label: 'Frontend', items: 'Next.js 16 · React 19 · Tailwind CSS · shadcn/ui · Nivo' },
           { label: 'Cloud', items: 'AWS S3 · Payphone · Docker · Railway' },
+        ],
+        links: [
+          { label: 'Reseller portal', url: 'https://distribuidores.solucionesnexus.com/' },
         ],
       },
     },

@@ -7,6 +7,7 @@ interface ProjectDetail {
   highlights: string[];
   stack: { label: string; items: string }[];
   numbers?: string[];
+  links?: { label: string; url: string }[];
 }
 
 interface ProjectItem {
@@ -146,8 +147,8 @@ export function ProjectDetailsModal({ project, language, onClose }: Props) {
             </div>
           )}
 
-          {(project.github || project.demo) && (
-            <div className="flex flex-col sm:flex-row gap-2 pt-5 border-t border-[var(--color-border)]">
+          {(project.github || project.demo || (details?.links && details.links.length > 0)) && (
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2 pt-5 border-t border-[var(--color-border)]">
               {project.github && (
                 <a
                   href={project.github}
@@ -171,6 +172,19 @@ export function ProjectDetailsModal({ project, language, onClose }: Props) {
                   {en ? 'Visit site' : 'Visitar sitio'}
                 </a>
               )}
+              {details?.links?.map((l) => (
+                <a
+                  key={l.url}
+                  href={l.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium py-2.5 px-3 rounded-xl border transition-colors hover:brightness-95"
+                  style={{ color: project.color, borderColor: `${project.color}40`, backgroundColor: `${project.color}0d` }}
+                >
+                  <ExternalLink size={14} />
+                  {l.label}
+                </a>
+              ))}
             </div>
           )}
         </div>
