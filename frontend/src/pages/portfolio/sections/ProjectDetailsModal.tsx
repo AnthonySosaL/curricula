@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, ExternalLink, Sparkles } from 'lucide-react';
 import { GithubIcon } from '@/components/ui/BrandIcons';
 
@@ -61,7 +62,7 @@ export function ProjectDetailsModal({ project, language, onClose }: Props) {
   if (!project) return null;
   const details = project.details;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
       <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={onClose} />
 
@@ -189,6 +190,7 @@ export function ProjectDetailsModal({ project, language, onClose }: Props) {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
