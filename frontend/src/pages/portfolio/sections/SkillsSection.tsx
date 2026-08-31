@@ -97,41 +97,50 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
     let rafId: number;
     let lastPhase = -1;
 
+    // Ancho (en fraccion de progreso) de la franja de cruce alrededor del
+    // 50% donde una fase se desvanece mientras la otra aparece. Fuera de
+    // esta franja cada fase esta 100% asentada.
+    const CROSSFADE_ZONE = 0.08;
+
     const tick = () => {
       const scrollable = scrollableRef.current;
       if (scrollable > 0) {
         const y = window.scrollY;
         const p = Math.max(0, Math.min(1, (y - topRef.current) / scrollable));
-        const phase = p < 0.5 ? 0 : 1;
 
+        // Mezcla continua atada directamente al scroll (no una transicion
+        // de CSS con duracion fija) — se siente tan fluida como el video
+        // del Hero porque se recalcula en cada frame segun la posicion real.
+        const raw = Math.max(0, Math.min(1, (p - 0.5 + CROSSFADE_ZONE) / (2 * CROSSFADE_ZONE)));
+        const mix = raw * raw * (3 - 2 * raw); // smoothstep
+
+        if (title0Ref.current) {
+          title0Ref.current.style.opacity = String(1 - mix);
+          title0Ref.current.style.transform = `translateY(${-14 * mix}px)`;
+          title0Ref.current.style.pointerEvents = mix < 0.5 ? 'auto' : 'none';
+        }
+        if (title1Ref.current) {
+          title1Ref.current.style.opacity = String(mix);
+          title1Ref.current.style.transform = `translateY(${14 * (1 - mix)}px)`;
+          title1Ref.current.style.pointerEvents = mix >= 0.5 ? 'auto' : 'none';
+        }
+        if (content0Ref.current) {
+          content0Ref.current.style.opacity = String(1 - mix);
+          content0Ref.current.style.transform = `translateY(${-28 * mix}px)`;
+          content0Ref.current.style.pointerEvents = mix < 0.5 ? 'auto' : 'none';
+        }
+        if (content1Ref.current) {
+          content1Ref.current.style.opacity = String(mix);
+          content1Ref.current.style.transform = `translateY(${28 * (1 - mix)}px)`;
+          content1Ref.current.style.pointerEvents = mix >= 0.5 ? 'auto' : 'none';
+        }
+
+        // Lo demas (pills, barras de progreso) sigue siendo un disparo
+        // puntual al cruzar la mitad — no necesitan scrubbing continuo.
+        const phase = mix < 0.5 ? 0 : 1;
         if (phase !== lastPhase) {
           lastPhase = phase;
 
-          // Titles
-          if (title0Ref.current) {
-            title0Ref.current.style.opacity   = phase === 0 ? '1' : '0';
-            title0Ref.current.style.transform = phase === 0 ? 'translateY(0)' : 'translateY(-14px)';
-            title0Ref.current.style.pointerEvents = phase === 0 ? 'auto' : 'none';
-          }
-          if (title1Ref.current) {
-            title1Ref.current.style.opacity   = phase === 1 ? '1' : '0';
-            title1Ref.current.style.transform = phase === 1 ? 'translateY(0)' : 'translateY(14px)';
-            title1Ref.current.style.pointerEvents = phase === 1 ? 'auto' : 'none';
-          }
-
-          // Content panels
-          if (content0Ref.current) {
-            content0Ref.current.style.opacity   = phase === 0 ? '1' : '0';
-            content0Ref.current.style.transform = phase === 0 ? 'translateY(0)' : 'translateY(-28px)';
-            content0Ref.current.style.pointerEvents = phase === 0 ? 'auto' : 'none';
-          }
-          if (content1Ref.current) {
-            content1Ref.current.style.opacity   = phase === 1 ? '1' : '0';
-            content1Ref.current.style.transform = phase === 1 ? 'translateY(0)' : 'translateY(28px)';
-            content1Ref.current.style.pointerEvents = phase === 1 ? 'auto' : 'none';
-          }
-
-          // Pills
           if (pill0Ref.current) {
             pill0Ref.current.style.width      = phase === 0 ? '28px' : '8px';
             pill0Ref.current.style.background = phase === 0 ? 'var(--color-primary)' : 'var(--color-border)';
@@ -246,7 +255,7 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
             <div
               ref={title0Ref}
               className="absolute inset-0 flex flex-col items-center justify-center"
-              style={{ opacity: 1, transform: 'translateY(0)', transition: 'opacity 0.45s ease, transform 0.45s ease', willChange: 'opacity, transform' }}
+              style={{ opacity: 1, transform: 'translateY(0)', willChange: 'opacity, transform' }}
             >
                 <h2 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg">{phases[0].title}</h2>
                 <p className="mt-1.5 text-white/75 text-sm max-w-lg drop-shadow">{phases[0].subtitle}</p>
@@ -254,7 +263,7 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
             <div
               ref={title1Ref}
               className="absolute inset-0 flex flex-col items-center justify-center"
-              style={{ opacity: 0, transform: 'translateY(14px)', transition: 'opacity 0.45s ease, transform 0.45s ease', pointerEvents: 'none', willChange: 'opacity, transform' }}
+              style={{ opacity: 0, transform: 'translateY(14px)', pointerEvents: 'none', willChange: 'opacity, transform' }}
             >
               <h2 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg">{phases[1].title}</h2>
               <p className="mt-1.5 text-white/75 text-sm max-w-lg drop-shadow">{phases[1].subtitle}</p>
@@ -268,7 +277,7 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
             <div
               ref={content0Ref}
               className="absolute inset-0"
-              style={{ opacity: 1, transform: 'translateY(0)', transition: 'opacity 0.45s ease, transform 0.45s ease', willChange: 'opacity, transform' }}
+              style={{ opacity: 1, transform: 'translateY(0)', willChange: 'opacity, transform' }}
             >
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 {skills.map(({ category, items }) => {
@@ -297,7 +306,7 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
             <div
               ref={content1Ref}
               className="absolute inset-0"
-              style={{ opacity: 0, transform: 'translateY(28px)', transition: 'opacity 0.45s ease, transform 0.45s ease', pointerEvents: 'none', willChange: 'opacity, transform' }}
+              style={{ opacity: 0, transform: 'translateY(28px)', pointerEvents: 'none', willChange: 'opacity, transform' }}
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {softSkills.map(({ name, icon: Icon, level, desc, color }, i) => (

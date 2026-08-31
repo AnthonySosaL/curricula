@@ -4,7 +4,10 @@ import { useAnimations, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
 const MODEL_URL = '/models/RobotExpressive.glb';
-const EMOTES = ['Wave', 'ThumbsUp', 'Jump', 'Yes', 'Dance'] as const;
+// "Wave" es el reposo (siempre saludando); al tocar el avatar se reproduce
+// uno de estos gestos una vez y despues vuelve a saludar.
+const REST_ANIMATION = 'Wave';
+const EMOTES = ['ThumbsUp', 'Jump', 'Yes', 'Dance'] as const;
 
 type EmoteRef = RefObject<(() => void) | null>;
 
@@ -24,11 +27,11 @@ function RobotModel({ isMobile, onReady, emoteRef }: RobotModelProps) {
 
   useEffect(() => { onReady(); }, [onReady]);
 
-  // Animacion base: Idle en loop
+  // Animacion base: saludando en loop (reposo)
   useEffect(() => {
-    const idle = actions.Idle;
-    idle?.reset().fadeIn(0.4).play();
-    return () => { idle?.stop(); };
+    const rest = actions[REST_ANIMATION];
+    rest?.reset().fadeIn(0.4).play();
+    return () => { rest?.stop(); };
   }, [actions]);
 
   // En desktop el robot sigue al cursor por toda la pagina
@@ -42,26 +45,26 @@ function RobotModel({ isMobile, onReady, emoteRef }: RobotModelProps) {
     return () => window.removeEventListener('mousemove', fn);
   }, [isMobile]);
 
-  // Click/tap: reproduce un emote y vuelve a Idle al terminar
+  // Click/tap: reproduce un gesto distinto y vuelve a saludar al terminar
   useEffect(() => {
     emoteRef.current = () => {
       if (busy.current) return;
       const name = EMOTES[emoteIdx.current % EMOTES.length];
       emoteIdx.current += 1;
       const action = actions[name];
-      const idle = actions.Idle;
+      const rest = actions[REST_ANIMATION];
       if (!action) return;
       busy.current = true;
       action.reset();
       action.setLoop(THREE.LoopOnce, 1);
       action.clampWhenFinished = true;
-      idle?.fadeOut(0.25);
+      rest?.fadeOut(0.25);
       action.fadeIn(0.25).play();
       const onFinished = (e: { action: THREE.AnimationAction }) => {
         if (e.action !== action) return;
         mixer.removeEventListener('finished', onFinished);
         action.fadeOut(0.3);
-        idle?.reset().fadeIn(0.3).play();
+        rest?.reset().fadeIn(0.3).play();
         busy.current = false;
       };
       mixer.addEventListener('finished', onFinished);
