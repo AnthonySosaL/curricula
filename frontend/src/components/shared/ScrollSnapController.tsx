@@ -19,7 +19,7 @@ export function ScrollSnapController() {
     const trySnap = () => {
       if (snapping) return;
       const y = window.scrollY;
-      const buffer = window.innerHeight * 0.2;
+      const buffer = window.innerHeight * 0.15;
       const boundaries = getBoundaryPoints();
       const inRiskZone = boundaries.some((b) => Math.abs(y - b) <= buffer);
       if (!inRiskZone) return;
@@ -42,7 +42,13 @@ export function ScrollSnapController() {
     const onScroll = () => {
       if (snapping) return;
       window.clearTimeout(debounceTimer);
-      debounceTimer = window.setTimeout(trySnap, 140);
+      // Bien largo a proposito: cualquier gesto de scroll en curso (rueda del
+      // mouse, trackpad, inercia) sigue disparando eventos de scroll cada
+      // pocos ms, lo que reinicia este timer una y otra vez. Solo llega a
+      // completarse cuando el usuario esta realmente detenido, no entre
+      // "tirones" del mismo gesto — eso es lo que antes se sentia como que
+      // el scroll peleaba con el usuario.
+      debounceTimer = window.setTimeout(trySnap, 900);
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
