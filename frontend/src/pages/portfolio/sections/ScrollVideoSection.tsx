@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Mail, Download, ChevronDown, Gamepad2 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import { Avatar3D } from '@/components/three/Avatar3D';
+import { registerSnapSpan } from '@/lib/scrollSnap';
 
 // phase thresholds
 const HERO_END = 0.25;
@@ -73,6 +74,12 @@ export function ScrollVideoSection({ started = true }: { started?: boolean }) {
     };
     cachePos();
     window.addEventListener('resize', cachePos, { passive: true });
+
+    const unregisterSnap = registerSnapSpan('inicio', () => ({
+      top: topRef.current,
+      scrollable: scrollableRef.current,
+      boundaries: [HERO_END, MAIN_END],
+    }));
 
     // Set initial state — hero visible
     applyFade(heroRef.current, true);
@@ -206,6 +213,7 @@ export function ScrollVideoSection({ started = true }: { started?: boolean }) {
       if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', cachePos);
+      unregisterSnap();
 
       stopPlayback();
     };

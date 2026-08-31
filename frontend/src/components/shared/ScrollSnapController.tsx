@@ -19,7 +19,7 @@ export function ScrollSnapController() {
     const trySnap = () => {
       if (snapping) return;
       const y = window.scrollY;
-      const buffer = window.innerHeight * 0.12;
+      const buffer = window.innerHeight * 0.2;
       const boundaries = getBoundaryPoints();
       const inRiskZone = boundaries.some((b) => Math.abs(y - b) <= buffer);
       if (!inRiskZone) return;

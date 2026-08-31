@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { registerSnapSpan } from '@/lib/scrollSnap';
+import { evenBoundaries, registerSnapSpan } from '@/lib/scrollSnap';
 
 export interface StoryPhase {
   id?: string;
@@ -53,7 +53,7 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
     const unregister = registerSnapSpan(id, () => ({
       top: topRef.current,
       scrollable: scrollableRef.current,
-      phaseCount: phases.length,
+      boundaries: evenBoundaries(phases.length),
     }));
 
     let rafId = 0;

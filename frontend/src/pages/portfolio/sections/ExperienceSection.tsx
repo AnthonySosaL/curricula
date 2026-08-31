@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Briefcase, MapPin } from 'lucide-react';
 import { usePortfolioData } from '@/data/portfolio';
 import { useI18n } from '@/lib/i18n';
-import { registerSnapSpan } from '@/lib/scrollSnap';
+import { evenBoundaries, registerSnapSpan } from '@/lib/scrollSnap';
 
 export function ExperienceSection({ className = 'bg-[var(--color-bg)]' }: { className?: string }) {
   const { experience } = usePortfolioData();
@@ -40,7 +40,7 @@ export function ExperienceSection({ className = 'bg-[var(--color-bg)]' }: { clas
     const unregister = registerSnapSpan('experiencia', () => ({
       top: topRef.current,
       scrollable: scrollableRef.current,
-      phaseCount: experience.length,
+      boundaries: evenBoundaries(experience.length),
     }));
 
     let rafId: number;

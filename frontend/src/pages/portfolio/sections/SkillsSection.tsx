@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Users, Lightbulb, Zap, Target, GitMerge, MessageSquare } from 'lucide-react';
-import { registerSnapSpan } from '@/lib/scrollSnap';
+import { evenBoundaries, registerSnapSpan } from '@/lib/scrollSnap';
 import { usePortfolioData } from '@/data/portfolio';
 import { useI18n } from '@/lib/i18n';
 
@@ -91,7 +91,7 @@ export function SkillsSection({ className = 'bg-white' }: { className?: string }
     const unregister = registerSnapSpan('habilidades', () => ({
       top: topRef.current,
       scrollable: scrollableRef.current,
-      phaseCount: 2,
+      boundaries: evenBoundaries(2),
     }));
 
     let rafId: number;
