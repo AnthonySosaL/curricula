@@ -427,7 +427,7 @@ export default function PortfolioPage() {
   const { theme } = useUiPreferences();
 
   const videoSectionOverlay = theme === 'dark'
-    ? 'bg-black/55 backdrop-blur-md'
+    ? 'bg-black/38 backdrop-blur-md'
     : 'bg-white/30 backdrop-blur-md';
 
   useEffect(() => {
