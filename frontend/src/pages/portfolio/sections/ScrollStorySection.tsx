@@ -29,6 +29,15 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
   const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const pillRefs    = useRef<(HTMLSpanElement | null)[]>([]);
   const mobileRefs  = useRef<(HTMLDivElement | null)[]>([]);
+  // Revelado mobile como estado de React (no classList.add directo): si la
+  // clase se agregara imperativamente sobre el mismo div que recibe el
+  // "className" con el overlay de tema, cualquier cambio de tema (que
+  // recalcula ese className) hace que React reescriba el atributo entero
+  // y borre la clase agregada a mano — quedando el contenido invisible
+  // para siempre, porque el IntersectionObserver ya la habia dejado de
+  // observar. Al guardarlo en estado, "story-active" queda dentro del
+  // mismo string controlado por React y sobrevive cualquier re-render.
+  const [mobileRevealed, setMobileRevealed] = useState<boolean[]>(() => phases.map(() => false));
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 900px), (pointer: coarse)');
@@ -109,10 +118,16 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('story-active');
-            observer.unobserve(entry.target);
-          }
+          if (!entry.isIntersecting) return;
+          const idx = mobileRefs.current.indexOf(entry.target as HTMLDivElement);
+          if (idx === -1) return;
+          setMobileRevealed((prev) => {
+            if (prev[idx]) return prev;
+            const next = [...prev];
+            next[idx] = true;
+            return next;
+          });
+          observer.unobserve(entry.target);
         });
       },
       // rootMargin positivo: dispara el reveal bastante antes de que el
@@ -140,7 +155,7 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
           <div
             key={ph.id ?? ph.title}
             ref={(el) => { mobileRefs.current[i] = el; }}
-            className={`min-h-[100svh] flex flex-col justify-center px-4 py-16 border-b border-white/10 ${className}`}
+            className={`min-h-[100svh] flex flex-col justify-center px-4 py-16 border-b border-white/10 ${className} ${mobileRevealed[i] ? 'story-active' : ''}`}
           >
             <div className="max-w-5xl mx-auto w-full">
               <div className="text-center mb-7" data-card>
