@@ -115,7 +115,11 @@ export function ScrollStorySection({ id, badge, phases, className = '' }: Props)
           }
         });
       },
-      { threshold: 0.18, rootMargin: '0px 0px -10% 0px' },
+      // rootMargin positivo: dispara el reveal bastante antes de que el
+      // bloque entre en pantalla, para que ya este visible cuando el
+      // usuario llega ahi (antes se notaba como que el contenido
+      // "desaparecia" al llegar, porque recien empezaba a revelarse).
+      { threshold: 0, rootMargin: '0px 0px 900px 0px' },
     );
     mobileRefs.current.forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
