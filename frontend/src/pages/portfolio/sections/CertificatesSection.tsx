@@ -19,6 +19,28 @@ export function CertificatesSection({ className = '' }: { className?: string }) 
       file: (profile.links as { certificate?: string }).certificate,
       verify: 'https://www.credly.com/go/7KSHyvoX' as string | null,
     },
+    {
+      name: 'AWS SimuLearn',
+      detail: 'Cloud Practitioner Training Badge',
+      issuer: 'Amazon Web Services (AWS)',
+      date: language === 'en' ? 'September 2026' : 'Septiembre 2026',
+      color: '#FF9900',
+      bg: '#FFF8EE',
+      badge: '☁️',
+      file: null,
+      verify: null,
+    },
+    {
+      name: 'AWS SimuLearn',
+      detail: 'AI Practitioner Training Badge',
+      issuer: 'Amazon Web Services (AWS)',
+      date: language === 'en' ? 'September 2026' : 'Septiembre 2026',
+      color: '#8B5CF6',
+      bg: '#F5F3FF',
+      badge: '🤖',
+      file: null,
+      verify: null,
+    },
   ];
 
   const content = (
