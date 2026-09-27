@@ -28,7 +28,7 @@ export function CertificatesSection({ className = '' }: { className?: string }) 
       bg: '#FFF8EE',
       badge: '☁️',
       file: null,
-      verify: null,
+      verify: 'https://www.credly.com/badges/f291f199-0f1c-4c0a-a058-be26610e4b59',
     },
     {
       name: 'AWS SimuLearn',
@@ -39,7 +39,7 @@ export function CertificatesSection({ className = '' }: { className?: string }) 
       bg: '#F5F3FF',
       badge: '🤖',
       file: null,
-      verify: null,
+      verify: 'https://www.credly.com/badges/835a30d4-78ad-4536-9fba-6a4e5f2a5760',
     },
   ];
 
