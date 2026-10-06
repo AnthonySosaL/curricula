@@ -1,53 +1,18 @@
 import { Award, Download, ExternalLink, Calendar } from 'lucide-react';
-import { usePortfolioData } from '@/data/portfolio';
+import { certificates } from '@/data/certificates';
 import { useI18n } from '@/lib/i18n';
 import { ScrollStorySection, type StoryPhase } from './ScrollStorySection';
 
 export function CertificatesSection({ className = '' }: { className?: string }) {
-  const { profile } = usePortfolioData();
   const { language } = useI18n();
 
-  const certs = [
-    {
-      name: 'AWS Academy Graduate',
-      detail: 'Cloud Foundations',
-      issuer: 'Amazon Web Services (AWS)',
-      date: language === 'en' ? 'April 2026' : 'Abril 2026',
-      color: '#FF9900',
-      bg: '#FFF8EE',
-      badge: '🏆',
-      file: (profile.links as { certificate?: string }).certificate,
-      verify: 'https://www.credly.com/go/7KSHyvoX' as string | null,
-    },
-    {
-      name: 'AWS SimuLearn',
-      detail: 'Cloud Practitioner Training Badge',
-      issuer: 'Amazon Web Services (AWS)',
-      date: language === 'en' ? 'September 2026' : 'Septiembre 2026',
-      color: '#FF9900',
-      bg: '#FFF8EE',
-      badge: '🏆',
-      file: null,
-      verify: 'https://www.credly.com/badges/f291f199-0f1c-4c0a-a058-be26610e4b59',
-    },
-    {
-      name: 'AWS SimuLearn',
-      detail: 'AI Practitioner Training Badge',
-      issuer: 'Amazon Web Services (AWS)',
-      date: language === 'en' ? 'September 2026' : 'Septiembre 2026',
-      color: '#8B5CF6',
-      bg: '#F5F3FF',
-      badge: '🏆',
-      file: null,
-      verify: 'https://www.credly.com/badges/835a30d4-78ad-4536-9fba-6a4e5f2a5760',
-    },
-  ];
+  const certs = certificates.map((c) => ({ ...c, date: language === 'en' ? c.date.en : c.date.es }));
 
   const content = (
     <div className="flex flex-wrap justify-center gap-5">
       {certs.map((cert) => (
         <div
-          key={cert.verify ?? `${cert.name}-${cert.detail}`}
+          key={cert.id}
           data-card
           className="group relative w-full sm:w-80 bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border)] overflow-hidden hover:shadow-[var(--shadow-md)] hover:-translate-y-1"
         >

@@ -76,7 +76,7 @@ export function ChatWidget() {
     slowTimerRef.current = setTimeout(() => setSlowLoad(true), 7000);
 
     try {
-      const res = await api.post<{ reply: string }>('/chat', {
+      const res = await api.post<{ reply: string; blocked?: boolean }>('/chat', {
         // Enviar SOLO { role, content } y solo los ultimos 10 mensajes:
         // - `actions` no es valido en el backend (lo rechaza el ValidationPipe)
         // - el cap de 10 evita superar @ArrayMaxSize y permite chatear sin limite
@@ -88,8 +88,9 @@ export function ChatWidget() {
       });
       // Botones contextuales: detecta tanto en la pregunta como en la RESPUESTA,
       // así si la IA ofrece el CV/redes aunque no se lo pidan, el botón aparece.
+      // Si el filtro de tema rechazó la pregunta no se ofrecen botones (ej. "código en github").
       const reply = res.data.reply ?? '';
-      const actions = detectChatActions(`${content}\n${reply}`, profile.links, language === 'en');
+      const actions = res.data.blocked ? [] : detectChatActions(content, reply, profile.links, language === 'en');
       setMessages((prev) => [...prev, { role: 'assistant', content: reply, actions }]);
     } catch {
       setMessages((prev) => [

@@ -1,4 +1,5 @@
 import { Download } from 'lucide-react';
+import { certificates } from '@/data/certificates';
 import { GithubIcon, LinkedinIcon } from '@/components/ui/BrandIcons';
 
 export interface ChatAction {
@@ -12,7 +13,6 @@ interface Links {
   github: string;
   linkedin: string;
   cv: string;
-  certificate: string;
 }
 
 // Normaliza para comparar sin acentos ni mayúsculas
@@ -25,15 +25,25 @@ function norm(s: string) {
  * descarga (CV, certificado) o enlaces a redes (LinkedIn, GitHub). Así el
  * visitante no tiene que buscar dónde descargar.
  */
-export function detectChatActions(userText: string, links: Links, en: boolean): ChatAction[] {
-  const q = norm(userText);
+export function detectChatActions(userText: string, replyText: string, links: Links, en: boolean): ChatAction[] {
+  const q = norm(`${userText}\n${replyText}`);
   const actions: ChatAction[] = [];
 
   if (/\bcv\b|hoja de vida|curriculum|curriculo|\bresume\b/.test(q)) {
     actions.push({ kind: 'cv', label: en ? 'Download CV (PDF)' : 'Descargar CV (PDF)', href: links.cv, download: true });
   }
-  if (/certificad|certificat|certification|\baws\b|cloud foundations/.test(q) && links.certificate) {
-    actions.push({ kind: 'certificate', label: en ? 'AWS certificate (PDF)' : 'Certificado AWS (PDF)', href: links.certificate, download: true });
+  if (/certificad|certificat|certification|credencial|credential|simulearn|\baws\b|cloud foundations|practitioner/.test(q)) {
+    // Si la pregunta nombra certificados concretos se muestran solo esos; si es general, los tres.
+    const asked = norm(userText);
+    const specific = certificates.filter((c) => c.match.test(asked));
+    for (const cert of specific.length ? specific : certificates) {
+      actions.push({
+        kind: 'certificate',
+        label: cert.chatLabel[en ? 'en' : 'es'],
+        href: cert.file ?? cert.verify,
+        download: cert.file !== null,
+      });
+    }
   }
   if (/linkedin/.test(q)) {
     actions.push({ kind: 'linkedin', label: 'LinkedIn', href: links.linkedin });
@@ -56,7 +66,7 @@ export function ChatActions({ actions }: { actions: ChatAction[] }) {
     <div className="mt-2 flex flex-wrap gap-1.5">
       {actions.map((a) => (
         <a
-          key={a.kind}
+          key={a.href}
           href={a.href}
           {...(a.download ? { download: true } : { target: '_blank', rel: 'noreferrer' })}
           className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)] transition-colors no-underline"
