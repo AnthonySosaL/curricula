@@ -47,7 +47,7 @@ export function CertificatesSection({ className = '' }: { className?: string }) 
     <div className="flex flex-wrap justify-center gap-5">
       {certs.map((cert) => (
         <div
-          key={cert.name}
+          key={cert.verify ?? `${cert.name}-${cert.detail}`}
           data-card
           className="group relative w-full sm:w-80 bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border)] overflow-hidden hover:shadow-[var(--shadow-md)] hover:-translate-y-1"
         >

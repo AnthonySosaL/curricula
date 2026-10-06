@@ -23,12 +23,12 @@ const esData = {
     links: { ...commonProfile.links, cv: '/cv.pdf' },
   },
   skills: [
-    { category: 'Frontend', items: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'shadcn/ui', 'React Native', 'Flutter', 'HTML5', 'CSS3'] },
-    { category: 'Backend', items: ['NestJS', 'Spring Boot', 'Node.js', 'Java', 'JavaScript', 'REST APIs', 'JWT Auth'] },
-    { category: 'Bases de datos & ORM', items: ['PostgreSQL', 'MySQL', 'Oracle', 'SQL Server', 'Firebase', 'Prisma ORM'] },
-    { category: 'Cloud & DevOps', items: ['Docker', 'AWS S3', 'Railway', 'AlmaLinux', 'SSL', 'Vercel', 'Git'] },
-    { category: 'IA & Datos', items: ['Python', 'scikit-learn', 'OpenAI API', 'Whisper', 'BeautifulSoup', 'Selenium', 'Jupyter Notebook'] },
-    { category: 'Automatizacion', items: ['Excel avanzado', 'Macros VBA', 'FFmpeg', 'YouTube Data API', 'React Email', 'Resend', 'Zod'] },
+    { category: 'Frontend', items: ['React', 'Next.js', 'Angular', 'TypeScript', 'Tailwind CSS', 'shadcn/ui', 'Radix UI', 'React Native', 'Flutter', 'HTML5', 'CSS3'] },
+    { category: 'Backend', items: ['NestJS', 'Spring Boot', 'ASP.NET Core', 'Node.js', 'FastAPI', 'Flask', 'C#', 'Java', 'JavaScript', 'REST APIs', 'JWT Auth'] },
+    { category: 'Bases de datos & ORM', items: ['PostgreSQL', 'MySQL', 'Oracle', 'SQL Server', 'MongoDB', 'Firebase', 'Prisma ORM', 'EF Core'] },
+    { category: 'Cloud & DevOps', items: ['Docker', 'AWS EC2', 'AWS S3', 'Lambda', 'RDS', 'DynamoDB', 'CloudFormation', 'AlmaLinux', 'SSL', 'Railway', 'Vercel', 'Git'] },
+    { category: 'IA & Datos', items: ['Python', 'pandas', 'scikit-learn', 'Claude Code', 'OpenAI API', 'Groq API', 'MCP', 'Whisper', 'RAG', 'Amazon Bedrock', 'SageMaker', 'Jupyter Notebook'] },
+    { category: 'Automatizacion', items: ['Excel avanzado', 'Macros VBA', 'n8n', 'Web scraping', 'FFmpeg', 'YouTube Data API', 'React Email', 'Resend', 'Zod'] },
   ],
   experience: [
     {
@@ -340,12 +340,12 @@ const enData = {
     links: { ...commonProfile.links, cv: '/cv-en.pdf' },
   },
   skills: [
-    { category: 'Frontend', items: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'shadcn/ui', 'React Native', 'Flutter', 'HTML5', 'CSS3'] },
-    { category: 'Backend', items: ['NestJS', 'Spring Boot', 'Node.js', 'Java', 'JavaScript', 'REST APIs', 'JWT Auth'] },
-    { category: 'Databases & ORM', items: ['PostgreSQL', 'MySQL', 'Oracle', 'SQL Server', 'Firebase', 'Prisma ORM'] },
-    { category: 'Cloud & DevOps', items: ['Docker', 'AWS S3', 'Railway', 'AlmaLinux', 'SSL', 'Vercel', 'Git'] },
-    { category: 'AI & Data', items: ['Python', 'scikit-learn', 'OpenAI API', 'Whisper', 'BeautifulSoup', 'Selenium', 'Jupyter Notebook'] },
-    { category: 'Automation', items: ['Advanced Excel', 'VBA Macros', 'FFmpeg', 'YouTube Data API', 'React Email', 'Resend', 'Zod'] },
+    { category: 'Frontend', items: ['React', 'Next.js', 'Angular', 'TypeScript', 'Tailwind CSS', 'shadcn/ui', 'Radix UI', 'React Native', 'Flutter', 'HTML5', 'CSS3'] },
+    { category: 'Backend', items: ['NestJS', 'Spring Boot', 'ASP.NET Core', 'Node.js', 'FastAPI', 'Flask', 'C#', 'Java', 'JavaScript', 'REST APIs', 'JWT Auth'] },
+    { category: 'Databases & ORM', items: ['PostgreSQL', 'MySQL', 'Oracle', 'SQL Server', 'MongoDB', 'Firebase', 'Prisma ORM', 'EF Core'] },
+    { category: 'Cloud & DevOps', items: ['Docker', 'AWS EC2', 'AWS S3', 'Lambda', 'RDS', 'DynamoDB', 'CloudFormation', 'AlmaLinux', 'SSL', 'Railway', 'Vercel', 'Git'] },
+    { category: 'AI & Data', items: ['Python', 'pandas', 'scikit-learn', 'Claude Code', 'OpenAI API', 'Groq API', 'MCP', 'Whisper', 'RAG', 'Amazon Bedrock', 'SageMaker', 'Jupyter Notebook'] },
+    { category: 'Automation', items: ['Advanced Excel', 'VBA Macros', 'n8n', 'Web scraping', 'FFmpeg', 'YouTube Data API', 'React Email', 'Resend', 'Zod'] },
   ],
   experience: [
     {

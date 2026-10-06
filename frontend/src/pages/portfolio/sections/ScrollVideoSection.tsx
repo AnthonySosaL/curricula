@@ -381,7 +381,7 @@ export function ScrollVideoSection({ started = true }: { started?: boolean }) {
             {[
               { value: '3+', label: language === 'en' ? 'years exp.' : 'anos exp.' },
               { value: '4', label: language === 'en' ? 'companies' : 'empresas' },
-              { value: '30+', label: language === 'en' ? 'technologies' : 'tecnologias' },
+              { value: '50+', label: language === 'en' ? 'technologies' : 'tecnologias' },
             ].map(({ value, label }) => (
               <div key={label} className="text-center">
                 <p className="text-3xl font-bold text-white drop-shadow">{value}</p>
