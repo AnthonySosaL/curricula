@@ -155,10 +155,10 @@ const esData = {
       live: true,
       color: '#ca8a04',
       details: {
-        summary: 'Tablero visual para planificar arquitectura empresarial con el marco TOGAF ADM: 11 fases fijas (Preliminar, A–H) organizadas en columnas con Entradas, Pasos y Salidas editables, generación automática de contenido con IA a partir de una descripción del proyecto, y exportación a PDF.',
+        summary: 'Tablero visual para planificar arquitectura empresarial con el marco TOGAF ADM: 11 fases fijas (Preliminar, A–H) organizadas en columnas con Inputs, Steps y Outputs (entradas, pasos y salidas) editables, generación automática de contenido con IA a partir de una descripción del proyecto, y exportación a PDF.',
         highlights: [
           'Reconstrucción completa de una app anterior en Node/Express + React (con base de datos e integración de IA ya caídas) migrada al mismo stack de Certis: backend en C# con Clean Architecture y frontend en Angular.',
-          'Abierto por defecto, sin login obligatorio: cualquiera puede usar el tablero completo (con un ejemplo precargado) sin cuenta; registrarse solo agrega guardado en base de datos (hasta 3 proyectos por cuenta) y la generación con IA.',
+          'Abierto por defecto, sin login obligatorio: cualquiera puede usar el tablero completo (con un ejemplo precargado) sin cuenta; la generación con IA también funciona sin cuenta; registrarse solo agrega guardado en base de datos (hasta 3 proyectos por cuenta).',
           'Generación con IA (Groq): a partir de una descripción de hasta 500 caracteres, completa las 11 fases respetando el propósito específico de cada una, con validaciones que rechazan y reintentan respuestas incompletas o genéricas en vez de servirlas silenciosamente.',
           'Reordenamiento por arrastrar y soltar dentro de cada fase, y exportación a PDF (tablero completo o solo entradas/salidas) optimizada de PNG a JPEG, bajando el peso de ~25MB a ~200KB sin pérdida visible.',
           'Rediseño visual completo tras feedback directo del usuario ("se ve como de junior"): paleta dorado/azul propia, flujo de creación de proyecto consolidado en un solo diálogo, y el tablero con su propio scroll interno siempre alcanzable.',
@@ -475,7 +475,7 @@ const enData = {
         summary: 'A visual board for planning enterprise architecture with the TOGAF ADM framework: 11 fixed phases (Preliminary, A-H) laid out as columns with editable Inputs, Steps, and Outputs, AI-generated content from a project description, and PDF export.',
         highlights: [
           'Full rebuild of an earlier Node/Express + React app (its database and AI integration both dead) migrated onto the same stack as Certis: a C# Clean Architecture backend and an Angular frontend.',
-          'Open by default, no forced login: anyone can use the full board (pre-loaded with a worked example) without an account; registering only adds database persistence (up to 3 projects per account) and AI generation.',
+          'Open by default, no forced login: anyone can use the full board (pre-loaded with a worked example) without an account; AI generation works without an account too; registering only adds database persistence (up to 3 projects per account).',
           'AI generation (Groq): from a description of up to 500 characters, fills in all 11 phases while respecting each phase\'s specific purpose, with validation that rejects and retries incomplete or generic responses instead of serving them silently.',
           'Drag-and-drop reordering within each phase, and PDF export (full board or inputs/outputs only) optimized from PNG to JPEG, cutting a ~25MB export down to ~200KB.',
           'Full visual redesign after direct user feedback ("looks like a junior built it"): a proper gold/azure theme, the project-creation flow consolidated into a single dialog, and the board keeping its own reachable internal scroll.',
