@@ -8,7 +8,7 @@ const BASE = { y: 4.2, z: 9, fov: 55 };
 /**
  * Cámara de "endless runner": sigue al robot en X con retardo suave (más en
  * pantallas verticales, donde los carriles laterales se salían de cuadro),
- * abre el FOV en vertical y tiembla un instante al chocar.
+ * abre el FOV en vertical y, al chocar, tiembla y se acerca al robot.
  */
 export function CameraRig({ stateRef }: { stateRef: RefObject<RobotState> }) {
   const deadFor = useRef(0);
@@ -26,9 +26,12 @@ export function CameraRig({ stateRef }: { stateRef: RefObject<RobotState> }) {
     deadFor.current = s.mode === 'dead' ? deadFor.current + dt : 0;
     const shake = s.mode === 'dead' ? Math.max(0, 0.35 - deadFor.current) * 0.5 : 0;
 
-    camera.position.x += (s.x * follow - camera.position.x) * k + (Math.random() - 0.5) * shake;
-    camera.position.y += (BASE.y + s.y * 0.15 - camera.position.y) * k;
-    camera.position.z = BASE.z;
+    // Al chocar la cámara se acerca al robot para que se vea el impacto
+    const dead = s.mode === 'dead';
+    const kz = Math.min(1, dt * 2.5);
+    camera.position.x += (s.x * (dead ? 0.9 : follow) - camera.position.x) * k + (Math.random() - 0.5) * shake;
+    camera.position.y += ((dead ? 3.6 : BASE.y + s.y * 0.15) - camera.position.y) * (dead ? kz : k);
+    camera.position.z += ((dead ? 7.8 : BASE.z) - camera.position.z) * (dead ? kz : k);
     if (Math.abs(camera.fov - fov) > 0.01) {
       camera.fov += (fov - camera.fov) * k;
       camera.updateProjectionMatrix();
