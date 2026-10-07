@@ -63,7 +63,7 @@ export function GameOverlay({ mode, finalScore, top, submitted, submitting, en, 
                 : 'Esquiva o salta las barreras rojas. ¡Cada vez más rápido!'}
             </p>
             <p className="text-[11px] text-white/45 mb-4">
-              {en ? '← → / A D to move · Space / ↑ / tap to jump' : '← → / A D para moverte · Espacio / ↑ / toca para saltar'}
+              {en ? '← → / A D or swipe to move · Space / ↑ / tap to jump' : '← → / A D o desliza para moverte · Espacio / ↑ / toca para saltar'}
             </p>
             <div className="flex gap-2 mb-5">
               {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => (
