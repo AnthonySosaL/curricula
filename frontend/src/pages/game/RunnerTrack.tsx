@@ -101,9 +101,9 @@ export function RunnerTrack({ fx, quality }: { fx: RefObject<WorldFx>; quality: 
             emissiveMap={tex.glow}
             emissive={COLORS.neon}
             emissiveIntensity={1.6}
-            roughness={0.6}
-            metalness={0.25}
-            envMapIntensity={0.35}
+            roughness={0.75}
+            metalness={0.2}
+            envMapIntensity={0.12}
           />
         ) : (
           <meshLambertMaterial map={tex.base} emissiveMap={tex.glow} emissive={COLORS.neon} emissiveIntensity={1.6} />

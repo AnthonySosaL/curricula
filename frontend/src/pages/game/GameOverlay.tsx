@@ -59,11 +59,11 @@ export function GameOverlay({ mode, finalScore, top, submitted, submitting, en, 
             <h2 className="text-2xl font-bold text-white mb-1">Robot Runner</h2>
             <p className="text-sm text-white/60 mb-4">
               {en
-                ? 'Dodge or jump the red barriers. It gets faster!'
-                : 'Esquiva o salta las barreras rojas. ¡Cada vez más rápido!'}
+                ? 'Jump the red barriers, slide under the drones. It gets faster!'
+                : 'Salta las barreras rojas y deslízate bajo los drones. ¡Cada vez más rápido!'}
             </p>
             <p className="text-[11px] text-white/45 mb-4">
-              {en ? '← → / A D or swipe to move · Space / ↑ / tap to jump' : '← → / A D o desliza para moverte · Espacio / ↑ / toca para saltar'}
+              {en ? '← → / A D or swipe to move · Space / ↑ / tap to jump · ↓ / S to slide' : '← → / A D o desliza para moverte · Espacio / ↑ / toca para saltar · ↓ / S para deslizarte'}
             </p>
             <div className="flex gap-2 mb-5">
               {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => (

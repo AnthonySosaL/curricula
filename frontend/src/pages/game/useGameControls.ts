@@ -9,7 +9,8 @@ const buzz = (ms: number) => {
 
 /**
  * Controles estilo "endless runner":
- * - Teclado: ← → / A D cambian de carril, ↑ / W / Espacio saltan (sin autorrepetición).
+ * - Teclado: ← → / A D cambian de carril, ↑ / W / Espacio saltan, ↓ / S se desliza
+ *   (sin autorrepetición).
  * - Táctil: deslizar en cualquier parte de la pantalla. El gesto se dispara en
  *   cuanto supera el umbral (no al soltar el dedo) → respuesta inmediata.
  *   Un toque corto sin desplazamiento también salta.
@@ -25,6 +26,7 @@ export function useGameControls(game: RefObject<RunnerHandle | null>, surface: R
       if (k === 'arrowleft' || k === 'a') game.current?.move(-1);
       else if (k === 'arrowright' || k === 'd') game.current?.move(1);
       else if (isJump) game.current?.jump();
+      else if (k === 'arrowdown' || k === 's') { e.preventDefault(); game.current?.slide(); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -48,6 +50,7 @@ export function useGameControls(game: RefObject<RunnerHandle | null>, surface: R
       used = true;
       if (Math.abs(dx) > Math.abs(dy)) { game.current?.move(dx > 0 ? 1 : -1); buzz(8); }
       else if (dy < 0) game.current?.jump();
+      else game.current?.slide();
     };
     const end = () => {
       if (!used) game.current?.jump(); // toque corto = saltar
