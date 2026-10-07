@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATLAS Lab: 34,751 estrategias de trading probadas con rigor estadístico</title>
+  <meta name="description" content="¿Funciona el trading algorítmico con datos retail? ATLAS Lab probó 34,751 estrategias con out-of-sample, Deflated Sharpe y Monte Carlo. Resultados públicos, incluidos los negativos." />
+  <link rel="canonical" href="https://curricula-fawn.vercel.app/proyectos/atlas-lab/" />
+  <link rel="alternate" hreflang="es" href="https://curricula-fawn.vercel.app/proyectos/atlas-lab/" />
+  <link rel="alternate" hreflang="en" href="https://curricula-fawn.vercel.app/proyectos/atlas-lab/en/" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="theme-color" content="#dc2626" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Probé 34,751 estrategias de trading. Esto es lo que encontré." />
+  <meta property="og:description" content="Laboratorio cuantitativo con validación anti-autoengaño y resultados publicados en vivo, incluidos los negativos." />
+  <meta property="og:url" content="https://curricula-fawn.vercel.app/proyectos/atlas-lab/" />
+  <meta property="og:image" content="https://curricula-fawn.vercel.app/foto.png" />
+  <meta property="og:locale" content="es_EC" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="/proyectos/landing.css" />
+  <script src="/adsense.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "ATLAS Lab: 34,751 estrategias de trading probadas con rigor estadístico",
+    "author": { "@type": "Person", "name": "Anthony Sosa", "url": "https://curricula-fawn.vercel.app/" },
+    "inLanguage": "es",
+    "mainEntityOfPage": "https://curricula-fawn.vercel.app/proyectos/atlas-lab/",
+    "about": ["trading cuantitativo", "backtesting", "Deflated Sharpe Ratio", "Monte Carlo"]
+  }
+  </script>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="crumbs"><a href="/">Anthony Sosa</a> / Proyectos / ATLAS Lab · <a href="/proyectos/atlas-lab/en/" hreflang="en">English</a></nav>
+    <span class="tag">Investigación cuantitativa</span>
+    <h1>Probé 34,751 estrategias de trading. Casi ninguna sobrevive a la estadística honesta.</h1>
+    <p class="lead">ATLAS Lab es un laboratorio abierto que genera, prueba y valida estrategias de trading con el mismo rigor que se le pide a un paper científico. Todo se publica en vivo, incluidos los resultados que no salen bien.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://atlas-lab-one.vercel.app/?utm_source=portfolio&utm_medium=landing&utm_campaign=atlas" rel="noopener">Ver el dashboard en vivo</a>
+      <a class="btn btn-ghost" href="/">Conocer al autor</a>
+    </div>
+
+    <section class="stats" aria-label="Cifras del proyecto">
+      <div class="stat"><b>34,751</b><span>estrategias validadas</span></div>
+      <div class="stat"><b>90</b><span>experimentos · 11 clases</span></div>
+      <div class="stat"><b>27</b><span>instrumentos</span></div>
+      <div class="stat"><b>+12 años</b><span>de histórico</span></div>
+    </section>
+
+    <h2>¿Por qué la mayoría de backtests mienten?</h2>
+    <p>Si pruebas suficientes combinaciones, alguna se verá rentable por pura suerte. Es el sesgo de selección: el gráfico precioso de tu backtest suele ser ruido optimizado. ATLAS Lab ataca ese problema de frente en lugar de esconderlo.</p>
+
+    <ins class="adsbygoogle ad" style="display:block" data-ad-slot="" data-ad-format="auto" data-full-width-responsive="true"></ins>
+
+    <h2>Cómo se valida cada estrategia</h2>
+    <ul>
+      <li><strong>Doble out-of-sample (18 meses):</strong> la estrategia se evalúa en datos que nunca vio durante su diseño.</li>
+      <li><strong>Deflated Sharpe Ratio:</strong> corrige el Sharpe por la cantidad de pruebas realizadas, para no premiar la suerte.</li>
+      <li><strong>Simulación Monte Carlo:</strong> mide qué tan frágil es el resultado ante otro orden de operaciones.</li>
+      <li><strong>Costos reales de transacción:</strong> spreads y comisiones incluidos, no un mundo sin fricción.</li>
+      <li><strong>Metodología preregistrada:</strong> las reglas se fijan antes de ver los resultados.</li>
+    </ul>
+
+    <h2>La conclusión (incómoda)</h2>
+    <p>Con datos accesibles para un trader retail, el laboratorio no encontró alpha explotable de forma consistente. Publicarlo es el punto: un resultado negativo bien medido vale más que cien capturas de pantalla de ganancias.</p>
+
+    <h2>Experimento en vivo</h2>
+    <p>Desde julio de 2026 corre un experimento que se actualiza solo cada día. El cómputo pesado se hace en Python y exporta JSON estático, por eso el dashboard carga al instante.</p>
+
+    <h2>Stack técnico</h2>
+    <ul>
+      <li><strong>Análisis:</strong> Python, pandas, numpy, scipy, scikit-learn</li>
+      <li><strong>Datos:</strong> Parquet (PyArrow), Dukascopy, yfinance, FRED, CFTC</li>
+      <li><strong>Dashboard:</strong> Next.js, React, TypeScript, Tailwind, lightweight-charts</li>
+      <li><strong>Integración:</strong> MetaTrader 5 (Python) y un servidor MCP propio</li>
+    </ul>
+
+    <section class="faq">
+      <h2>Preguntas frecuentes</h2>
+      <details><summary>¿ATLAS Lab vende señales o un bot?</summary><p>No. Es un proyecto de investigación abierta; los datos y conclusiones son públicos y no constituyen asesoría financiera.</p></details>
+      <details><summary>¿Qué es el Deflated Sharpe Ratio?</summary><p>Una versión del Sharpe que descuenta el efecto de haber probado muchas estrategias. Si pruebas miles, exige mucho más para considerar un resultado real.</p></details>
+      <details><summary>¿Puedo ver los resultados negativos?</summary><p>Sí, están en el dashboard junto a todo lo demás.</p></details>
+    </section>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://atlas-lab-one.vercel.app/?utm_source=portfolio&utm_medium=landing&utm_campaign=atlas" rel="noopener">Explorar ATLAS Lab</a>
+      <a class="btn btn-ghost" href="/proyectos/certis/">Ver otro proyecto: Certis</a>
+    </div>
+
+    <p>Artículos relacionados: <a href="/articulos/deflated-sharpe-ratio/">Qué es el Deflated Sharpe Ratio</a></p>
+
+    <footer>Proyecto de <a href="/">Anthony Sosa</a>, desarrollador full stack. Contenido informativo, no es asesoría de inversión.</footer>
+  </main>
+</body>
+</html>
