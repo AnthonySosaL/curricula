@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { DashboardLoadingScreen } from './DashboardLoadingScreen';
 import { DashboardMetrics } from './DashboardMetrics';
 import { DashboardActivityCard } from './DashboardActivityCard';
+import { DashboardAiUsageCard } from './DashboardAiUsageCard';
 import { DashboardAiPanel } from './DashboardAiPanel';
 import { useAiAnalysis } from './useAiAnalysis';
 
@@ -86,6 +87,7 @@ export function BusinessDashboard({ publicView = false }: Props) {
         {!showLoader && (
           <>
             <DashboardMetrics snapshot={snapshot} />
+            <DashboardAiUsageCard snapshot={snapshot} />
             <section className="grid grid-cols-1 xl:grid-cols-3 gap-4">
               <DashboardActivityCard snapshot={snapshot} />
               <DashboardAiPanel

@@ -27,6 +27,18 @@ export interface AnalyticsTrendPoint {
   day: string;
   visits: number;
   aiRequests: number;
+  aiTokens?: number;
+}
+
+// Opcionales: si el frontend se despliega antes que el backend, la respuesta puede no traerlos
+export interface AiUsageSummary {
+  tokens: { total: number; prompt: number; completion: number; chat: number; dashboard: number };
+  messages: { answered: number; blocked: number };
+  avgTokensPerMessage: number;
+  peakTokensPerMinute: number;
+  tpmLimit: number;
+  trackingSince: string | null;
+  lastUsedAt: string | null;
 }
 
 export interface AnalyticsSummaryResponse {
@@ -47,4 +59,5 @@ export interface AnalyticsSummaryResponse {
   dashboardAdoption: number;
   lastVisitAt: string | null;
   trend: AnalyticsTrendPoint[];
+  aiUsage?: AiUsageSummary;
 }
