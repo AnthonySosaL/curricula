@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import { Bot, ChartColumnBig, Eye, Gauge, Users } from 'lucide-react';
+import { Bot, Eye, Gauge, Users } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { useCounter } from '@/hooks/useCounter';
 import { useI18n } from '@/lib/i18n';
 import type { AnalyticsSummaryResponse } from '@/types/api';
+import { DashboardTimelineCard } from './DashboardTimelineCard';
 
 // KPI con contador animado (los valores string, ej. "3.5%", se muestran estaticos)
 function KpiValue({ value }: { value: number | string }) {
@@ -33,8 +34,6 @@ export function DashboardMetrics({ snapshot }: { snapshot?: AnalyticsSummaryResp
     },
     { day: '-', score: 0 },
   ), [trend]);
-
-  const topScale = Math.max(1, ...trend.map((p) => Math.max(p.visits, p.aiRequests)));
 
   const kpis = [
     { title: t('dashboard.kpiVisits'), value: totals?.totalVisits ?? 0, helper: t('dashboard.kpiVisitsHelp'), icon: Eye, accent: 'bg-orange-100 text-orange-700' },
@@ -66,28 +65,7 @@ export function DashboardMetrics({ snapshot }: { snapshot?: AnalyticsSummaryResp
       </section>
 
       <section className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <Card className="xl:col-span-2 rounded-2xl dash-card">
-          <CardHeader className="flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-semibold text-[var(--color-text)]">{t('dashboard.trendTitle')}</h2>
-              <p className="text-xs text-[var(--color-text-muted)]">{t('dashboard.trendSubtitle')}</p>
-            </div>
-            <ChartColumnBig size={18} className="text-[var(--color-text-muted)]" />
-          </CardHeader>
-          <CardBody>
-            <div className="grid grid-cols-7 gap-2 items-end h-44">
-              {trend.map((point) => (
-                <div key={point.day} className="flex flex-col items-center gap-2 h-full">
-                  <div className="w-full flex items-end justify-center gap-1 flex-1">
-                    <div className="dash-bar w-2.5 rounded-full bg-orange-500/80" style={{ height: `${Math.max(8, (point.visits / topScale) * 100)}%` }} title={`${t('dashboard.visits')} ${point.visits}`} />
-                    <div className="dash-bar w-2.5 rounded-full bg-red-500/80" style={{ height: `${Math.max(8, (point.aiRequests / topScale) * 100)}%` }} title={`${t('dashboard.aiUsage')} ${point.aiRequests}`} />
-                  </div>
-                  <p className="text-[11px] text-[var(--color-text-muted)]">{point.day}</p>
-                </div>
-              ))}
-            </div>
-          </CardBody>
-        </Card>
+        <DashboardTimelineCard />
 
         <Card className="rounded-2xl dash-card">
           <CardHeader>

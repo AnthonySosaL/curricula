@@ -62,14 +62,58 @@ export function DashboardAiUsageCard({ snapshot }: { snapshot?: AnalyticsSummary
                 </p>
                 <p className="text-xs text-[var(--color-text-muted)]">{t('dashboard.tokensBlockedHelp')}</p>
               </div>
-              <div>
-                <p className="text-xs text-[var(--color-text-muted)]">{t('dashboard.tokensPeak')}</p>
-                <p className={`text-2xl font-bold tabular-nums ${tone.text}`}>{fmt(usage.peakTokensPerMinute)}</p>
-                <div className="mt-1 h-2 rounded-full bg-[var(--color-surface-soft)] overflow-hidden">
-                  <div className={`h-full ${tone.bar}`} style={{ width: `${peakRatio}%` }} />
+              {usage.capacityTpm ? (
+                <div>
+                  <p className="text-xs text-[var(--color-text-muted)]">{t('dashboard.tokensCapacity')}</p>
+                  <p className="text-2xl font-bold text-[var(--color-text)] tabular-nums">{fmt(usage.capacityTpm)}</p>
+                  <p className="text-xs text-[var(--color-text-muted)]">
+                    {t('dashboard.tokensCapacityHelp')}
+                    {usage.modelCount ? ` · ${usage.modelCount} ${t('dashboard.tokensModels')}` : ''}
+                    {usage.providerCount ? ` / ${usage.providerCount} ${t('dashboard.tokensProviders')}` : ''}
+                  </p>
                 </div>
-                <p className="text-xs text-[var(--color-text-muted)] mt-1">{t('dashboard.tokensPeakHelp')} {fmt(usage.tpmLimit)}</p>
-              </div>
+              ) : (
+                <div>
+                  <p className="text-xs text-[var(--color-text-muted)]">{t('dashboard.tokensPeak')}</p>
+                  <p className={`text-2xl font-bold tabular-nums ${tone.text}`}>{fmt(usage.peakTokensPerMinute)}</p>
+                  <div className="mt-1 h-2 rounded-full bg-[var(--color-surface-soft)] overflow-hidden">
+                    <div className={`h-full ${tone.bar}`} style={{ width: `${peakRatio}%` }} />
+                  </div>
+                  <p className="text-xs text-[var(--color-text-muted)] mt-1">{t('dashboard.tokensPeakHelp')} {fmt(usage.tpmLimit)}</p>
+                </div>
+              )}
+
+              {usage.byModel && usage.byModel.length > 0 && (
+                <div className="sm:col-span-2 space-y-2.5">
+                  <p className="text-xs text-[var(--color-text-muted)]">
+                    {t('dashboard.tokensByModel')} · {t('dashboard.tokensPeak24')} / {t('dashboard.tokensLimit')}
+                  </p>
+                  {usage.byModel.map((m) => {
+                    const [provider, ...rest] = m.model.split(':');
+                    const name = rest.join(':').split('/').pop();
+                    const ratio = m.tpm ? Math.min(100, (m.peakPerMinute / m.tpm) * 100) : 0;
+                    const modelTone = peakTone(ratio);
+                    return (
+                      <div key={m.model}>
+                        <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-xs">
+                          <span className="font-medium text-[var(--color-text)]">
+                            {name} <span className="font-normal text-[var(--color-text-muted)]">· {provider}</span>
+                          </span>
+                          <span className="text-[var(--color-text-muted)] tabular-nums">
+                            {fmt(m.tokens)} · {fmt(m.calls)} {t('dashboard.tokensCalls')}
+                            {m.tpm ? ` · ${fmt(m.peakPerMinute)} / ${fmt(m.tpm)}` : ` · ${t('dashboard.tokensNoCap')}`}
+                          </span>
+                        </div>
+                        {m.tpm ? (
+                          <div className="mt-1 h-1.5 rounded-full bg-[var(--color-surface-soft)] overflow-hidden">
+                            <div className={`h-full ${modelTone.bar}`} style={{ width: `${ratio}%` }} />
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <div>
