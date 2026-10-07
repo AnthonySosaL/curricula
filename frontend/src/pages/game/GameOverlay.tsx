@@ -52,7 +52,7 @@ export function GameOverlay({ mode, finalScore, top, submitted, submitting, en, 
   const isHighEnough = top.length < 5 || finalScore > (top[top.length - 1]?.score ?? 0);
 
   return (
-    <div className="absolute inset-0 z-20 flex items-center justify-center px-4 bg-black/55 backdrop-blur-sm">
+    <div className={`absolute inset-0 z-20 flex items-center justify-center px-4 ${mode === 'over' ? 'bg-black/30' : 'bg-black/55 backdrop-blur-sm'}`}>
       <div className="w-full max-w-sm rounded-2xl border border-red-500/30 bg-[#160707]/95 p-6 text-center shadow-2xl">
         {mode === 'start' ? (
           <>
@@ -63,7 +63,7 @@ export function GameOverlay({ mode, finalScore, top, submitted, submitting, en, 
                 : 'Esquiva o salta las barreras rojas. ¡Cada vez más rápido!'}
             </p>
             <p className="text-[11px] text-white/45 mb-4">
-              {en ? '← → / A D to move · Space / ↑ / tap to jump' : '← → / A D para moverte · Espacio / ↑ / toca para saltar'}
+              {en ? '← → / A D or swipe to move · Space / ↑ / tap to jump' : '← → / A D o desliza para moverte · Espacio / ↑ / toca para saltar'}
             </p>
             <div className="flex gap-2 mb-5">
               {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => (
