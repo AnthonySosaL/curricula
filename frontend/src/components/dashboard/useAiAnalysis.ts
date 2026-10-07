@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { buildAIExecutiveSummary } from '@/lib/analytics';
 import type { AnalyticsSummaryResponse } from '@/types/api';
@@ -24,8 +24,18 @@ export function useAiAnalysis(snapshot: AnalyticsSummaryResponse | undefined, la
     setAiError(false);
   }, [language]);
 
+  // El analisis se genera una vez cuando llegan los datos y solo se repite al cambiar de idioma o
+  // reintentar. Depender del `snapshot` lo regeneraba cada vez que el resumen se refrescaba (cada
+  // 15 s) y, como el propio analisis suma tokens al resumen, se disparaba a si mismo en bucle.
+  const snapshotRef = useRef(snapshot);
   useEffect(() => {
-    if (!snapshot) return;
+    snapshotRef.current = snapshot;
+  }, [snapshot]);
+  const hasSnapshot = snapshot !== undefined;
+
+  useEffect(() => {
+    const current = snapshotRef.current;
+    if (!hasSnapshot || !current) return;
 
     const controller = new AbortController();
     let isCurrentRequest = true;
@@ -42,7 +52,7 @@ export function useAiAnalysis(snapshot: AnalyticsSummaryResponse | undefined, la
       try {
         for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
           try {
-            const context = buildAIExecutiveSummary(snapshot);
+            const context = buildAIExecutiveSummary(current);
             const lang = language === 'en' ? 'English' : 'Spanish';
             const prompt = [
               context,
@@ -112,7 +122,7 @@ export function useAiAnalysis(snapshot: AnalyticsSummaryResponse | undefined, la
       clearTimeout(slowTimer);
       controller.abort();
     };
-  }, [snapshot, language, retryNonce]);
+  }, [hasSnapshot, language, retryNonce]);
 
   return {
     aiRecommendations,
