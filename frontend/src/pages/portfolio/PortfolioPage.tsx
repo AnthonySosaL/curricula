@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { useI18n } from '@/lib/i18n';
 import { recordMetric } from '@/lib/analytics';
 import { useUiPreferences } from '@/contexts/ui-preferences';
+import FooterResources from './sections/FooterResources';
 
 const DESKTOP_BOOT_VIDEOS = [
   '/scroll-video-web.mp4',
@@ -405,6 +406,7 @@ function Footer() {
 
   return (
     <footer className="bg-[var(--color-card)] border-t border-[var(--color-border)] py-10 px-4">
+      <FooterResources />
       <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
           <p className="font-bold text-lg text-[var(--color-text)]">{profile.name}</p>
