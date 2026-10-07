@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>7 errores de backtesting que inflan tus resultados (y cómo evitarlos)</title>
+  <meta name="description" content="Look-ahead bias, sesgo de supervivencia, sobreajuste, costos ignorados y más: los 7 errores de backtesting más comunes y cómo evitarlos antes de arriesgar dinero real." />
+  <link rel="canonical" href="https://curricula-fawn.vercel.app/articulos/errores-backtesting/" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="theme-color" content="#dc2626" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="7 errores de backtesting que inflan tus resultados" />
+  <meta property="og:description" content="Por qué tu estrategia gana en el backtest y pierde en real, y cómo evitarlo." />
+  <meta property="og:url" content="https://curricula-fawn.vercel.app/articulos/errores-backtesting/" />
+  <meta property="og:image" content="https://curricula-fawn.vercel.app/foto.png" />
+  <meta property="og:locale" content="es_EC" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="/proyectos/landing.css" />
+  <script src="/adsense.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "7 errores de backtesting que inflan tus resultados (y cómo evitarlos)",
+    "datePublished": "2026-10-07",
+    "author": { "@type": "Person", "name": "Anthony Sosa", "url": "https://curricula-fawn.vercel.app/" },
+    "inLanguage": "es",
+    "mainEntityOfPage": "https://curricula-fawn.vercel.app/articulos/errores-backtesting/",
+    "about": ["backtesting", "trading cuantitativo", "sobreajuste", "sesgo de selección"]
+  }
+  </script>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="crumbs"><a href="/">Anthony Sosa</a> / Artículos / Errores de backtesting</nav>
+    <span class="tag">Trading cuantitativo</span>
+    <h1>7 errores de backtesting que inflan tus resultados</h1>
+    <p class="meta">Por Anthony Sosa · 7 de octubre de 2026 · 6 min de lectura</p>
+    <p class="lead">Si tu estrategia gana en el backtest y pierde en real, casi nunca es mala suerte: es un error de método. Estos son los siete más comunes, de los que tuve que defenderme al construir ATLAS Lab.</p>
+
+    <h2>1. Look-ahead bias (mirar el futuro)</h2>
+    <p>Usar en una decisión un dato que aún no existía en ese momento: el cierre del día para operar en la apertura, un indicador calculado con la vela completa o datos fundamentales publicados días después. <strong>Cómo evitarlo:</strong> desplaza las señales al menos una barra y revisa a qué hora se publica realmente cada dato.</p>
+
+    <h2>2. Sesgo de supervivencia</h2>
+    <p>Probar solo con activos que existen hoy ignora a los que quebraron o salieron del índice. El resultado se ve mejor de lo que fue. <strong>Cómo evitarlo:</strong> usa universos históricos que incluyan los activos que desaparecieron.</p>
+
+    <h2>3. Sobreajuste (overfitting)</h2>
+    <p>Ajustar parámetros hasta que la curva sea perfecta en el pasado. Funciona de maravilla con los datos que ya viste y falla con los nuevos. <strong>Cómo evitarlo:</strong> pocas reglas, pocos parámetros y validación fuera de muestra.</p>
+
+    <ins class="adsbygoogle ad" style="display:block" data-ad-slot="" data-ad-format="auto" data-full-width-responsive="true"></ins>
+
+    <h2>4. Probar muchas variantes y quedarte con la mejor</h2>
+    <p>Es el sesgo de selección: entre cientos de pruebas, alguna saldrá brillante por azar. <strong>Cómo evitarlo:</strong> registra cuántas pruebas hiciste y corrige con el <a href="/articulos/deflated-sharpe-ratio/">Deflated Sharpe Ratio</a>.</p>
+
+    <h2>5. Ignorar costos y deslizamiento</h2>
+    <p>Spreads, comisiones y slippage pueden convertir una estrategia rentable en perdedora, sobre todo si opera mucho. <strong>Cómo evitarlo:</strong> modela costos realistas desde el primer backtest, no al final.</p>
+
+    <h2>6. No reservar datos fuera de muestra</h2>
+    <p>Si usas todo el histórico para diseñar, no te queda nada para comprobar. <strong>Cómo evitarlo:</strong> separa un periodo que no toques hasta el final. En ATLAS Lab se usa un doble out-of-sample de 18 meses.</p>
+
+    <h2>7. Fiarse de una sola curva</h2>
+    <p>El orden de las operaciones importa: la misma estrategia puede tener drawdowns muy distintos con otra secuencia. <strong>Cómo evitarlo:</strong> simula con Monte Carlo para ver un rango de resultados posibles, no uno solo.</p>
+
+    <h2>Lo que aprendí al aplicarlo todo</h2>
+    <p>En <a href="/proyectos/atlas-lab/">ATLAS Lab</a> probé 34,751 estrategias en 90 experimentos con estas protecciones: out-of-sample, Deflated Sharpe, Monte Carlo y costos reales. Con datos accesibles para un trader retail, no encontré alpha explotable de forma consistente, y lo publiqué igual. Un resultado negativo bien medido te ahorra perder dinero real.</p>
+
+    <section class="faq">
+      <h2>Preguntas frecuentes</h2>
+      <details><summary>¿Cuántos años de datos necesito?</summary><p>Los suficientes para cubrir distintos regímenes de mercado (subidas, caídas y laterales). Pocos años suelen representar un solo régimen.</p></details>
+      <details><summary>¿El paper trading reemplaza al backtest?</summary><p>No, lo complementa: el backtest descarta ideas rápido y el paper trading confirma la ejecución en condiciones reales.</p></details>
+      <details><summary>¿Esto es asesoría financiera?</summary><p>No. Es contenido educativo sobre método y estadística.</p></details>
+    </section>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://atlas-lab-one.vercel.app/?utm_source=portfolio&utm_medium=article&utm_campaign=errores_backtesting" rel="noopener">Ver los experimentos en ATLAS Lab</a>
+      <a class="btn btn-ghost" href="/articulos/deflated-sharpe-ratio/">Qué es el Deflated Sharpe</a>
+    </div>
+
+    <footer>Escrito por <a href="/">Anthony Sosa</a>. Contenido informativo, no es asesoría de inversión.</footer>
+  </main>
+</body>
+</html>
