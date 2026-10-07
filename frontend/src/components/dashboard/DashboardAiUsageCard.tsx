@@ -82,7 +82,7 @@ export function DashboardAiUsageCard({ snapshot }: { snapshot?: AnalyticsSummary
               {usage.byModel && usage.byModel.length > 0 && (
                 <div className="sm:col-span-2 space-y-2.5">
                   <p className="text-xs text-[var(--color-text-muted)]">
-                    {t('dashboard.tokensByModel')} · {t('dashboard.tokensPeak').toLowerCase()} / {t('dashboard.tokensLimit')}
+                    {t('dashboard.tokensByModel')} · {t('dashboard.tokensPeak24')} / {t('dashboard.tokensLimit')}
                   </p>
                   {usage.byModel.map((m) => {
                     const ratio = m.tpm > 0 ? Math.min(100, (m.peakPerMinute / m.tpm) * 100) : 0;

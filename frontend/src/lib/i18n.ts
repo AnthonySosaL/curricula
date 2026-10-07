@@ -110,6 +110,7 @@ const dictionary: Dictionary = {
   'dashboard.timelineLoading': { es: 'Cargando cronograma...', en: 'Loading timeline...' },
   'dashboard.timelineError': { es: 'No se pudo cargar el cronograma.', en: 'The timeline could not be loaded.' },
   'dashboard.tokensByModel': { es: 'Por modelo', en: 'By model' },
+  'dashboard.tokensPeak24': { es: 'pico por minuto (24 h)', en: 'peak per minute (24 h)' },
   'dashboard.tokensLimit': { es: 'limite', en: 'limit' },
   'dashboard.tokensCalls': { es: 'llamadas', en: 'calls' },
   'dashboard.tokensCapacity': { es: 'Cupo combinado', en: 'Combined quota' },
