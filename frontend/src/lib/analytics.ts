@@ -45,8 +45,39 @@ export function getPreviewSummary(): AnalyticsSummaryResponse {
   };
 }
 
-export function buildAIExecutiveSummary(summary: AnalyticsSummaryResponse): string {
+export function buildAIExecutiveSummary(summary: AnalyticsSummaryResponse, language: 'es' | 'en' = 'es'): string {
   const { totals, roles } = summary;
+
+  // Las instrucciones y el contexto van en el idioma pedido: una instruccion en espanol
+  // ("Debes responder en espanol") le gana a un "Respond in English" puesto al final.
+  if (language === 'en') {
+    const trendLine = summary.trend
+      .map((point) => `${point.day}: visits ${point.visits}, AI ${point.aiRequests}`)
+      .join(' | ');
+    return [
+      'Act as a senior growth and digital operations analyst.',
+      'You must answer in English, with a professional and executive tone.',
+      'MANDATORY RESPONSE FORMAT:',
+      '1) Executive summary (maximum 6 lines).',
+      '2) Key findings (3 bullets).',
+      '3) Risks and alerts (2 bullets).',
+      '4) Improvement opportunities (3 bullets).',
+      '5) Prioritized recommendations (Top 3, with expected impact).',
+      '6) Final conclusion (1 short paragraph with a suggested decision).',
+      'Do not invent data that is not in the context.',
+      'DATA CONTEXT:',
+      `Total visits: ${totals.totalVisits}`,
+      `AI requests: ${totals.aiRequests}`,
+      `Registered users: ${totals.totalUsers}`,
+      `Role distribution -> Admin: ${roles.admins}, Instructor: ${roles.instructors}, Student: ${roles.students}`,
+      `Conversion rate (users/visits): ${summary.conversionRate.toFixed(1)}%`,
+      `AI usage intensity (requests/visit): ${summary.aiPerVisit}`,
+      `Dashboard adoption (dashboard views/visits): ${summary.dashboardAdoption.toFixed(1)}%`,
+      `Last visit detected: ${summary.lastVisitAt ?? 'no data'}`,
+      `7-day trend: ${trendLine}`,
+    ].join('\n');
+  }
+
   const trendLine = summary.trend
     .map((point) => `${point.day}: visitas ${point.visits}, IA ${point.aiRequests}`)
     .join(' | ');

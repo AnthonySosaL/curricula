@@ -52,7 +52,7 @@ export function useAiAnalysis(snapshot: AnalyticsSummaryResponse | undefined, la
       try {
         for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
           try {
-            const context = buildAIExecutiveSummary(current);
+            const context = buildAIExecutiveSummary(current, language === 'en' ? 'en' : 'es');
             const lang = language === 'en' ? 'English' : 'Spanish';
             const prompt = [
               context,
