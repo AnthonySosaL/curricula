@@ -1,11 +1,13 @@
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Canvas } from '@react-three/fiber';
-import { ArrowLeft, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import { getTopScores, submitScore, type ScoreEntry } from '@/lib/scores';
 import { RunnerScene, type RunnerHandle, type Difficulty } from './RunnerScene';
 import { GameOverlay } from './GameOverlay';
+import { GameCanvas } from './GameCanvas';
+import { ControlsHint } from './ControlsHint';
+import { useGameControls, buzz } from './useGameControls';
 
 type Status = 'start' | 'playing' | 'over';
 
@@ -32,21 +34,18 @@ export default function GamePage() {
   const refreshTop = () => { void getTopScores(5).then(setTop); };
   useEffect(refreshTop, []);
 
-  // Controles de teclado
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const k = e.key.toLowerCase();
-      if (k === 'arrowleft' || k === 'a') game.current?.move(-1);
-      else if (k === 'arrowright' || k === 'd') game.current?.move(1);
-      else if (k === ' ' || k === 'arrowup' || k === 'w') { e.preventDefault(); game.current?.jump(); }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  // Teclado + gestos táctiles (deslizar) sobre toda la pantalla
+  const surface = useRef<HTMLDivElement>(null);
+  const [runId, setRunId] = useState(0);
+  useGameControls(game, surface, status === 'playing');
 
-  const play = () => { setSubmitted(false); setStatus('playing'); game.current?.start(difficulty); };
+  const play = () => {
+    setSubmitted(false); setStatus('playing'); setRunId((n) => n + 1);
+    game.current?.start(difficulty);
+  };
 
   const handleGameOver = (score: number) => {
+    buzz(60);
     setFinalScore(score);
     setStatus('over');
     refreshTop();
@@ -67,21 +66,20 @@ export default function GamePage() {
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-[radial-gradient(circle_at_50%_20%,#3b0a0a_0%,#160707_45%,#080203_100%)]">
-      <Canvas
-        dpr={[1, isMobile ? 1.5 : 2]}
-        camera={{ position: [0, 4.2, 9], fov: 55 }}
-        gl={{ antialias: !isMobile, powerPreference: 'high-performance' }}
-        onCreated={({ camera }) => camera.lookAt(0, 1, 0)}
-      >
-        <Suspense fallback={null}>
+    <div
+      ref={surface}
+      className={`fixed inset-0 overflow-hidden overscroll-none bg-[radial-gradient(circle_at_50%_20%,#3b0a0a_0%,#160707_45%,#080203_100%)] ${status === 'playing' ? 'touch-none select-none' : ''}`}
+    >
+      <GameCanvas>
+        {(quality) => (
           <RunnerScene
             ref={game}
+            quality={quality}
             onScore={(n) => { if (scoreRef.current) scoreRef.current.textContent = String(n); }}
             onGameOver={handleGameOver}
           />
-        </Suspense>
-      </Canvas>
+        )}
+      </GameCanvas>
 
       {/* Top bar: volver + score (z-30 para quedar SOBRE el overlay) */}
       <div className="absolute top-0 inset-x-0 z-30 flex items-center justify-between p-4 pointer-events-none">
@@ -99,20 +97,7 @@ export default function GamePage() {
         )}
       </div>
 
-      {/* Controles táctiles */}
-      {status === 'playing' && isMobile && (
-        <div className="absolute bottom-6 inset-x-0 flex items-center justify-center gap-4 px-6">
-          <button onClick={() => game.current?.move(-1)} className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm flex items-center justify-center text-white active:bg-white/25">
-            <ChevronLeft size={28} />
-          </button>
-          <button onClick={() => game.current?.jump()} className="flex-1 max-w-[180px] h-16 rounded-2xl bg-gradient-to-r from-red-600 to-orange-500 flex items-center justify-center text-white font-bold gap-1 active:brightness-110">
-            <ChevronUp size={24} /> {en ? 'JUMP' : 'SALTA'}
-          </button>
-          <button onClick={() => game.current?.move(1)} className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm flex items-center justify-center text-white active:bg-white/25">
-            <ChevronRight size={28} />
-          </button>
-        </div>
-      )}
+      {status === 'playing' && <ControlsHint key={runId} en={en} touch={isMobile} />}
 
       {status !== 'playing' && (
         <GameOverlay
