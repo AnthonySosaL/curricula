@@ -415,6 +415,7 @@ function Footer() {
             © {new Date().getFullYear()} · {t('portfolio.footerBuilt')}
           </p>
           <p className="text-[var(--color-text-muted)] text-xs mt-1">{profile.email}</p>
+          <a href="/privacidad/" className="text-[var(--color-text-muted)] text-xs underline">Privacidad / Privacy</a>
         </div>
       </div>
     </footer>
