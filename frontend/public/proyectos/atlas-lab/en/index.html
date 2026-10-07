@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATLAS Lab: 34,751 trading strategies tested with statistical rigor</title>
+  <meta name="description" content="Does algorithmic trading work with retail data? ATLAS Lab tested 34,751 strategies with out-of-sample validation, the Deflated Sharpe Ratio and Monte Carlo. Public results, negative ones included." />
+  <link rel="canonical" href="https://curricula-fawn.vercel.app/proyectos/atlas-lab/en/" />
+  <link rel="alternate" hreflang="es" href="https://curricula-fawn.vercel.app/proyectos/atlas-lab/" />
+  <link rel="alternate" hreflang="en" href="https://curricula-fawn.vercel.app/proyectos/atlas-lab/en/" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="theme-color" content="#dc2626" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="I tested 34,751 trading strategies. Here's what I found." />
+  <meta property="og:description" content="A quant lab with anti-self-deception validation and results published live, including the negative ones." />
+  <meta property="og:url" content="https://curricula-fawn.vercel.app/proyectos/atlas-lab/en/" />
+  <meta property="og:image" content="https://curricula-fawn.vercel.app/foto.png" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="/proyectos/landing.css" />
+  <script src="/adsense.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "ATLAS Lab: 34,751 trading strategies tested with statistical rigor",
+    "author": { "@type": "Person", "name": "Anthony Sosa", "url": "https://curricula-fawn.vercel.app/" },
+    "inLanguage": "en",
+    "mainEntityOfPage": "https://curricula-fawn.vercel.app/proyectos/atlas-lab/en/",
+    "about": ["quantitative trading", "backtesting", "Deflated Sharpe Ratio", "Monte Carlo"]
+  }
+  </script>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="crumbs"><a href="/">Anthony Sosa</a> / Projects / ATLAS Lab · <a href="/proyectos/atlas-lab/" hreflang="es">Español</a></nav>
+    <span class="tag">Quantitative research</span>
+    <h1>I tested 34,751 trading strategies. Almost none survive honest statistics.</h1>
+    <p class="lead">ATLAS Lab is an open lab that generates, tests and validates trading strategies with the rigor you'd expect from a scientific paper. Everything is published live, including the results that don't work out.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://atlas-lab-one.vercel.app/?utm_source=portfolio&utm_medium=landing_en&utm_campaign=atlas" rel="noopener">See the live dashboard</a>
+      <a class="btn btn-ghost" href="/">Meet the author</a>
+    </div>
+
+    <section class="stats" aria-label="Project figures">
+      <div class="stat"><b>34,751</b><span>strategies validated</span></div>
+      <div class="stat"><b>90</b><span>experiments · 11 classes</span></div>
+      <div class="stat"><b>27</b><span>instruments</span></div>
+      <div class="stat"><b>12+ years</b><span>of history</span></div>
+    </section>
+
+    <h2>Why most backtests lie</h2>
+    <p>Test enough combinations and one of them will look profitable by pure luck. That's selection bias: the beautiful equity curve in your backtest is often optimized noise. ATLAS Lab tackles that problem head-on instead of hiding it.</p>
+
+    <ins class="adsbygoogle ad" style="display:block" data-ad-slot="" data-ad-format="auto" data-full-width-responsive="true"></ins>
+
+    <h2>How every strategy is validated</h2>
+    <ul>
+      <li><strong>Double out-of-sample (18 months):</strong> the strategy is evaluated on data it never saw while it was being designed.</li>
+      <li><strong>Deflated Sharpe Ratio:</strong> corrects the Sharpe ratio for the number of trials, so luck isn't rewarded. <a href="/articulos/deflated-sharpe-ratio/">Read the explainer (Spanish)</a>.</li>
+      <li><strong>Monte Carlo simulation:</strong> measures how fragile the result is to a different order of trades.</li>
+      <li><strong>Real transaction costs:</strong> spreads and commissions included, not a frictionless world.</li>
+      <li><strong>Preregistered methodology:</strong> the rules are fixed before looking at the results.</li>
+    </ul>
+
+    <h2>The (uncomfortable) conclusion</h2>
+    <p>With data available to a retail trader, the lab did not find consistently exploitable alpha. Publishing that is the point: a well-measured negative result is worth more than a hundred screenshots of profits.</p>
+
+    <h2>Live experiment</h2>
+    <p>Since July 2026 an experiment has been updating itself every day. The heavy computation runs in Python and exports static JSON, which is why the dashboard loads instantly.</p>
+
+    <h2>Tech stack</h2>
+    <ul>
+      <li><strong>Analysis:</strong> Python, pandas, numpy, scipy, scikit-learn</li>
+      <li><strong>Data:</strong> Parquet (PyArrow), Dukascopy, yfinance, FRED, CFTC</li>
+      <li><strong>Dashboard:</strong> Next.js, React, TypeScript, Tailwind, lightweight-charts</li>
+      <li><strong>Integration:</strong> MetaTrader 5 (Python) and a custom MCP server</li>
+    </ul>
+
+    <section class="faq">
+      <h2>FAQ</h2>
+      <details><summary>Does ATLAS Lab sell signals or a bot?</summary><p>No. It's an open research project; the data and conclusions are public and are not financial advice.</p></details>
+      <details><summary>What is the Deflated Sharpe Ratio?</summary><p>A version of the Sharpe ratio that discounts the effect of having tried many strategies. If you test thousands, it demands much more before calling a result real.</p></details>
+      <details><summary>Can I see the negative results?</summary><p>Yes, they're on the dashboard alongside everything else.</p></details>
+    </section>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://atlas-lab-one.vercel.app/?utm_source=portfolio&utm_medium=landing_en&utm_campaign=atlas" rel="noopener">Explore ATLAS Lab</a>
+      <a class="btn btn-ghost" href="/proyectos/certis/en/">Another project: Certis</a>
+    </div>
+
+    <footer>A project by <a href="/">Anthony Sosa</a>, full-stack developer. Informational content, not investment advice.</footer>
+  </main>
+</body>
+</html>
