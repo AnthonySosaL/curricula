@@ -7,9 +7,12 @@ import { radialTexture } from './textures';
 import { ROBOT_Z } from './config';
 
 const MODEL_URL = '/models/RobotExpressive.glb';
-const AIR_TIME = 0.96; // 2 * JUMP_V0 / GRAVITY (ver RunnerScene)
+const AIR_TIME = 0.96; // 2 * JUMP_V0 / GRAVITY (ver rules.ts)
+const SLIDE_CLIP = 'Sitting';
+const SLIDE_LEAN = 0.15; // rad: leve inclinación hacia atrás al deslizarse
+const SLIDE_DROP = 0.3;  // el cuerpo baja: la cabeza queda (~0.9) bajo los drones (1.25)
 
-export type RobotMode = 'run' | 'jump' | 'dead';
+export type RobotMode = 'run' | 'jump' | 'slide' | 'dead';
 
 export interface RobotState {
   x: number;
@@ -28,14 +31,14 @@ type Actions = Record<string, THREE.AnimationAction | null>;
 
 /** Cambia de clip con crossfade; el salto se ajusta al tiempo real en el aire. */
 function playMode(actions: Actions, mode: RobotMode) {
-  const name = mode === 'jump' ? 'Jump' : mode === 'dead' ? 'Death' : 'Running';
+  const name = mode === 'jump' ? 'Jump' : mode === 'dead' ? 'Death' : mode === 'slide' ? SLIDE_CLIP : 'Running';
   const next = actions[name] ?? actions.Running;
   if (!next) return;
   Object.values(actions).forEach((a) => { if (a && a !== next) a.fadeOut(0.15); });
   next.reset();
-  if (mode === 'run') {
+  if (mode === 'run' || mode === 'slide') {
     next.setLoop(THREE.LoopRepeat, Infinity);
-    next.setEffectiveTimeScale(1.15);
+    next.setEffectiveTimeScale(mode === 'run' ? 1.15 : 1);
   } else {
     next.setLoop(THREE.LoopOnce, 1);
     next.clampWhenFinished = true;
@@ -55,6 +58,7 @@ export function RunnerRobot({ stateRef, shadows }: { stateRef: RefObject<RobotSt
   const { scene, animations } = useGLTF(MODEL_URL);
   const { actions } = useAnimations(animations, group);
   const shown = useRef<RobotMode | null>(null);
+  const drop = useRef(0);
   const blobTex = useMemo(() => radialTexture('rgba(0,0,0,0.75)'), []);
 
   const cloned = useMemo(() => {
@@ -88,10 +92,12 @@ export function RunnerRobot({ stateRef, shadows }: { stateRef: RefObject<RobotSt
     // La X ya viene suavizada desde RunnerScene (es la misma que usa la colisión)
     const vx = (s.x - g.position.x) / Math.max(dt, 1e-3);
     g.position.x = s.x;
-    g.position.y = s.y;
+    drop.current += ((s.mode === 'slide' ? SLIDE_DROP : 0) - drop.current) * Math.min(1, dt * 25);
+    g.position.y = s.y - drop.current;
     // Se inclina hacia el carril al que se mueve
     const lean = THREE.MathUtils.clamp(-vx * 0.02, -0.12, 0.12);
     g.rotation.z += (lean - g.rotation.z) * Math.min(1, dt * 10);
+    g.rotation.x += ((s.mode === 'slide' ? SLIDE_LEAN : 0) - g.rotation.x) * Math.min(1, dt * 18);
     if (blob.current) {
       const sc = Math.max(0.35, 1 - s.y * 0.25);
       blob.current.position.x = g.position.x;

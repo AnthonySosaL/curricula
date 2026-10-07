@@ -5,14 +5,14 @@ import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeom
 import { COLORS, LANES, OBS_H, type Quality } from './config';
 import { hazardTexture, radialTexture } from './textures';
 
-export interface ObstacleView { lane: number; z: number; active: boolean; }
+export interface ObstacleView { lane: number; z: number; active: boolean; kind: 'low' | 'high'; }
 
 const tmp = new THREE.Object3D();
 const HIDDEN = new THREE.Matrix4().makeScale(0, 0, 0);
 
 /**
- * Dibuja el pool de obstáculos con 2 InstancedMesh (barrera + charco de luz):
- * 2 draw calls en total sin importar cuántos haya. Solo lee el estado; la
+ * Dibuja las barreras del pool (los drones van en DroneField) con 2 InstancedMesh
+ * (barrera + charco de luz): 2 draw calls sin importar cuántas haya. Solo lee el estado; la
  * colisión sigue en RunnerScene.
  */
 export function ObstacleField({ obstacles, quality }: { obstacles: ObstacleView[]; quality: Quality }) {
@@ -32,7 +32,7 @@ export function ObstacleField({ obstacles, quality }: { obstacles: ObstacleView[
     if (!b || !g) return;
     const pulse = 1 + Math.sin(state.clock.elapsedTime * 6) * 0.08;
     obstacles.forEach((o, i) => {
-      if (!o.active) {
+      if (!o.active || o.kind !== 'low') {
         b.setMatrixAt(i, HIDDEN);
         g.setMatrixAt(i, HIDDEN);
         return;
