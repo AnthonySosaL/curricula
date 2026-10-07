@@ -30,6 +30,14 @@ export interface AnalyticsTrendPoint {
   aiTokens?: number;
 }
 
+export interface AiModelUsage {
+  model: string;
+  tokens: number;
+  calls: number;
+  peakPerMinute: number;
+  tpm: number;
+}
+
 // Opcionales: si el frontend se despliega antes que el backend, la respuesta puede no traerlos
 export interface AiUsageSummary {
   tokens: { total: number; prompt: number; completion: number; chat: number; dashboard: number };
@@ -37,8 +45,24 @@ export interface AiUsageSummary {
   avgTokensPerMessage: number;
   peakTokensPerMinute: number;
   tpmLimit: number;
+  byModel?: AiModelUsage[];
+  capacityTpm?: number;
   trackingSince: string | null;
   lastUsedAt: string | null;
+}
+
+export interface AnalyticsTimelinePoint {
+  date: string;
+  visits: number;
+  aiRequests: number;
+  dashboardViews: number;
+}
+
+export interface AnalyticsTimelineResponse {
+  days: number;
+  timezone: string;
+  firstEventDate: string | null;
+  points: AnalyticsTimelinePoint[];
 }
 
 export interface AnalyticsSummaryResponse {
