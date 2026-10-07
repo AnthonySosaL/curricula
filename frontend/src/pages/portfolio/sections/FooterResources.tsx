@@ -12,6 +12,8 @@ const ARTICLES = [
   { slug: 'diferencia-b2-c1-ingles', label: 'Diferencia entre B2 y C1' },
   { slug: 'speaking-c1-advanced', label: 'Speaking del C1 Advanced' },
   { slug: 'writing-c1-advanced', label: 'Writing del C1 Advanced' },
+  { slug: 'reading-use-of-english-c1', label: 'Reading and Use of English del C1' },
+  { slug: 'preparar-c1-advanced-3-meses', label: 'Preparar el C1 en 3 meses' },
   { slug: 'togaf-adm-fases', label: 'Fases del TOGAF ADM' },
   { slug: 'deflated-sharpe-ratio', label: 'Deflated Sharpe Ratio' },
   { slug: 'errores-backtesting', label: '7 errores de backtesting' },
