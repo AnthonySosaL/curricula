@@ -7,9 +7,12 @@ import { RunnerScene, type RunnerHandle, type Difficulty } from './RunnerScene';
 import { GameOverlay } from './GameOverlay';
 import { GameCanvas } from './GameCanvas';
 import { ControlsHint } from './ControlsHint';
+import { CrashFlash } from './CrashFlash';
 import { useGameControls, buzz } from './useGameControls';
 
-type Status = 'start' | 'playing' | 'over';
+// 'crashed': animación del choque antes de mostrar el menú de fin de partida
+type Status = 'start' | 'playing' | 'crashed' | 'over';
+const CRASH_MS = 1300;
 
 export default function GamePage() {
   const { language } = useI18n();
@@ -44,11 +47,15 @@ export default function GamePage() {
     game.current?.start(difficulty);
   };
 
+  const crashTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(crashTimer.current), []);
+
   const handleGameOver = (score: number) => {
     buzz(60);
     setFinalScore(score);
-    setStatus('over');
+    setStatus('crashed');
     refreshTop();
+    crashTimer.current = window.setTimeout(() => setStatus('over'), CRASH_MS);
   };
 
   const handleSubmit = async (name: string) => {
@@ -89,7 +96,7 @@ export default function GamePage() {
         >
           <ArrowLeft size={15} /> {en ? 'Back' : 'Volver'}
         </Link>
-        {status === 'playing' && (
+        {(status === 'playing' || status === 'crashed') && (
           <div className="text-right">
             <p className="text-[10px] uppercase tracking-widest text-white/50">{en ? 'Score' : 'Puntaje'}</p>
             <span ref={scoreRef} className="text-3xl font-bold text-white tabular-nums drop-shadow-lg">0</span>
@@ -99,7 +106,9 @@ export default function GamePage() {
 
       {status === 'playing' && <ControlsHint key={runId} en={en} touch={isMobile} />}
 
-      {status !== 'playing' && (
+      {status === 'crashed' && <CrashFlash en={en} />}
+
+      {(status === 'start' || status === 'over') && (
         <GameOverlay
           mode={status === 'start' ? 'start' : 'over'}
           finalScore={finalScore}

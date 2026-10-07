@@ -6,7 +6,8 @@ import { RunnerTrack } from './RunnerTrack';
 import { ObstacleField } from './ObstacleField';
 import { SpeedParticles } from './SpeedParticles';
 import { CameraRig } from './CameraRig';
-import { LANES, ROBOT_Z, type Quality, type WorldFx } from './config';
+import { ImpactBurst } from './ImpactBurst';
+import { LANES, ROBOT_Z, type Impact, type Quality, type WorldFx } from './config';
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -30,6 +31,7 @@ const JUMP_V0 = 9.6;   // más impulso = más tiempo en el aire
 const GRAVITY = 20;    // gravedad suave = salto indulgente
 const CLEAR_Y = 0.9;   // si los pies pasan esta altura, libra el obstáculo
 const HIT_Z = 0.6;     // ventana de colisión en Z (ajustada al cubo)
+const HIT_X = 0.95;    // choque solo si el robot (posición visible) está realmente dentro del carril
 const JUMP_BUFFER = 0.15; // s: un salto pedido justo antes de aterrizar se ejecuta al tocar suelo
 
 const DIFFICULTY: Record<Difficulty, { speed: number; ramp: number; cap: number; gap: number }> = {
@@ -44,11 +46,13 @@ const createPool = () => Array.from({ length: POOL }, (): Obstacle => ({ lane: 0
 export const RunnerScene = forwardRef<RunnerHandle, Props>(({ onScore, onGameOver, quality }, ref) => {
   const robotState = useRef<RobotState>({ x: 0, y: 0, mode: 'run' });
   const fx = useRef<WorldFx>({ speed: 14 });
+  const impact = useRef<Impact>({ t: -1, x: 0, z: 0 });
   const [obstacles] = useState(createPool);
 
   const g = useRef({
     playing: false,
     lane: 1,
+    x: 0, // X visible del robot (se desliza hacia el carril)
     vy: 0,
     jumping: false,
     jumpBuffer: 0,
@@ -63,12 +67,13 @@ export const RunnerScene = forwardRef<RunnerHandle, Props>(({ onScore, onGameOve
   const resetState = () => {
     const s = g.current;
     s.playing = false;
-    s.lane = 1; s.vy = 0; s.jumping = false; s.jumpBuffer = 0;
+    s.lane = 1; s.x = LANES[1]; s.vy = 0; s.jumping = false; s.jumpBuffer = 0;
     s.speed = s.cfg.speed; s.distance = 0; s.sinceSpawn = 0; s.gap = s.cfg.gap;
     s.obstacles.forEach((o) => { o.active = false; o.z = SPAWN_Z; });
     robotState.current.x = 0;
     robotState.current.y = 0;
     robotState.current.mode = 'run';
+    impact.current = { t: -1, x: 0, z: 0 };
     onScore(0);
   };
 
@@ -96,12 +101,13 @@ export const RunnerScene = forwardRef<RunnerHandle, Props>(({ onScore, onGameOve
     },
   }), []);
 
-  useFrame((_, rawDt) => {
+  useFrame((state, rawDt) => {
     const s = g.current;
     const dt = Math.min(0.05, rawDt);
     const dead = robotState.current.mode === 'dead';
     fx.current.speed = dead ? fx.current.speed * Math.max(0, 1 - dt * 3) : s.speed;
-    robotState.current.x = LANES[s.lane];
+    s.x += (LANES[s.lane] - s.x) * Math.min(1, dt * 12);
+    robotState.current.x = s.x;
 
     if (s.playing) {
       if (s.jumping) {
@@ -129,9 +135,11 @@ export const RunnerScene = forwardRef<RunnerHandle, Props>(({ onScore, onGameOve
       if (o.active && s.playing) {
         o.z += s.speed * dt;
         if (o.z > DESPAWN_Z) o.active = false;
-        if (o.active && o.lane === s.lane && Math.abs(o.z - ROBOT_Z) < HIT_Z && robotState.current.y < CLEAR_Y) {
+        const hit = Math.abs(LANES[o.lane] - s.x) < HIT_X && Math.abs(o.z - ROBOT_Z) < HIT_Z;
+        if (o.active && s.playing && hit && robotState.current.y < CLEAR_Y) {
           s.playing = false;
           robotState.current.mode = 'dead';
+          impact.current = { t: state.clock.elapsedTime, x: (s.x + LANES[o.lane]) / 2, z: ROBOT_Z - 0.4 };
           onGameOver(Math.floor(s.distance));
         }
       }
@@ -146,6 +154,7 @@ export const RunnerScene = forwardRef<RunnerHandle, Props>(({ onScore, onGameOve
       <SpeedParticles fx={fx} quality={quality} />
       <RunnerRobot stateRef={robotState} shadows={quality === 'high'} />
       <ObstacleField obstacles={obstacles} quality={quality} />
+      <ImpactBurst impact={impact} />
     </>
   );
 });

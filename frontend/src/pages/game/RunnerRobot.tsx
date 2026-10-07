@@ -4,6 +4,7 @@ import { useGLTF, useAnimations } from '@react-three/drei';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import * as THREE from 'three';
 import { radialTexture } from './textures';
+import { ROBOT_Z } from './config';
 
 const MODEL_URL = '/models/RobotExpressive.glb';
 const AIR_TIME = 0.96; // 2 * JUMP_V0 / GRAVITY (ver RunnerScene)
@@ -54,7 +55,6 @@ export function RunnerRobot({ stateRef, shadows }: { stateRef: RefObject<RobotSt
   const { scene, animations } = useGLTF(MODEL_URL);
   const { actions } = useAnimations(animations, group);
   const shown = useRef<RobotMode | null>(null);
-  const blobZ = useRef<number | null>(null);
   const blobTex = useMemo(() => radialTexture('rgba(0,0,0,0.75)'), []);
 
   const cloned = useMemo(() => {
@@ -85,19 +85,14 @@ export function RunnerRobot({ stateRef, shadows }: { stateRef: RefObject<RobotSt
     const s = stateRef.current;
     if (!g || !s) return;
     if (shown.current !== s.mode) { shown.current = s.mode; playMode(actions, s.mode); }
-    const k = Math.min(1, dt * 12);
-    const dx = s.x - g.position.x;
-    g.position.x += dx * k;
+    // La X ya viene suavizada desde RunnerScene (es la misma que usa la colisión)
+    const vx = (s.x - g.position.x) / Math.max(dt, 1e-3);
+    g.position.x = s.x;
     g.position.y = s.y;
     // Se inclina hacia el carril al que se mueve
-    const lean = THREE.MathUtils.clamp(-dx * 0.08, -0.12, 0.12);
+    const lean = THREE.MathUtils.clamp(-vx * 0.02, -0.12, 0.12);
     g.rotation.z += (lean - g.rotation.z) * Math.min(1, dt * 10);
     if (blob.current) {
-      if (blobZ.current === null) {
-        g.updateWorldMatrix(true, true);
-        blobZ.current = new THREE.Box3().setFromObject(cloned).getCenter(new THREE.Vector3()).z;
-        blob.current.position.z = blobZ.current;
-      }
       const sc = Math.max(0.35, 1 - s.y * 0.25);
       blob.current.position.x = g.position.x;
       blob.current.scale.setScalar(sc);
@@ -106,10 +101,10 @@ export function RunnerRobot({ stateRef, shadows }: { stateRef: RefObject<RobotSt
 
   return (
     <>
-      <group ref={group} rotation={[0, Math.PI, 0]} scale={0.5}>
+      <group ref={group} position={[0, 0, ROBOT_Z]} rotation={[0, Math.PI, 0]} scale={0.5}>
         <primitive object={cloned} />
       </group>
-      <mesh ref={blob} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, 0]}>
+      <mesh ref={blob} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, ROBOT_Z]}>
         <planeGeometry args={[1.6, 1.6]} />
         <meshBasicMaterial map={blobTex} transparent depthWrite={false} />
       </mesh>
