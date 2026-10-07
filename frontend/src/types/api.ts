@@ -35,7 +35,8 @@ export interface AiModelUsage {
   tokens: number;
   calls: number;
   peakPerMinute: number;
-  tpm: number;
+  // null: sin tope de tokens por minuto conocido (Gemini y NVIDIA limitan por otras vias)
+  tpm: number | null;
 }
 
 // Opcionales: si el frontend se despliega antes que el backend, la respuesta puede no traerlos
@@ -47,6 +48,8 @@ export interface AiUsageSummary {
   tpmLimit: number;
   byModel?: AiModelUsage[];
   capacityTpm?: number;
+  modelCount?: number;
+  providerCount?: number;
   trackingSince: string | null;
   lastUsedAt: string | null;
 }

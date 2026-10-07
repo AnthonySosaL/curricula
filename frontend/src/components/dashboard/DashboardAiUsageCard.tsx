@@ -66,7 +66,11 @@ export function DashboardAiUsageCard({ snapshot }: { snapshot?: AnalyticsSummary
                 <div>
                   <p className="text-xs text-[var(--color-text-muted)]">{t('dashboard.tokensCapacity')}</p>
                   <p className="text-2xl font-bold text-[var(--color-text)] tabular-nums">{fmt(usage.capacityTpm)}</p>
-                  <p className="text-xs text-[var(--color-text-muted)]">{t('dashboard.tokensCapacityHelp')}</p>
+                  <p className="text-xs text-[var(--color-text-muted)]">
+                    {t('dashboard.tokensCapacityHelp')}
+                    {usage.modelCount ? ` · ${usage.modelCount} ${t('dashboard.tokensModels')}` : ''}
+                    {usage.providerCount ? ` / ${usage.providerCount} ${t('dashboard.tokensProviders')}` : ''}
+                  </p>
                 </div>
               ) : (
                 <div>
@@ -85,19 +89,26 @@ export function DashboardAiUsageCard({ snapshot }: { snapshot?: AnalyticsSummary
                     {t('dashboard.tokensByModel')} · {t('dashboard.tokensPeak24')} / {t('dashboard.tokensLimit')}
                   </p>
                   {usage.byModel.map((m) => {
-                    const ratio = m.tpm > 0 ? Math.min(100, (m.peakPerMinute / m.tpm) * 100) : 0;
+                    const [provider, ...rest] = m.model.split(':');
+                    const name = rest.join(':').split('/').pop();
+                    const ratio = m.tpm ? Math.min(100, (m.peakPerMinute / m.tpm) * 100) : 0;
                     const modelTone = peakTone(ratio);
                     return (
                       <div key={m.model}>
                         <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-xs">
-                          <span className="font-medium text-[var(--color-text)]">{m.model.split('/').pop()}</span>
+                          <span className="font-medium text-[var(--color-text)]">
+                            {name} <span className="font-normal text-[var(--color-text-muted)]">· {provider}</span>
+                          </span>
                           <span className="text-[var(--color-text-muted)] tabular-nums">
-                            {fmt(m.tokens)} · {fmt(m.calls)} {t('dashboard.tokensCalls')} · {fmt(m.peakPerMinute)} / {fmt(m.tpm)}
+                            {fmt(m.tokens)} · {fmt(m.calls)} {t('dashboard.tokensCalls')}
+                            {m.tpm ? ` · ${fmt(m.peakPerMinute)} / ${fmt(m.tpm)}` : ` · ${t('dashboard.tokensNoCap')}`}
                           </span>
                         </div>
-                        <div className="mt-1 h-1.5 rounded-full bg-[var(--color-surface-soft)] overflow-hidden">
-                          <div className={`h-full ${modelTone.bar}`} style={{ width: `${ratio}%` }} />
-                        </div>
+                        {m.tpm ? (
+                          <div className="mt-1 h-1.5 rounded-full bg-[var(--color-surface-soft)] overflow-hidden">
+                            <div className={`h-full ${modelTone.bar}`} style={{ width: `${ratio}%` }} />
+                          </div>
+                        ) : null}
                       </div>
                     );
                   })}
