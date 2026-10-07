@@ -23,11 +23,14 @@ Sitio: https://curricula-fawn.vercel.app · ATLAS: https://atlas-lab-one.vercel.
 4. Confirmar si Certis es gratis (si sí, usarlo como gancho principal).
 5. Mergear la rama.
 
-## Pendiente técnico (para la próxima sesión)
+## Hecho en la sesión 2 (2026-10-07, rama `claude/epic-cannon-1kdgaj` en los 3 repos)
 
-1. Dentro de los repos de ATLAS Lab (Next.js) y Certis (Angular): SEO propio (title/description, Open Graph, sitemap, robots, JSON-LD) y AdSense con el mismo ID.
-2. En Certis (SPA Angular): prerender o SSR de la home para que Google la indexe.
-3. Enlaces cruzados: ATLAS ↔ Certis ↔ portafolio (footer "Otros proyectos").
-4. Versiones en inglés de las landings y artículos SEO (Deflated Sharpe, B2 vs C1, speaking C1).
-5. Banner de consentimiento (GDPR) si no se activa el de AdSense.
-6. Con el `ca-pub` real: reemplazarlo en `adsense.js` y `ads.txt` de todos los repos.
+- **atlas-lab**: metadata + Open Graph (descripción calculada de los datos), `generateMetadata` por experimento, `sitemap.ts`, `robots.ts`, JSON-LD, `public/adsense.js` + `ads.txt`, footer "Otros proyectos" con UTM.
+- **certis-platform**: prerender estático de `/` y `/about` (`@angular/ssr`, `outputMode: static`, sin servidor Node), meta/OG/JSON-LD, títulos por ruta, `robots.txt`, `sitemap.xml`, `public/web.config` (fallback a `index.csr.html`), AdSense + `ads.txt`, footer "Other projects".
+- **curricula**: landings en inglés (`/proyectos/*/en/`) con hreflang, 3 artículos en `/articulos/` (Deflated Sharpe, B2 vs C1, speaking C1), sitemap actualizado.
+
+## Pendiente técnico
+
+1. Con el `ca-pub` real: reemplazarlo en `adsense.js` y `ads.txt` de los 3 repos.
+2. Banner de consentimiento (GDPR) si no se activa el de AdSense.
+3. Certis: el próximo deploy debe subir el `dist/` completo (incluye `web.config`, `about/` e `index.csr.html`).

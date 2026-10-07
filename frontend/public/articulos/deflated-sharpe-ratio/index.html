@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qué es el Deflated Sharpe Ratio y por qué tu backtest probablemente miente</title>
+  <meta name="description" content="El Deflated Sharpe Ratio (DSR) corrige el Sharpe por el número de estrategias probadas y por colas gordas. Explicación sencilla, fórmula y un caso real de ATLAS Lab." />
+  <link rel="canonical" href="https://curricula-fawn.vercel.app/articulos/deflated-sharpe-ratio/" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="theme-color" content="#dc2626" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Deflated Sharpe Ratio: por qué tu backtest probablemente miente" />
+  <meta property="og:description" content="Si pruebas mil estrategias, alguna saldrá brillante por suerte. El DSR te dice si la tuya es algo más que eso." />
+  <meta property="og:url" content="https://curricula-fawn.vercel.app/articulos/deflated-sharpe-ratio/" />
+  <meta property="og:image" content="https://curricula-fawn.vercel.app/foto.png" />
+  <meta property="og:locale" content="es_EC" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="/proyectos/landing.css" />
+  <script src="/adsense.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Qué es el Deflated Sharpe Ratio y por qué tu backtest probablemente miente",
+    "datePublished": "2026-10-07",
+    "author": { "@type": "Person", "name": "Anthony Sosa", "url": "https://curricula-fawn.vercel.app/" },
+    "inLanguage": "es",
+    "mainEntityOfPage": "https://curricula-fawn.vercel.app/articulos/deflated-sharpe-ratio/",
+    "about": ["Deflated Sharpe Ratio", "backtesting", "sesgo de selección", "trading cuantitativo"]
+  }
+  </script>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="crumbs"><a href="/">Anthony Sosa</a> / Artículos / Deflated Sharpe Ratio</nav>
+    <span class="tag">Trading cuantitativo</span>
+    <h1>Qué es el Deflated Sharpe Ratio y por qué tu backtest probablemente miente</h1>
+    <p class="meta">Por Anthony Sosa · 7 de octubre de 2026 · 6 min de lectura</p>
+    <p class="lead">Si pruebas suficientes estrategias, alguna va a parecer excelente por pura suerte. El Deflated Sharpe Ratio es la herramienta que te dice si tu "mejor estrategia" es algo más que el ganador de una lotería.</p>
+
+    <h2>El problema: el Sharpe no sabe cuántas veces lo intentaste</h2>
+    <p>El ratio de Sharpe mide el retorno por unidad de riesgo. Un Sharpe de 1 o más suele considerarse bueno. Pero el número no guarda memoria de cuántas variantes probaste antes de quedarte con esa: cambiar un parámetro, otro activo, otra ventana temporal… Cada intento es un boleto más en la lotería.</p>
+    <p>Esto se llama <strong>sesgo de selección</strong> (o <em>multiple testing</em>). Si generas cientos de estrategias aleatorias, sin ninguna ventaja real, la mejor de ellas mostrará un Sharpe alto solo por azar. Si eliges esa y la reportas sola, estás presentando ruido optimizado.</p>
+
+    <ins class="adsbygoogle ad" style="display:block" data-ad-slot="" data-ad-format="auto" data-full-width-responsive="true"></ins>
+
+    <h2>La idea del Deflated Sharpe Ratio</h2>
+    <p>El DSR fue propuesto por David H. Bailey y Marcos López de Prado (2014). Responde a una pregunta concreta: <strong>¿cuál es la probabilidad de que el Sharpe real de mi estrategia sea mayor que el que esperaría obtener por suerte, dado cuántas pruebas hice?</strong></p>
+    <p>Para eso combina dos correcciones:</p>
+    <ul>
+      <li><strong>Número de pruebas:</strong> calcula el Sharpe máximo que esperarías ver entre N estrategias sin ninguna ventaja. Ese es el listón a superar, y sube a medida que pruebas más.</li>
+      <li><strong>Forma de los retornos:</strong> los retornos financieros no son normales; tienen asimetría y colas gordas. El DSR ajusta por ambas, porque un Sharpe con colas gordas es menos fiable.</li>
+    </ul>
+
+    <h2>La fórmula, sin miedo</h2>
+    <p>Primero, el Sharpe esperado del mejor de N intentos sin ventaja real (el listón):</p>
+    <p class="formula">SR₀ = √V[SR] · ( (1 − γ) · Φ⁻¹(1 − 1/N) + γ · Φ⁻¹(1 − 1/(N·e)) )</p>
+    <p>donde V[SR] es la varianza de los Sharpe de todas las pruebas, Φ⁻¹ es la inversa de la normal estándar y γ ≈ 0,5772 es la constante de Euler-Mascheroni.</p>
+    <p>Después, la probabilidad de que tu Sharpe observado (SR̂) supere ese listón, corrigiendo por asimetría (γ₃) y curtosis (γ₄) con T observaciones:</p>
+    <p class="formula">DSR = Φ( (SR̂ − SR₀) · √(T − 1) / √(1 − γ₃·SR̂ + ((γ₄ − 1)/4)·SR̂²) )</p>
+    <p>El resultado es una probabilidad entre 0 y 1. Una regla habitual es exigir <strong>DSR ≥ 0,95</strong> para considerar que la estrategia tiene algo real.</p>
+
+    <h2>Cómo leerlo en la práctica</h2>
+    <ul>
+      <li><strong>DSR alto (≥ 0,95):</strong> el resultado es difícil de explicar solo por suerte, aun contando todas tus pruebas.</li>
+      <li><strong>DSR medio o bajo:</strong> tu estrategia no se distingue del mejor resultado que saldría de probar al azar.</li>
+      <li><strong>Lo crucial:</strong> N debe incluir <em>todas</em> las pruebas, también las que descartaste. Si escondes intentos, el DSR pierde sentido.</li>
+    </ul>
+
+    <h2>Un caso real: ATLAS Lab</h2>
+    <p>En <a href="/proyectos/atlas-lab/">ATLAS Lab</a> probé decenas de miles de estrategias de trading con datos retail. Tras más de 40 intentos de sistemas ejecutables, el mejor tenía un Sharpe de 0,38. Al calcular su Deflated Sharpe el resultado fue 0,35: no se distinguía del mejor resultado que se obtendría por puro azar. Por eso el laboratorio lo registra como negativo, y lo publica igual.</p>
+
+    <h2>Checklist anti-autoengaño</h2>
+    <ul>
+      <li>Cuenta y registra cada variante que pruebes.</li>
+      <li>Fija las reglas antes de mirar resultados (preregistro).</li>
+      <li>Reserva datos fuera de muestra que nunca uses para diseñar.</li>
+      <li>Incluye costos reales de transacción.</li>
+      <li>Reporta el DSR, no solo el Sharpe.</li>
+    </ul>
+
+    <section class="faq">
+      <h2>Preguntas frecuentes</h2>
+      <details><summary>¿El DSR reemplaza al out-of-sample?</summary><p>No, lo complementa. El out-of-sample prueba la estrategia en datos nuevos; el DSR corrige por cuántas cosas probaste. Lo ideal es usar ambos.</p></details>
+      <details><summary>¿Qué pasa si solo probé una estrategia?</summary><p>Con N = 1 no hay corrección por pruebas múltiples, pero sí por asimetría y curtosis. Siendo honestos, casi nunca se prueba solo una.</p></details>
+      <details><summary>¿Esto es asesoría financiera?</summary><p>No. Es contenido educativo sobre estadística aplicada al backtesting.</p></details>
+    </section>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://atlas-lab-one.vercel.app/?utm_source=portfolio&utm_medium=article&utm_campaign=dsr" rel="noopener">Ver los resultados en ATLAS Lab</a>
+      <a class="btn btn-ghost" href="/proyectos/atlas-lab/">Sobre el proyecto</a>
+    </div>
+
+    <footer>Escrito por <a href="/">Anthony Sosa</a>. Referencia: Bailey, D. H. y López de Prado, M. (2014), "The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting and Non-Normality", <em>Journal of Portfolio Management</em>. Contenido informativo, no es asesoría de inversión.</footer>
+  </main>
+</body>
+</html>
