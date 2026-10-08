@@ -14,6 +14,8 @@ const ARTICLES = [
   { slug: 'writing-c1-advanced', label: 'Writing del C1 Advanced' },
   { slug: 'reading-use-of-english-c1', label: 'Reading and Use of English del C1' },
   { slug: 'preparar-c1-advanced-3-meses', label: 'Preparar el C1 en 3 meses' },
+  { slug: 'listening-b2-first', label: 'Listening del B2 First' },
+  { slug: 'que-es-el-mcer', label: 'Qué es el MCER' },
   { slug: 'togaf-adm-fases', label: 'Fases del TOGAF ADM' },
   { slug: 'deflated-sharpe-ratio', label: 'Deflated Sharpe Ratio' },
   { slug: 'errores-backtesting', label: '7 errores de backtesting' },
