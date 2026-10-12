@@ -17,6 +17,8 @@ const ARTICLES = [
   { slug: 'speaking-c1-advanced', label: 'Cómo es el examen oral (Speaking) del C1 Advanced: las 4 partes y cómo practicarlo' },
   { slug: 'listening-b2-first', label: 'Comprensión auditiva (Listening) del B2 First: las 4 partes y trucos' },
   { slug: 'togaf-adm-fases', label: 'Qué es el TOGAF ADM y qué se hace en cada fase' },
+  { slug: 'togaf-fase-a-vision', label: 'Fase A del TOGAF: cómo escribir la visión de arquitectura' },
+  { slug: 'togaf-vs-zachman', label: 'TOGAF vs Zachman: diferencias y cuándo usar cada uno' },
   { slug: 'deflated-sharpe-ratio', label: 'Qué es el Deflated Sharpe Ratio y por qué tu backtest probablemente miente' },
   { slug: 'errores-backtesting', label: '7 errores de backtesting que inflan tus resultados' },
 ];
