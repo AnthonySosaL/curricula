@@ -9,14 +9,16 @@ const PROJECTS = [
 ];
 
 const ARTICLES = [
-  { slug: 'diferencia-b2-c1-ingles', label: 'Diferencia entre B2 y C1' },
-  { slug: 'speaking-c1-advanced', label: 'Speaking del C1 Advanced' },
-  { slug: 'writing-c1-advanced', label: 'Writing del C1 Advanced' },
-  { slug: 'reading-use-of-english-c1', label: 'Reading and Use of English del C1' },
-  { slug: 'preparar-c1-advanced-3-meses', label: 'Preparar el C1 en 3 meses' },
-  { slug: 'togaf-adm-fases', label: 'Fases del TOGAF ADM' },
-  { slug: 'deflated-sharpe-ratio', label: 'Deflated Sharpe Ratio' },
-  { slug: 'errores-backtesting', label: '7 errores de backtesting' },
+  { slug: 'diferencia-b2-c1-ingles', label: 'Diferencia entre B2 y C1 de inglés: qué cambia de verdad' },
+  { slug: 'que-es-el-mcer', label: 'Qué es el MCER y qué significa cada nivel de inglés' },
+  { slug: 'preparar-c1-advanced-3-meses', label: 'Cómo prepararse para el C1 Advanced en 3 meses' },
+  { slug: 'reading-use-of-english-c1', label: 'Lectura y gramática (Reading and Use of English) del C1: las 8 partes y trucos' },
+  { slug: 'writing-c1-advanced', label: 'Escritura (Writing) del C1 Advanced: cómo estructurar el ensayo y la Part 2' },
+  { slug: 'speaking-c1-advanced', label: 'Cómo es el examen oral (Speaking) del C1 Advanced: las 4 partes y cómo practicarlo' },
+  { slug: 'listening-b2-first', label: 'Comprensión auditiva (Listening) del B2 First: las 4 partes y trucos' },
+  { slug: 'togaf-adm-fases', label: 'Qué es el TOGAF ADM y qué se hace en cada fase' },
+  { slug: 'deflated-sharpe-ratio', label: 'Qué es el Deflated Sharpe Ratio y por qué tu backtest probablemente miente' },
+  { slug: 'errores-backtesting', label: '7 errores de backtesting que inflan tus resultados' },
 ];
 
 const linkClass = 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)] underline-offset-2 hover:underline';
