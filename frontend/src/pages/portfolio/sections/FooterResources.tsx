@@ -55,6 +55,10 @@ export default function FooterResources() {
             </li>
           ))}
         </ul>
+        <p className="mt-3 space-x-3">
+          <a className={linkClass} href="/articulos/">{en ? 'All articles' : 'Todos los artículos'}</a>
+          <a className={linkClass} href="/sobre-mi/">{en ? 'About & contact' : 'Sobre mí y contacto'}</a>
+        </p>
       </div>
     </nav>
   );

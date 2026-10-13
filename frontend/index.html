@@ -32,7 +32,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Texto estático para buscadores y visitantes sin JavaScript; React lo reemplaza al montar. -->
+      <main style="max-width:720px;margin:40px auto;padding:0 16px;font-family:Inter,sans-serif">
+        <h1>Anthony Sosa · Desarrollador Full Stack</h1>
+        <p>Graduado de Ingeniería de Sistemas de la Información, con experiencia real en desarrollo Full Stack, análisis de datos, automatización e inteligencia artificial. Basado en Pichincha, Ecuador, disponible para proyectos remotos.</p>
+        <p>Proyectos: <a href="/proyectos/atlas-lab/">ATLAS Lab</a> · <a href="/proyectos/certis/">Certis</a> · <a href="/proyectos/praxis-togaf/">Praxis TOGAF</a></p>
+        <p><a href="/articulos/">Artículos</a> · <a href="/sobre-mi/">Sobre mí y contacto</a> · <a href="/privacidad/">Privacidad</a></p>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

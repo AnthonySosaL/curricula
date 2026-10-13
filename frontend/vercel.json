@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/(articulos/[^/]+|proyectos/[^/]+|proyectos/[^/]+/en|privacidad)/?", "destination": "/$1/index.html" },
+    { "source": "/(articulos|articulos/[^/]+|proyectos/[^/]+|proyectos/[^/]+/en|privacidad|sobre-mi)/?", "destination": "/$1/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
