@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qué es el walk-forward analysis y cómo usarlo para validar una estrategia</title>
+  <meta name="description" content="Explicación clara del walk-forward analysis: cómo dividir los datos en ventanas de optimización y prueba, ventana fija vs. ancla, cómo leer los resultados y errores comunes." />
+  <link rel="canonical" href="https://curricula-fawn.vercel.app/articulos/walk-forward-analysis/" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="theme-color" content="#dc2626" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Qué es el walk-forward analysis" />
+  <meta property="og:description" content="Cómo validar una estrategia de trading con ventanas sucesivas de optimización y prueba." />
+  <meta property="og:url" content="https://curricula-fawn.vercel.app/articulos/walk-forward-analysis/" />
+  <meta property="og:image" content="https://curricula-fawn.vercel.app/foto.png" />
+  <meta property="og:locale" content="es_EC" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="/proyectos/landing.css" />
+  <script src="/adsense.js"></script>
+  <script src="/analytics.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Qué es el walk-forward analysis y cómo usarlo para validar una estrategia",
+    "datePublished": "2026-10-13",
+    "author": { "@type": "Person", "name": "Anthony Sosa", "url": "https://curricula-fawn.vercel.app/" },
+    "inLanguage": "es",
+    "mainEntityOfPage": "https://curricula-fawn.vercel.app/articulos/walk-forward-analysis/",
+    "about": ["walk-forward analysis", "backtesting", "trading cuantitativo", "validación fuera de muestra"]
+  }
+  </script>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="crumbs"><a href="/">Anthony Sosa</a> / Artículos / Walk-forward analysis</nav>
+    <span class="tag">Trading cuantitativo</span>
+    <h1>Qué es el walk-forward analysis (análisis de avance) y cómo usarlo</h1>
+    <p class="meta">Por Anthony Sosa · 13 de octubre de 2026 · 6 min de lectura</p>
+    <p class="lead">Un backtest optimizado sobre todo el histórico siempre se ve bien. El walk-forward analysis responde a una pregunta más honesta: si hubieras ajustado la estrategia con los datos de ese momento, ¿habría funcionado en los meses siguientes?</p>
+
+    <h2>La idea en una frase</h2>
+    <p>Optimizas los parámetros en un tramo de datos (<strong>ventana in-sample</strong>), los pruebas sin tocarlos en el tramo siguiente (<strong>ventana out-of-sample</strong>), avanzas en el tiempo y repites. Al final unes todos los tramos de prueba y obtienes una curva hecha solo con datos que la optimización no vio.</p>
+
+    <h2>Un ejemplo con números</h2>
+    <p>Con 10 años de datos, ventanas de 3 años para optimizar y 1 año para probar:</p>
+    <table>
+      <thead><tr><th>Paso</th><th>Optimizas con</th><th>Pruebas en</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Años 1–3</td><td>Año 4</td></tr>
+        <tr><td>2</td><td>Años 2–4</td><td>Año 5</td></tr>
+        <tr><td>3</td><td>Años 3–5</td><td>Año 6</td></tr>
+        <tr><td>…</td><td>…</td><td>…</td></tr>
+        <tr><td>7</td><td>Años 7–9</td><td>Año 10</td></tr>
+      </tbody>
+    </table>
+    <p>Resultado: 7 años de rendimiento "fuera de muestra" encadenados, en lugar de un solo número optimizado sobre todo el periodo.</p>
+
+    <ins class="adsbygoogle ad" style="display:block" data-ad-slot="" data-ad-format="auto" data-full-width-responsive="true"></ins>
+
+    <h2>Ventana móvil vs. ventana anclada</h2>
+    <ul>
+      <li><strong>Móvil (rolling):</strong> la ventana de optimización tiene siempre el mismo largo y se desplaza. Se adapta mejor a cambios de régimen, pero usa menos datos en cada paso.</li>
+      <li><strong>Anclada (anchored):</strong> el inicio queda fijo y la ventana crece. Usa más datos, pero reacciona más lento si el mercado cambia.</li>
+    </ul>
+
+    <h2>Cómo leer el resultado</h2>
+    <ul>
+      <li><strong>Compara in-sample con out-of-sample.</strong> Si en optimización ganas mucho y en prueba casi nada, la estrategia está sobreajustada.</li>
+      <li><strong>Mira la estabilidad de los parámetros.</strong> Si los valores óptimos saltan de un extremo a otro en cada paso, no hay un patrón robusto.</li>
+      <li><strong>Revisa cada tramo, no solo el total.</strong> Un buen resultado sostenido por un único año excepcional es frágil.</li>
+    </ul>
+
+    <h2>Errores comunes</h2>
+    <ul>
+      <li>Elegir el tamaño de ventana después de ver qué combinación da mejor resultado: eso vuelve a ser optimizar sobre todo el histórico.</li>
+      <li>Repetir el walk-forward muchas veces cambiando reglas hasta que salga bien. Es el mismo sesgo de selección de siempre; conviene corregirlo con el <a href="/articulos/deflated-sharpe-ratio/">Deflated Sharpe Ratio</a>.</li>
+      <li>Ignorar costos y deslizamiento en los tramos de prueba.</li>
+    </ul>
+
+    <h2>Cómo encaja con otras validaciones</h2>
+    <p>El walk-forward no reemplaza a reservar un periodo final que no toques nunca. En <a href="/proyectos/atlas-lab/">ATLAS Lab</a> cada experimento se evalúa con un doble out-of-sample de 18 meses, Deflated Sharpe y Monte Carlo; los resultados, incluidos los negativos, están publicados. Si quieres repasar las trampas generales, lee <a href="/articulos/errores-backtesting/">los 7 errores de backtesting</a>.</p>
+
+    <section class="faq">
+      <h2>Preguntas frecuentes</h2>
+      <details><summary>¿Qué proporción entre ventanas se usa?</summary><p>No hay una regla única; es habitual que la ventana de prueba sea bastante más corta que la de optimización. Lo importante es fijarla antes de mirar resultados.</p></details>
+      <details><summary>¿Un buen walk-forward garantiza ganancias?</summary><p>No. Reduce el riesgo de sobreajuste, pero el mercado puede cambiar de forma que ningún dato pasado anticipe.</p></details>
+      <details><summary>¿Esto es asesoría financiera?</summary><p>No. Es contenido educativo sobre método y estadística.</p></details>
+    </section>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://atlas-lab-one.vercel.app/?utm_source=portfolio&utm_medium=article&utm_campaign=walk_forward" rel="noopener">Ver los experimentos en ATLAS Lab</a>
+      <a class="btn btn-ghost" href="/articulos/sesgo-supervivencia-trading/">Sesgo de supervivencia</a>
+    </div>
+
+    <footer>Escrito por <a href="/">Anthony Sosa</a>. Referencia: Pardo, R. (2008), <em>The Evaluation and Optimization of Trading Strategies</em>, Wiley. Contenido informativo, no es asesoría de inversión. · <a href="/privacidad/">Privacidad</a></footer>
+  </main>
+</body>
+</html>

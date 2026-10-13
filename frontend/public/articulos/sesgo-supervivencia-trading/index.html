@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sesgo de supervivencia en trading: qué es y cómo evitarlo en tus backtests</title>
+  <meta name="description" content="Qué es el sesgo de supervivencia, por qué hace que estrategias y fondos parezcan mejores de lo que son, ejemplos en acciones, fondos y redes sociales, y cómo evitarlo." />
+  <link rel="canonical" href="https://curricula-fawn.vercel.app/articulos/sesgo-supervivencia-trading/" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="theme-color" content="#dc2626" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Sesgo de supervivencia en trading, explicado" />
+  <meta property="og:description" content="Por qué solo ves a los que sobrevivieron y cómo eso infla los resultados." />
+  <meta property="og:url" content="https://curricula-fawn.vercel.app/articulos/sesgo-supervivencia-trading/" />
+  <meta property="og:image" content="https://curricula-fawn.vercel.app/foto.png" />
+  <meta property="og:locale" content="es_EC" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="/proyectos/landing.css" />
+  <script src="/adsense.js"></script>
+  <script src="/analytics.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Sesgo de supervivencia en trading: qué es y cómo evitarlo",
+    "datePublished": "2026-10-13",
+    "author": { "@type": "Person", "name": "Anthony Sosa", "url": "https://curricula-fawn.vercel.app/" },
+    "inLanguage": "es",
+    "mainEntityOfPage": "https://curricula-fawn.vercel.app/articulos/sesgo-supervivencia-trading/",
+    "about": ["sesgo de supervivencia", "backtesting", "trading cuantitativo", "fondos de inversión"]
+  }
+  </script>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="crumbs"><a href="/">Anthony Sosa</a> / Artículos / Sesgo de supervivencia</nav>
+    <span class="tag">Trading cuantitativo</span>
+    <h1>Sesgo de supervivencia en trading: qué es y cómo evitarlo</h1>
+    <p class="meta">Por Anthony Sosa · 13 de octubre de 2026 · 5 min de lectura</p>
+    <p class="lead">Si solo miras a los que siguen en pie, el pasado siempre parece más fácil de lo que fue. Eso es el sesgo de supervivencia, y es uno de los motivos más comunes por los que un backtest promete más de lo que el mercado entrega.</p>
+
+    <h2>La definición</h2>
+    <p>Es el error de sacar conclusiones a partir de un grupo que ya pasó un filtro (sobrevivió), ignorando a los que no lo pasaron. El ejemplo clásico es el de los aviones de la Segunda Guerra Mundial: el estadístico Abraham Wald señaló que había que reforzar las zonas <em>sin</em> impactos de los aviones que volvían, porque los que recibían disparos ahí no regresaban.</p>
+
+    <h2>Dónde aparece en los mercados</h2>
+    <ul>
+      <li><strong>Backtests con el índice de hoy.</strong> Si pruebas una estrategia sobre las empresas que hoy forman un índice, dejas fuera a las que quebraron, fueron compradas o salieron por mal desempeño. Tu muestra está llena de ganadoras por construcción.</li>
+      <li><strong>Fondos de inversión.</strong> Los fondos que cierran o se fusionan suelen ser los peores. Si una base de datos solo guarda los vivos, el rendimiento promedio del sector se ve mejor de lo que fue; está documentado en estudios académicos como el de Elton, Gruber y Blake (1996).</li>
+      <li><strong>Gurús y redes sociales.</strong> Ves a quien ganó con una estrategia, no a los miles que la siguieron y perdieron y ya no publican.</li>
+    </ul>
+
+    <ins class="adsbygoogle ad" style="display:block" data-ad-slot="" data-ad-format="auto" data-full-width-responsive="true"></ins>
+
+    <h2>Por qué infla los resultados</h2>
+    <p>Las empresas que desaparecieron suelen hacerlo tras caídas fuertes. Al excluirlas, eliminas justo las peores pérdidas del histórico. Estrategias que compran caídas o activos "baratos" son las más afectadas: en datos con supervivientes, todo lo que cayó terminó recuperándose, porque las que no se recuperaron no están.</p>
+
+    <h2>Cómo evitarlo</h2>
+    <ol>
+      <li><strong>Usa datos que incluyan activos deslistados</strong> (point-in-time): la composición real del universo en cada fecha.</li>
+      <li><strong>Reconstruye el índice histórico</strong> en lugar de usar la lista actual de componentes.</li>
+      <li><strong>Desconfía de los resultados demasiado limpios</strong>, sobre todo en estrategias de reversión a la media.</li>
+      <li><strong>Si no tienes esos datos, dilo.</strong> Prueba en activos que existen todo el periodo (índices, futuros, ETF amplios) y reconoce la limitación.</li>
+    </ol>
+
+    <h2>Cómo lo trato en mis experimentos</h2>
+    <p>En <a href="/proyectos/atlas-lab/">ATLAS Lab</a> el enfoque es el inverso al de buscar ganadores: se catalogan las ideas que <strong>no</strong> funcionan y se ponen a prueba afirmaciones de influencers, y cualquier estrategia que sobrevive se trata como sospechosa hasta revalidarla. Es otra forma de protegerse del mismo sesgo: el que algo haya pasado un filtro no prueba que sea real.</p>
+
+    <section class="faq">
+      <h2>Preguntas frecuentes</h2>
+      <details><summary>¿Es lo mismo que el sobreajuste?</summary><p>No. El sobreajuste viene de ajustar demasiado los parámetros; el sesgo de supervivencia viene de una muestra de datos incompleta. Pueden darse a la vez. Más en <a href="/articulos/errores-backtesting/">los 7 errores de backtesting</a>.</p></details>
+      <details><summary>¿Afecta también a las criptomonedas?</summary><p>Sí. Muchas monedas dejaron de cotizar; probar solo con las que hoy están en los primeros puestos repite el mismo problema.</p></details>
+      <details><summary>¿Esto es asesoría financiera?</summary><p>No. Es contenido educativo sobre método y estadística.</p></details>
+    </section>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://atlas-lab-one.vercel.app/?utm_source=portfolio&utm_medium=article&utm_campaign=sesgo_supervivencia" rel="noopener">Ver los experimentos en ATLAS Lab</a>
+      <a class="btn btn-ghost" href="/articulos/walk-forward-analysis/">Qué es el walk-forward analysis</a>
+    </div>
+
+    <footer>Escrito por <a href="/">Anthony Sosa</a>. Referencia: Elton, E. J., Gruber, M. J. y Blake, C. R. (1996), "Survivorship Bias and Mutual Fund Performance", <em>The Review of Financial Studies</em>. Contenido informativo, no es asesoría de inversión. · <a href="/privacidad/">Privacidad</a></footer>
+  </main>
+</body>
+</html>
