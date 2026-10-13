@@ -21,6 +21,8 @@ const ARTICLES = [
   { slug: 'togaf-vs-zachman', label: 'TOGAF vs Zachman: diferencias y cuándo usar cada uno' },
   { slug: 'deflated-sharpe-ratio', label: 'Qué es el Deflated Sharpe Ratio y por qué tu backtest probablemente miente' },
   { slug: 'errores-backtesting', label: '7 errores de backtesting que inflan tus resultados' },
+  { slug: 'walk-forward-analysis', label: 'Qué es el walk-forward analysis (análisis de avance) y cómo usarlo' },
+  { slug: 'sesgo-supervivencia-trading', label: 'Sesgo de supervivencia en trading: qué es y cómo evitarlo' },
 ];
 
 const linkClass = 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)] underline-offset-2 hover:underline';
