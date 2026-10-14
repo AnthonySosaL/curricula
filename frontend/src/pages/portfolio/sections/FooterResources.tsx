@@ -16,6 +16,7 @@ const ARTICLES = [
   { slug: 'writing-c1-advanced', label: 'Escritura (Writing) del C1 Advanced: cómo estructurar el ensayo y la Part 2' },
   { slug: 'speaking-c1-advanced', label: 'Cómo es el examen oral (Speaking) del C1 Advanced: las 4 partes y cómo practicarlo' },
   { slug: 'listening-b2-first', label: 'Comprensión auditiva (Listening) del B2 First: las 4 partes y trucos' },
+  { slug: 'writing-b2-first', label: 'Escritura (Writing) del B2 First: formato, tipos de texto y estructura del ensayo' },
   { slug: 'togaf-adm-fases', label: 'Qué es el TOGAF ADM y qué se hace en cada fase' },
   { slug: 'togaf-fase-a-vision', label: 'Fase A del TOGAF: cómo escribir la visión de arquitectura' },
   { slug: 'togaf-vs-zachman', label: 'TOGAF vs Zachman: diferencias y cuándo usar cada uno' },
@@ -23,6 +24,7 @@ const ARTICLES = [
   { slug: 'errores-backtesting', label: '7 errores de backtesting que inflan tus resultados' },
   { slug: 'walk-forward-analysis', label: 'Qué es el walk-forward analysis (análisis de avance) y cómo usarlo' },
   { slug: 'sesgo-supervivencia-trading', label: 'Sesgo de supervivencia en trading: qué es y cómo evitarlo' },
+  { slug: 'sharpe-vs-sortino', label: 'Sharpe vs Sortino: diferencias y cuándo usar cada ratio' },
 ];
 
 const linkClass = 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)] underline-offset-2 hover:underline';
