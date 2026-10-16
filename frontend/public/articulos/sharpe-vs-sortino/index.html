@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sharpe vs Sortino: diferencias, fórmulas y cuándo usar cada ratio</title>
+  <meta name="description" content="Qué miden el ratio de Sharpe y el de Sortino, cómo se calculan con un ejemplo, en qué se diferencian (volatilidad total vs. volatilidad a la baja) y cuándo conviene usar cada uno." />
+  <link rel="canonical" href="https://curricula-fawn.vercel.app/articulos/sharpe-vs-sortino/" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="theme-color" content="#dc2626" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Sharpe vs Sortino: cuál usar" />
+  <meta property="og:description" content="Dos formas de medir retorno por unidad de riesgo, con fórmulas y ejemplo." />
+  <meta property="og:url" content="https://curricula-fawn.vercel.app/articulos/sharpe-vs-sortino/" />
+  <meta property="og:image" content="https://curricula-fawn.vercel.app/foto.png" />
+  <meta property="og:locale" content="es_EC" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="/proyectos/landing.css" />
+  <script src="/adsense.js"></script>
+  <script src="/analytics.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Sharpe vs Sortino: diferencias, fórmulas y cuándo usar cada ratio",
+    "datePublished": "2026-10-14",
+    "author": { "@type": "Person", "name": "Anthony Sosa", "url": "https://curricula-fawn.vercel.app/" },
+    "inLanguage": "es",
+    "mainEntityOfPage": "https://curricula-fawn.vercel.app/articulos/sharpe-vs-sortino/",
+    "about": ["ratio de Sharpe", "ratio de Sortino", "riesgo", "trading cuantitativo"]
+  }
+  </script>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="crumbs"><a href="/">Anthony Sosa</a> / <a href="/articulos/">Artículos</a> / Sharpe vs Sortino</nav>
+    <span class="tag">Trading cuantitativo</span>
+    <h1>Sharpe vs Sortino: diferencias y cuándo usar cada ratio</h1>
+    <p class="meta">Por Anthony Sosa · 14 de octubre de 2026 · 5 min de lectura</p>
+    <p class="lead">Los dos miden cuánto retorno obtienes por cada unidad de riesgo. La diferencia está en qué consideran "riesgo": Sharpe castiga toda la volatilidad; Sortino, solo la que te hace perder.</p>
+
+    <h2>El ratio de Sharpe</h2>
+    <p>Propuesto por William F. Sharpe en 1966. Se calcula así:</p>
+    <p><strong>Sharpe = (retorno medio − tasa libre de riesgo) ÷ desviación estándar de los retornos</strong></p>
+    <p>La desviación estándar mide cuánto se mueven los retornos alrededor de su media, hacia arriba y hacia abajo por igual. Un Sharpe de 1 significa que ganas, por encima de la tasa libre de riesgo, una unidad por cada unidad de volatilidad.</p>
+
+    <h2>El ratio de Sortino</h2>
+    <p>Desarrollado por Frank Sortino y popularizado en los años noventa. Cambia el denominador:</p>
+    <p><strong>Sortino = (retorno medio − retorno mínimo aceptable) ÷ desviación a la baja</strong></p>
+    <p>La <strong>desviación a la baja</strong> solo usa los periodos en que el retorno quedó por debajo del mínimo aceptable (a menudo 0 o la tasa libre de riesgo). Las subidas fuertes no cuentan como riesgo.</p>
+
+    <ins class="adsbygoogle ad" style="display:block" data-ad-slot="" data-ad-format="auto" data-full-width-responsive="true"></ins>
+
+    <h2>Ejemplo rápido</h2>
+    <p>Dos estrategias con el mismo retorno medio mensual del 1 % y la misma desviación estándar del 4 %. Tienen el mismo Sharpe. Pero la estrategia A tiene meses muy buenos y pérdidas pequeñas, y la B tiene meses normales y alguna caída fuerte. Como la desviación a la baja de A es menor, <strong>A tiene un Sortino más alto</strong>. Sharpe no las distingue; Sortino sí.</p>
+
+    <h2>Comparación directa</h2>
+    <table>
+      <thead><tr><th></th><th>Sharpe</th><th>Sortino</th></tr></thead>
+      <tbody>
+        <tr><td>Riesgo que mide</td><td>Toda la volatilidad</td><td>Solo la volatilidad a la baja</td></tr>
+        <tr><td>Castiga las subidas fuertes</td><td>Sí</td><td>No</td></tr>
+        <tr><td>Datos que necesita</td><td>Pocos: usa todos los periodos</td><td>Más: solo usa los periodos negativos</td></tr>
+        <tr><td>Mejor para</td><td>Comparar estrategias con retornos más o menos simétricos</td><td>Estrategias asimétricas (con colas, opciones, tendencia)</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Cuidados al usarlos</h2>
+    <ul>
+      <li><strong>Anualiza igual en ambos.</strong> Con datos diarios, se suele multiplicar por la raíz de 252 (días hábiles); con mensuales, por la raíz de 12. Mezclar frecuencias distorsiona la comparación.</li>
+      <li><strong>Ninguno ve el orden de las pérdidas.</strong> Dos curvas con el mismo ratio pueden tener drawdowns muy distintos.</li>
+      <li><strong>Ninguno corrige por cuántas pruebas hiciste.</strong> Si elegiste la mejor de cien variantes, su Sharpe está inflado. Para eso existe el <a href="/articulos/deflated-sharpe-ratio/">Deflated Sharpe Ratio</a>.</li>
+      <li><strong>Con pocos datos, Sortino es inestable</strong>, porque se calcula con pocos periodos negativos.</li>
+    </ul>
+
+    <h2>Cuál usar</h2>
+    <p>Usa los dos y fíjate si cuentan la misma historia. Si el Sortino es mucho mayor que el Sharpe, las subidas pesan más que las caídas; si son parecidos, los retornos son bastante simétricos. En <a href="/proyectos/atlas-lab/">ATLAS Lab</a> el filtro principal es el Deflated Sharpe, complementado con Monte Carlo y validación fuera de muestra; ver <a href="/articulos/walk-forward-analysis/">qué es el walk-forward analysis</a>.</p>
+
+    <section class="faq">
+      <h2>Preguntas frecuentes</h2>
+      <details><summary>¿Qué es un buen Sharpe?</summary><p>Depende del activo y del periodo, pero en backtests valores muy altos suelen ser señal de sobreajuste o de costos mal modelados más que de una gran estrategia.</p></details>
+      <details><summary>¿Puede ser negativo?</summary><p>Sí, ambos lo son cuando el retorno queda por debajo de la tasa libre de riesgo o del mínimo aceptable.</p></details>
+      <details><summary>¿Esto es asesoría financiera?</summary><p>No. Es contenido educativo sobre método y estadística.</p></details>
+    </section>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://atlas-lab-one.vercel.app/?utm_source=portfolio&utm_medium=article&utm_campaign=sharpe_sortino" rel="noopener">Ver los experimentos en ATLAS Lab</a>
+      <a class="btn btn-ghost" href="/articulos/deflated-sharpe-ratio/">Qué es el Deflated Sharpe</a>
+    </div>
+
+    <footer>Escrito por <a href="/sobre-mi/">Anthony Sosa</a>. Referencias: Sharpe, W. F. (1966), "Mutual Fund Performance", <em>Journal of Business</em>; Sortino, F. A. y Price, L. N. (1994), "Performance Measurement in a Downside Risk Framework", <em>The Journal of Investing</em>. Contenido informativo, no es asesoría de inversión. · <a href="/privacidad/">Privacidad</a></footer>
+  </main>
+</body>
+</html>
