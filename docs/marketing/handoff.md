@@ -1,6 +1,6 @@
 # Handoff — Tráfico, SEO y AdSense (ATLAS Lab, Certis, Praxis TOGAF, portafolio)
 
-Actualizado: 2026-10-16. Para continuar en otro chat: lee este archivo primero.
+Actualizado: 2026-10-16 (tarde). Para continuar en otro chat: lee este archivo primero.
 
 ## Reglas de trabajo (las pidió Anthony)
 
@@ -28,7 +28,7 @@ IDs: AdSense `ca-pub-6972285940439853` · GA4 `G-N2H066P5K6` · Search Console v
 
 **Portafolio (`frontend/public/`):**
 - Landings: `/proyectos/{atlas-lab,certis,praxis-togaf}/` y versión `/en/`.
-- `/articulos/` (índice) + 16 artículos en `/articulos/<slug>/` (inglés Cambridge, TOGAF, trading cuantitativo). Formato: `landing.css`, adsense, analytics, JSON-LD Article, FAQ, CTA con UTM, footer con fuentes y Privacidad.
+- `/articulos/` (índice) + 18 artículos en `/articulos/<slug>/` (inglés Cambridge, TOGAF, trading cuantitativo). Formato: `landing.css`, adsense, analytics, JSON-LD Article, FAQ, CTA con UTM, footer con fuentes y Privacidad.
 - `/sobre-mi/` (autor y contacto, JSON-LD Person) y `/privacidad/`.
 - `index.html`: texto estático dentro de `#root` para Google (React lo reemplaza al cargar).
 - `src/pages/portfolio/sections/FooterResources.tsx`: lista ARTICLES (label = H1 de cada artículo) + enlaces a `/articulos/` y `/sobre-mi/`.
@@ -42,7 +42,7 @@ IDs: AdSense `ca-pub-6972285940439853` · GA4 `G-N2H066P5K6` · Search Console v
 
 ## Estado al 16-oct
 
-- **PR abierto:** https://github.com/AnthonySosaL/curricula/pull/16 (Sharpe vs Sortino, Writing del B2 First). Mergear con check de Vercel ✅.
+- PR #16 (Sharpe vs Sortino, Writing B2 First) mergeado. Rama `claude/articulos-speaking-b2-phrasal-c1`: Speaking del B2 First y phrasal verbs del C1 (sitemap con 28 URLs).
 - **AdSense:** cuenta **no aprobada** (12-oct) por contenido/navegación. Causa probable: artículos daban 404 durante la revisión y la portada no tenía texto sin JavaScript. Ya corregido. **No reenviar todavía.**
 - **Indexación (13-oct):** portafolio 2 indexadas / 12 sin indexar; ATLAS 13 / 84. "Solicitar indexación" da "cuota superada" casi siempre; se reinicia a las 2:00 a.m. hora Ecuador.
 - **runasp.net (Certis, Praxis):** AdSense no los acepta (subdominio de MonsterASP). Solo con dominio propio.
@@ -63,7 +63,7 @@ Pendiente opcional de Anthony: en GA4 aceptar "Vincular Search Console"; poner l
 
 ## Próximos artículos (en este orden)
 
-Speaking del B2 First · Phrasal verbs más usados en el C1 · Cómo calcular el drawdown máximo. Luego seguir alternando temas de Certis (inglés), Praxis (TOGAF) y ATLAS (trading).
+Cómo calcular el drawdown máximo (ATLAS) · un tema de TOGAF (Praxis). Hechos: Speaking del B2 First, Phrasal verbs del C1. Luego seguir alternando temas de Certis (inglés), Praxis (TOGAF) y ATLAS (trading).
 
 Al crear uno: carpeta `frontend/public/articulos/<slug>/index.html` con el formato de los existentes, y añadirlo a **`public/sitemap.xml`**, a **ARTICLES en `FooterResources.tsx`** y al **índice `public/articulos/index.html`** (en su grupo). Luego `npm install --no-package-lock`, `npx tsc --noEmit -p .`, `npm run build`, validar JSON-LD y enlaces internos, commit, PR.
 
