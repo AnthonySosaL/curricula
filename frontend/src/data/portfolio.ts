@@ -177,7 +177,7 @@ const esData = {
     },
     {
       name: 'ATLAS Lab · Investigación Cuantitativa',
-      description: 'Laboratorio de trading cuantitativo: generó y validó 34,751 estrategias con rigor estadístico (Deflated Sharpe, Monte Carlo, out-of-sample). Resultados publicados en vivo, incluidos los negativos.',
+      description: 'Laboratorio de trading cuantitativo: generó 34,751 estrategias y probó de verdad 33,363 con rigor estadístico (Deflated Sharpe, Monte Carlo, out-of-sample). Resultados publicados en vivo, incluidos los negativos.',
       techs: ['Python', 'Pandas', 'Next.js', 'TypeScript', 'MetaTrader 5', 'Vercel'],
       github: null as string | null,
       demo: 'https://atlas-lab-one.vercel.app/' as string | null,
@@ -186,7 +186,7 @@ const esData = {
       details: {
         summary: 'Plataforma de análisis de datos financieros de extremo a extremo: pipeline en Python que ingesta, procesa y valida estadísticamente miles de estrategias de trading, con dashboard público y un experimento en vivo que se actualiza solo cada día.',
         highlights: [
-          '34,751 estrategias generadas y validadas en 90 experimentos, 11 clases, 27 instrumentos y más de 12 años de histórico.',
+          '34,751 estrategias generadas (33,363 probadas) en 90 experimentos, 11 clases, 27 instrumentos y más de 12 años de histórico.',
           'Validación anti-autoengaño: doble out-of-sample (18 meses), Deflated Sharpe Ratio, simulación Monte Carlo y costos reales de transacción.',
           'Metodología preregistrada: se publican también los resultados negativos — la conclusión central es que no hay alpha explotable en datos retail.',
           'El cómputo pesado corre local en Python y exporta JSON estático que consume la web, por eso el dashboard es instantáneo y no necesita servidor de cómputo.',
@@ -200,7 +200,7 @@ const esData = {
           { label: 'Integración', items: 'MetaTrader 5 (Python) · servidor MCP propio' },
         ],
         links: [{ label: 'Caso de estudio', url: '/proyectos/atlas-lab/' }],
-        numbers: ['34,751 estrategias', '90 experimentos · 11 clases', '27 instrumentos', '+12 años de histórico', 'OOS de 18 meses'],
+        numbers: ['33,363 estrategias probadas', '90 experimentos · 11 clases', '27 instrumentos', '+12 años de histórico', 'OOS de 18 meses'],
       },
     },
     {
@@ -497,7 +497,7 @@ const enData = {
     },
     {
       name: 'ATLAS Lab · Quantitative Research',
-      description: 'Quantitative trading laboratory: generated and validated 34,751 strategies with statistical rigor (Deflated Sharpe, Monte Carlo, out-of-sample). Results published live, including the negative ones.',
+      description: 'Quantitative trading laboratory: generated 34,751 strategies and fully tested 33,363 with statistical rigor (Deflated Sharpe, Monte Carlo, out-of-sample). Results published live, including the negative ones.',
       techs: ['Python', 'Pandas', 'Next.js', 'TypeScript', 'MetaTrader 5', 'Vercel'],
       github: null as string | null,
       demo: 'https://atlas-lab-one.vercel.app/' as string | null,
@@ -506,7 +506,7 @@ const enData = {
       details: {
         summary: 'End-to-end financial data platform: a Python pipeline that ingests, processes, and statistically validates thousands of trading strategies, with a public dashboard and a live experiment that self-updates daily.',
         highlights: [
-          '34,751 strategies generated and validated across 90 experiments, 11 classes, 27 instruments, and over 12 years of history.',
+          '34,751 strategies generated (33,363 tested) across 90 experiments, 11 classes, 27 instruments, and over 12 years of history.',
           'Anti-self-deception validation: double out-of-sample (18 months), Deflated Sharpe Ratio, Monte Carlo simulation, and real transaction costs.',
           'Preregistered methodology: negative results are published too — the core conclusion is that there is no exploitable alpha in retail data.',
           'Heavy computation runs locally in Python and exports static JSON consumed by the site, which is why the dashboard is instant and needs no compute server.',
@@ -520,7 +520,7 @@ const enData = {
           { label: 'Integration', items: 'MetaTrader 5 (Python) · custom MCP server' },
         ],
         links: [{ label: 'Case study', url: '/proyectos/atlas-lab/en/' }],
-        numbers: ['34,751 strategies', '90 experiments · 11 classes', '27 instruments', '12+ years of history', '18-month OOS'],
+        numbers: ['33,363 strategies tested', '90 experiments · 11 classes', '27 instruments', '12+ years of history', '18-month OOS'],
       },
     },
     {
